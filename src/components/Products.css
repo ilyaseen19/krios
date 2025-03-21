@@ -314,8 +314,8 @@
 }
 
 .view-btn svg {
-  stroke: #6b7280;
-  fill: none;
+  stroke: currentColor;
+  fill: currentColor;
   width: 1.25rem;
   height: 1.25rem;
 }
@@ -327,7 +327,8 @@
 }
 
 .view-btn.active svg {
-  stroke: #4b5563;
+  stroke: currentColor;
+  fill: currentColor;
 }
 
 /* Products Grid View */

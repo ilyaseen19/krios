@@ -23,15 +23,6 @@ const Sales: React.FC = () => {
   
   const ordersPerPage = 8;
   
-  // Calculate order summary
-  const orderSummary: OrderSummary = sales.reduce((summary, sale) => {
-    summary.total += 1;
-    if (sale.status === 'Completed') summary.completed += 1;
-    if (sale.status === 'Pending') summary.pending += 1;
-    if (sale.status === 'Cancelled') summary.cancelled += 1;
-    return summary;
-  }, { total: 0, completed: 0, pending: 0, cancelled: 0 });
-  
   // Filter sales based on search term, status, and date range
   const filteredSales = sales.filter(sale => {
     const matchesSearch = sale.customer.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -43,7 +34,9 @@ const Sales: React.FC = () => {
     if (startDate && endDate) {
       const saleDate = new Date(sale.date);
       const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
       const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
       matchesDateRange = saleDate >= start && saleDate <= end;
     } else if (startDate) {
       const saleDate = new Date(sale.date);
@@ -57,6 +50,16 @@ const Sales: React.FC = () => {
     
     return matchesSearch && matchesStatus && matchesDateRange;
   });
+
+  // Calculate order summary
+  const orderSummary: OrderSummary = filteredSales.reduce((summary, sale) => {
+    summary.total += 1;
+    if (sale.status === 'Completed') summary.completed += 1;
+    if (sale.status === 'Pending') summary.pending += 1;
+    if (sale.status === 'Cancelled') summary.cancelled += 1;
+    return summary;
+  }, { total: 0, completed: 0, pending: 0, cancelled: 0 });
+
   
   // Pagination
   const indexOfLastOrder = currentPage * ordersPerPage;
@@ -87,14 +90,69 @@ const Sales: React.FC = () => {
   return (
     <div className="sales-container">
       <div className="sales-header">
-        <h2 className="section-title">Orders</h2>
-        <div className="header-actions">
-          <button className="add-sale-btn">
+        <h2 className="section-title">Sales</h2>
+        
+      </div>
+
+      {/* Filter Section */}
+      <div className="filter-section">
+        <div className="search-box">
+          <div className="search-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            Create New Order
-          </button>
+          </div>
+          <input
+            className="search-input"
+            type="text"
+            placeholder="Search orders..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="filter-options">
+          <select
+            className="filter-select"
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+          >
+            <option value="">All Statuses</option>
+            {saleStatuses.map(status => (
+              <option key={status} value={status}>{status}</option>
+            ))}
+          </select>
+          <input
+            type="date"
+            className="filter-select"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            max={endDate}
+          />
+          <input
+            type="date"
+            className="filter-select"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            min={startDate}
+          />
+          <div className="view-toggle">
+            <button 
+              className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+            </button>
+            <button 
+              className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -323,71 +381,6 @@ const Sales: React.FC = () => {
           </button>
         </div>
       )}
-
-      <div className="filter-section">
-        <div className="search-box">
-          <svg className="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input 
-            type="text" 
-            placeholder="Search orders..."
-            className="search-input"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        
-        <div className="filter-options">
-          <select 
-            className="filter-select"
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-          >
-            <option value="">All Statuses</option>
-            {saleStatuses.map((status, index) => (
-              <option key={index} value={status}>{status}</option>
-            ))}
-          </select>
-          
-          <div className="date-filter">
-            <input 
-              type="date" 
-              className="date-input" 
-              placeholder="From" 
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-            <span>to</span>
-            <input 
-              type="date" 
-              className="date-input" 
-              placeholder="To" 
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </div>
-          
-          <div className="view-toggle">
-            <button 
-              className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-              onClick={() => setViewMode('grid')}
-            >
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-              </svg>
-            </button>
-            <button 
-              className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-              onClick={() => setViewMode('list')}
-            >
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
       
       {/* Order Details Modal */}
       <Modal
