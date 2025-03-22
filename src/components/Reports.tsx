@@ -1,4 +1,5 @@
 import React from 'react';
+import Table from './Table';
 
 const Reports: React.FC = () => {
   return (
@@ -85,40 +86,37 @@ const Reports: React.FC = () => {
         
         <div className="report-table-container">
           <h3 className="table-title">Sales by Product Category</h3>
-          <table className="report-table">
-            <thead>
-              <tr>
-                <th>Category</th>
-                <th>Sales</th>
-                <th>Orders</th>
-                <th>Avg. Price</th>
-                <th>% of Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Electronics</td>
-                <td>$12,450</td>
-                <td>78</td>
-                <td>$159.62</td>
-                <td>50.7%</td>
-              </tr>
-              <tr>
-                <td>Accessories</td>
-                <td>$8,320</td>
-                <td>45</td>
-                <td>$184.89</td>
-                <td>33.9%</td>
-              </tr>
-              <tr>
-                <td>Clothing</td>
-                <td>$3,790</td>
-                <td>22</td>
-                <td>$172.27</td>
-                <td>15.4%</td>
-              </tr>
-            </tbody>
-          </table>
+          <Table
+            columns={[
+              {
+                header: 'Category',
+                accessor: 'category'
+              },
+              {
+                header: 'Sales',
+                accessor: 'sales'
+              },
+              {
+                header: 'Orders',
+                accessor: 'orders'
+              },
+              {
+                header: 'Avg. Price',
+                accessor: 'avgPrice'
+              },
+              {
+                header: '% of Total',
+                accessor: 'percentage'
+              }
+            ]}
+            data={[
+              { category: 'Electronics', sales: '$12,450', orders: 78, avgPrice: '$159.62', percentage: '50.7%' },
+              { category: 'Accessories', sales: '$8,320', orders: 45, avgPrice: '$184.89', percentage: '33.9%' },
+              { category: 'Clothing', sales: '$3,790', orders: 22, avgPrice: '$172.27', percentage: '15.4%' }
+            ]}
+            tableClassName="report-table"
+            emptyMessage="No data available"
+          />
         </div>
       </div>
     </div>

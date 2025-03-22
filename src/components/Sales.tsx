@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { mockSales, Sale, saleStatuses } from '../data/mockSales';
 import './Sales.css';
 import Modal from './Modal';
+import Table from './Table';
 
 interface OrderSummary {
   total: number;
@@ -269,68 +270,77 @@ const Sales: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="orders-table-container">
-          <table className="orders-table">
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Date</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentOrders.map(order => (
-                <tr key={order.id}>
-                  <td>#{order.id}</td>
-                  <td>
-                    <div className="customer-cell">
-                      <div className="customer-cell-avatar">
-                        {getCustomerInitials(order.customer)}
-                      </div>
-                      <div className="customer-cell-info">
-                        <span className="customer-cell-name">{order.customer}</span>
-                        <span className="customer-cell-email">{order.customer.toLowerCase().replace(' ', '.') + '@example.com'}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>{formatDate(order.date)}</td>
-                  <td>${order.total.toFixed(2)}</td>
-                  <td>
-                    <span className={`status-badge ${order.status.toLowerCase()}`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="actions-cell">
-                    <button className="action-btn view" onClick={() => handleViewOrder(order)}>
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </button>
-                    <button className="action-btn edit">
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
-                    <button className="action-btn print">
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                      </svg>
-                    </button>
-                    <button className="action-btn delete">
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table
+          columns={[
+            {
+              header: 'Order ID',
+              accessor: (order) => `#${order.id}`
+            },
+            {
+              header: 'Customer',
+              accessor: (order) => (
+                <div className="customer-cell">
+                  <div className="customer-cell-avatar">
+                    {getCustomerInitials(order.customer)}
+                  </div>
+                  <div className="customer-cell-info">
+                    <span className="customer-cell-name">{order.customer}</span>
+                    <span className="customer-cell-email">{order.customer.toLowerCase().replace(' ', '.') + '@example.com'}</span>
+                  </div>
+                </div>
+              )
+            },
+            {
+              header: 'Date',
+              accessor: (order) => formatDate(order.date)
+            },
+            {
+              header: 'Amount',
+              accessor: (order) => `$${order.total.toFixed(2)}`
+            },
+            {
+              header: 'Status',
+              accessor: (order) => (
+                <span className={`status-badge ${order.status.toLowerCase()}`}>
+                  {order.status}
+                </span>
+              )
+            },
+            {
+              header: 'Actions',
+              accessor: (order) => (
+                <div className="actions-cell">
+                  <button className="action-btn view" onClick={() => handleViewOrder(order)}>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </button>
+                  <button className="action-btn edit">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button className="action-btn print">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                  </button>
+                  <button className="action-btn delete">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              ),
+              className: 'actions-cell'
+            }
+          ]}
+          data={currentOrders}
+          className="orders-table-container"
+          tableClassName="orders-table"
+          emptyMessage="No orders found matching your filters"
+        />
       )}
 
       {/* Pagination */}
@@ -389,78 +399,94 @@ const Sales: React.FC = () => {
         title={`Order #${selectedOrder?.id || ''}`}
         size="medium"
         actions={
-          <div>
-            <button 
-              className="action-btn edit" 
-              style={{ marginRight: '8px', width: 'auto', padding: '0 16px', height: '36px' }}
-            >
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ marginRight: '8px' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              Edit Order
-            </button>
-            <button 
-              className="action-btn print" 
-              style={{ width: 'auto', padding: '0 16px', height: '36px' }}
-            >
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ marginRight: '8px' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-              </svg>
-              Print Invoice
-            </button>
-          </div>
+          <div className="receipt-actions">
+              <button 
+                className="action-btn refund"
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to refund this order?')) {
+                    // Add refund logic here
+                    alert('Order refunded successfully!');
+                  }
+                }}
+              >
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+              </button>
+              <button 
+                className="action-btn print" 
+                onClick={() => window.print()}
+              >
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+              </button>
+              <button 
+                className="action-btn delete" 
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to delete this order?')) {
+                    setSales(sales.filter(s => s.id !== selectedOrder.id));
+                    setShowOrderDetails(false);
+                  }
+                }}
+              >
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
         }
       >
         {selectedOrder && (
-          <div className="product-details-content">
-            <div className="order-details-info">
-              <div style={{ marginBottom: '20px' }}>
-                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>Order Information</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <p style={{ fontSize: '14px', color: '#666', margin: '0 0 4px 0' }}>Order Date:</p>
-                    <p style={{ fontSize: '14px', fontWeight: '500', margin: '0' }}>{formatDate(selectedOrder.date)}</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '14px', color: '#666', margin: '0 0 4px 0' }}>Status:</p>
-                    <span className={`status-badge ${selectedOrder.status.toLowerCase()}`}>
-                      {selectedOrder.status}
-                    </span>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '14px', color: '#666', margin: '0 0 4px 0' }}>Total Amount:</p>
-                    <p style={{ fontSize: '16px', fontWeight: '600', color: '#7367f0', margin: '0' }}>
-                      ${selectedOrder.total.toFixed(2)}
-                    </p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '14px', color: '#666', margin: '0 0 4px 0' }}>Payment Method:</p>
-                    <p style={{ fontSize: '14px', fontWeight: '500', margin: '0' }}>Credit Card</p>
-                  </div>
-                </div>
+          <div className="receipt-container">
+            <div className="receipt-header">
+              <div className="company-name">Krios Store</div>
+              <div className="order-number">{`Order #${selectedOrder.id}`}</div>
+              <div className="order-date">{formatDate(selectedOrder.date)}</div>
+              <div className="cashier-info">
+                <div>Cashier: John Doe</div>
+                <div>Time: {new Date(selectedOrder.date).toLocaleTimeString()}</div>
               </div>
-              
-              <div style={{ marginBottom: '20px' }}>
-                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>Customer Information</h4>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                  <div className="customer-avatar" style={{ width: '48px', height: '48px', fontSize: '18px' }}>
-                    {getCustomerInitials(selectedOrder.customer)}
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '16px', fontWeight: '500', margin: '0 0 4px 0' }}>{selectedOrder.customer}</p>
-                    <p style={{ fontSize: '14px', color: '#666', margin: '0' }}>
-                      {selectedOrder.customer.toLowerCase().replace(' ', '.') + '@example.com'}
-                    </p>
-                  </div>
-                </div>
+            </div>
+
+            <div className="order-details">
+              <div className="order-detail-item">
+                <span className="detail-label">Status</span>
+                <span className={`status-badge ${selectedOrder.status.toLowerCase()}`}>
+                  {selectedOrder.status}
+                </span>
               </div>
-              
-              <div>
-                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>Order Items</h4>
-                <div style={{ backgroundColor: '#f8f8ff', padding: '12px', borderRadius: '8px' }}>
-                  <p style={{ textAlign: 'center', margin: '0', color: '#666' }}>Sample order items would be displayed here</p>
-                </div>
+              <div className="order-detail-item">
+                <span className="detail-label">Payment Method</span>
+                <span className="detail-value">Credit Card</span>
               </div>
+            </div>
+
+
+            <div className="item-list">
+              <div className="item-row" style={{ fontWeight: '600', borderBottom: '2px solid #333' }}>
+                <span>Item</span>
+                <span>Qty</span>
+                <span>Price</span>
+              </div>
+              {/* Sample items - replace with actual data */}
+              <div className="item-row">
+                <span>Sample Item 1</span>
+                <span>2</span>
+                <span>$20.00</span>
+              </div>
+              <div className="item-row">
+                <span>Sample Item 2</span>
+                <span>1</span>
+                <span>$15.00</span>
+              </div>
+            </div>
+
+            <div className="summary-row">
+              <span className="detail-label">Total Amount</span>
+              <span className="detail-value" style={{ color: '#7367f0', fontSize: '1.2rem' }}>
+                ${selectedOrder.total.toFixed(2)}
+              </span>
             </div>
           </div>
         )}

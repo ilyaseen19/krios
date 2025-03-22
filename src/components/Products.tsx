@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { mockProducts, productCategories, sortOptions, Product } from '../data/mockProducts';
 import './Products.css';
 import Modal from './Modal';
+import Table from './Table';
 
 const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>(mockProducts);
@@ -410,66 +411,75 @@ const Products: React.FC = () => {
           })}
         </div>
       ) : (
-        <div className="products-table-container">
-          <table className="products-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Quantity</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentProducts.map(product => {
+        <Table
+          columns={[
+            {
+              header: 'Product',
+              accessor: (product) => (
+                <div className="product-cell">
+                  <div className="product-cell-img">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                  </div>
+                  <div className="product-cell-info">
+                    <div className="product-cell-name">{product.name}</div>
+                    <div className="product-cell-category">{product.category}</div>
+                  </div>
+                </div>
+              )
+            },
+            {
+              header: 'Category',
+              accessor: 'category'
+            },
+            {
+              header: 'Price',
+              accessor: (product) => `$${product.price.toFixed(2)}`
+            },
+            {
+              header: 'Stock',
+              accessor: (product) => {
                 const stockStatus = getStockStatus(product.stock);
                 return (
-                  <tr key={product.id}>
-                    <td>
-                      <div className="product-cell">
-                        <div className="product-cell-img">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                          </svg>
-                        </div>
-                        <div className="product-cell-info">
-                          <div className="product-cell-name">{product.name}</div>
-                          <div className="product-cell-category">{product.category}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>{product.category}</td>
-                    <td>${product.price.toFixed(2)}</td>
-                    <td>
-                      <span className={`product-stock ${stockStatus.class}`}>{stockStatus.text}</span>
-                    </td>
-                    <td>{product.stock}</td>
-                    <td className="actions-cell">
-                      <button className="action-btn view" onClick={() => handleViewProduct(product)}>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      </button>
-                      <button className="action-btn edit" onClick={() => handleEditProduct(product)}>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
-                      <button className="action-btn delete" onClick={() => handleDeleteProduct(product)}>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </td>
-                  </tr>
+                  <span className={`product-stock ${stockStatus.class}`}>{stockStatus.text}</span>
                 );
-              })}
-            </tbody>
-          </table>
-        </div>
+              }
+            },
+            {
+              header: 'Quantity',
+              accessor: 'stock'
+            },
+            {
+              header: 'Actions',
+              accessor: (product) => (
+                <div className="actions-cell">
+                  <button className="action-btn view" onClick={() => handleViewProduct(product)}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </button>
+                  <button className="action-btn edit" onClick={() => handleEditProduct(product)}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button className="action-btn delete" onClick={() => handleDeleteProduct(product)}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              ),
+              className: 'actions-cell'
+            }
+          ]}
+          data={currentProducts}
+          className="products-table-container"
+          tableClassName="products-table"
+          emptyMessage="No products found matching your filters"
+        />
       )}
       {/* Pagination section */}
       <div className="pagination">
