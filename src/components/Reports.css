@@ -1,0 +1,322 @@
+/* Reports.css */
+.reports-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.reports-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-color, #5e5873);
+  margin: 0;
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: #6e6b7b;
+  margin: 5px 0 0 0;
+}
+
+.report-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.export-btn,
+.print-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 36px;
+}
+
+.generate-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 36px;
+}
+
+.export-btn {
+  background-color: #e5f0ff;
+  color: #7367f0;
+  border: none;
+}
+
+.export-btn:hover {
+  background-color: #d8e5ff;
+}
+
+.print-btn {
+  background-color: #f8f8f8;
+  color: #6e6b7b;
+  border: 1px solid #ebe9f1;
+}
+
+.print-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.generate-btn {
+  background-color: #7367f0;
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 32px;
+  margin-top: 26px;
+}
+
+.generate-btn svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+}
+
+.generate-btn:hover {
+  background-color: #6554e8;
+}
+
+.report-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.time-range-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.time-range-btn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  background-color: #f8f8f8;
+  color: #6e6b7b;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.time-range-btn.active {
+  background-color: #7367f0;
+  color: white;
+}
+
+.time-range-btn:hover:not(.active) {
+  background-color: #f0f0f0;
+}
+
+.filter-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6e6b7b;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ebe9f1;
+  font-size: 14px;
+  color: #5e5873;
+  background-color: #fff;
+}
+
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ebe9f1;
+  font-size: 14px;
+  color: #5e5873;
+  background-color: #f8f8f8;
+}
+
+/* Darker color for date picker icons */
+.date-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+}
+
+.report-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.report-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.summary-card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card h3 {
+  font-size: 14px;
+  color: #6e6b7b;
+  margin: 0 0 10px 0;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #5e5873;
+  margin: 0 0 5px 0;
+}
+
+.summary-change {
+  font-size: 12px;
+  margin: 0;
+}
+
+.summary-change.positive {
+  color: #28c76f;
+}
+
+.summary-change.negative {
+  color: #ea5455;
+}
+
+.report-chart {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.chart-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #5e5873;
+  margin: 0 0 20px 0;
+}
+
+.chart-placeholder {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6e6b7b;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+}
+
+.report-table-container {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.table-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #5e5873;
+  margin: 0 0 20px 0;
+}
+
+.report-table {
+  width: 100%;
+}
+
+/* Responsive adjustments */
+/* Responsive styles for generate button */
+@media (max-width: 992px) {
+  .generate-btn {
+    margin-top: 26px;
+    align-self: flex-start;
+  }
+  
+  .report-filters {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .reports-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .report-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .report-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .date-range {
+    flex-wrap: wrap;
+  }
+  
+  .generate-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

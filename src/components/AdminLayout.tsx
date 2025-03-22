@@ -51,10 +51,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <Topbar onMobileMenuToggle={toggleMobileMenu} />
         <div className="content-wrapper">
           <div className="page-header">
-            <h1 className="page-title">Dashboard</h1>
+            <h1 className="page-title"></h1>
             <div className="breadcrumb">
-              <span className="breadcrumb-item">Home</span>
-              <span className="breadcrumb-item">Dashboard</span>
             </div>
           </div>
           {children}

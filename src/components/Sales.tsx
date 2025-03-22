@@ -124,14 +124,14 @@ const Sales: React.FC = () => {
           </select>
           <input
             type="date"
-            className="filter-select"
+            className="date-input" 
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
             max={endDate}
           />
           <input
             type="date"
-            className="filter-select"
+            className="date-input" 
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
             min={startDate}

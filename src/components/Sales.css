@@ -40,6 +40,21 @@
   gap: 16px;
 }
 
+.date-input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ebe9f1;
+  font-size: 14px;
+  color: #5e5873;
+  background-color: #f8f8f8;
+}
+
+/* Darker color for date picker icons */
+.date-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+}
+
 @media print {
   body * {
     visibility: hidden;
@@ -2269,7 +2284,7 @@
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  overflow-x: auto; /* Enable horizontal scrolling */
   margin-bottom: 24px;
 }
 
@@ -2303,6 +2318,7 @@
 .orders-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 650px; /* Ensure table doesn't shrink too much on small screens */
 }
 
 @media print {
