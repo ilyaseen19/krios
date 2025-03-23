@@ -70,6 +70,13 @@ const Table = <T extends object>({
             </tr>
           )}
         </tbody>
+<tfoot className="table-footer">
+<tr>
+{columns.map((col, index) => (
+<td key={index} className="footer-cell">{col.footer || ''}</td>
+))}
+</tr>
+</tfoot>
       </table>
     </div>
   );

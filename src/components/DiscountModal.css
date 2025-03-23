@@ -1,0 +1,88 @@
+.discount-modal-content {
+  padding: 1rem;
+}
+
+.discount-type-options {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.discount-type-btn {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.discount-type-btn.active {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.discount-input-wrapper {
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+.discount-input-wrapper input {
+  width: 100%;
+  padding: 0.75rem;
+  padding-right: 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.discount-input-wrapper input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.discount-symbol {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.discount-preview {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+}
+
+.discount-preview p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.5rem 0;
+  color: #4b5563;
+}
+
+.discount-preview p span {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.discount-total {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed #d1d5db;
+  font-weight: 600;
+}
+
+.discount-total span {
+  color: #3b82f6 !important;
+  font-weight: 600 !important;
+}

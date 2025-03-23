@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  padding-left: 20px;
 }
 
 .reports-header {
@@ -10,13 +11,15 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
+  margin-top: 20px;
 }
 
 .section-title {
   font-size: 24px;
   font-weight: 600;
-  color: var(--text-color, #5e5873);
+  color: #7367f0;
   margin: 0;
+  font-family: 'Courier New', monospace;
 }
 
 .section-subtitle {
@@ -48,9 +51,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -84,20 +87,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 14px;
+  padding: 8px;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  height: 32px;
-  margin-top: 26px;
+  height: 34px;
+  margin-top: 5px;
 }
 
 .generate-btn svg {
   width: 16px;
   height: 16px;
-  margin-right: 6px;
+  margin-right: 4px;
 }
 
 .generate-btn:hover {
@@ -120,32 +123,10 @@
   flex-direction: column;
   gap: 8px;
   min-width: 200px;
+  margin-bottom: 0;
 }
 
-.time-range-buttons {
-  display: flex;
-  gap: 8px;
-}
 
-.time-range-btn {
-  padding: 6px 12px;
-  border-radius: 4px;
-  border: none;
-  background-color: #f8f8f8;
-  color: #6e6b7b;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.time-range-btn.active {
-  background-color: #7367f0;
-  color: white;
-}
-
-.time-range-btn:hover:not(.active) {
-  background-color: #f0f0f0;
-}
 
 .filter-group label {
   font-size: 14px;
@@ -175,6 +156,8 @@
   font-size: 14px;
   color: #5e5873;
   background-color: #f8f8f8;
+  min-width: 200px;
+  padding-right: 2.5rem;
 }
 
 /* Darker color for date picker icons */
@@ -190,17 +173,50 @@
 }
 
 .report-summary {
-  display: grid;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 24px;
 }
 
-.summary-card {
-  background-color: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.sales-summary-card {
+  background: #fff;
+  width: 300px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  font-family: 'Courier New', monospace;
+}
+
+.summary-header {
+  color: #6e6b7b;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid #eee;
+}
+
+.summary-item:first-child {
+  border-top: none;
+}
+
+.summary-item h3 {
+  font-size: 14px;
+  color: #6e6b7b;
+  margin: 0;
+}
+
+.summary-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #5e5873;
 }
 
 .summary-card:hover {
@@ -216,10 +232,11 @@
 }
 
 .summary-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: #5e5873;
-  margin: 0 0 5px 0;
+  font-size: 1.2rem;
+  color: #4a4a4a;
+  letter-spacing: -0.5px;
+  padding: 0.25rem 0;
+  border-bottom: 1px dashed #eee;
 }
 
 .summary-change {
@@ -235,29 +252,7 @@
   color: #ea5455;
 }
 
-.report-chart {
-  background-color: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
 
-.chart-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #5e5873;
-  margin: 0 0 20px 0;
-}
-
-.chart-placeholder {
-  height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6e6b7b;
-  background-color: #f8f8f8;
-  border-radius: 8px;
-}
 
 .report-table-container {
   background-color: white;
@@ -275,6 +270,39 @@
 
 .report-table {
   width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.report-table th,
+.report-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.status-low {
+  color: #e53e3e;
+  background-color: #fed7d7;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.status-ok {
+  color: #38a169;
+  background-color: #c6f6d5;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.inventory-summary-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin-bottom: 24px;
 }
 
 /* Responsive adjustments */

@@ -1,202 +1,472 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Product, CartItem } from '../types/product';
+import { mockProducts, productCategories } from '../data/mockProducts';
+import { createTransaction, calculateTax } from '../services/transactionService';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useCashDrawer, simulateOpenCashDrawer } from '../services/cashDrawerService';
+import PasswordModal from './PasswordModal';
+import DiscountModal from './DiscountModal';
+import './POS.css';
+
+const getInitials = (name: string) => {
+  return name.split(' ').map(word => word[0]).join('').slice(0, 2).toUpperCase();
+};
+
+const generateBackgroundColor = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = hash % 360;
+  return `hsl(${hue}, 70%, 85%)`;
+};
 
 const POS: React.FC = () => {
-  const [cart, setCart] = useState<{id: number, name: string, price: number, quantity: number}[]>([]);
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Wireless Headphones', category: 'Electronics', price: 89.99 },
-    { id: 2, name: 'Smart Watch', category: 'Electronics', price: 199.99 },
-    { id: 3, name: 'Bluetooth Speaker', category: 'Electronics', price: 59.99 },
-    { id: 4, name: 'Laptop Backpack', category: 'Accessories', price: 49.99 },
-    { id: 5, name: 'USB-C Cable', category: 'Accessories', price: 12.99 },
-    { id: 6, name: 'Wireless Mouse', category: 'Electronics', price: 29.99 },
-    { id: 7, name: 'Phone Case', category: 'Accessories', price: 19.99 },
-    { id: 8, name: 'Power Bank', category: 'Electronics', price: 39.99 },
-  ]);
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [searchTerm, setSearchTerm] = useState('');
+  const { userRole } = useAuth();
+  const navigate = useNavigate();
+  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(mockProducts);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
+  const [showDiscountModal, setShowDiscountModal] = useState<boolean>(false);
+  const [discount, setDiscount] = useState<{type: 'percentage' | 'fixed', value: number} | null>(null);
+  
+  // Initialize cash drawer hook
+  const { openDrawer, isOpening, error: drawerError, isSupported } = useCashDrawer();
 
-  const addToCart = (product: {id: number, name: string, price: number}) => {
-    const existingItem = cart.find(item => item.id === product.id);
+  // Filter products based on category and search query
+  useEffect(() => {
+    let result = products;
     
-    if (existingItem) {
-      setCart(cart.map(item => 
-        item.id === product.id 
-          ? { ...item, quantity: item.quantity + 1 } 
-          : item
-      ));
-    } else {
-      setCart([...cart, { ...product, quantity: 1 }]);
+    // Filter by category
+    if (selectedCategory !== 'All') {
+      result = result.filter(product => product.category === selectedCategory);
     }
+    
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(product => 
+        product.name.toLowerCase().includes(query) || 
+        product.barcode.toLowerCase().includes(query)
+      );
+    }
+    
+    setFilteredProducts(result);
+  }, [selectedCategory, searchQuery, products]);
+
+  // Add product to cart
+  const addToCart = (product: Product) => {
+    setCart(prevCart => {
+      const existingItem = prevCart.find(item => item.id === product.id);
+      
+      if (existingItem) {
+        return prevCart.map(item => 
+          item.id === product.id 
+            ? { ...item, quantity: item.quantity + 1 } 
+            : item
+        );
+      } else {
+        return [...prevCart, { ...product, quantity: 1 }];
+      }
+    });
   };
 
+  // Remove item from cart
   const removeFromCart = (productId: number) => {
-    setCart(cart.filter(item => item.id !== productId));
+    setCart(prevCart => prevCart.filter(item => item.id !== productId));
   };
 
+  // Update item quantity in cart
   const updateQuantity = (productId: number, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
     }
     
-    setCart(cart.map(item => 
-      item.id === productId 
-        ? { ...item, quantity } 
-        : item
-    ));
+    setCart(prevCart => 
+      prevCart.map(item => 
+        item.id === productId 
+          ? { ...item, quantity } 
+          : item
+      )
+    );
   };
 
-  const calculateTotal = () => {
+  // Clear cart
+  const clearCart = () => {
+    setCart([]);
+  };
+
+  // Calculate subtotal
+  const calculateSubtotal = () => {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
+  
+  // Calculate discount amount
+  const calculateDiscountAmount = () => {
+    if (!discount) return 0;
+    
+    const subtotal = calculateSubtotal();
+    return discount.type === 'percentage'
+      ? subtotal * (discount.value / 100)
+      : discount.value;
+  };
+  
+  // Calculate final subtotal after discount
+  const calculateFinalSubtotal = () => {
+    const subtotal = calculateSubtotal();
+    const discountAmount = calculateDiscountAmount();
+    return subtotal - discountAmount;
+  };
+  
+  // Handle applying discount
+  const handleApplyDiscount = (discountType: 'percentage' | 'fixed', value: number) => {
+    setDiscount({ type: discountType, value });
+  };
 
-  const filteredProducts = products.filter(product => {
-    const matchesCategory = activeCategory === 'All' || product.category === activeCategory;
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  // State for payment type
+  const [paymentType, setPaymentType] = useState<string>('cash'); // Default to cash
 
-  const categories = ['All', ...new Set(products.map(product => product.category))];
+  // Process transaction
+  const processTransaction = async () => {
+    if (cart.length === 0) return;
+    
+    setIsProcessing(true);
+    try {
+      // In a real app, you would use the actual cashier ID from auth context
+      // Pass the payment type and discount to the transaction
+      const transaction = await createTransaction(cart, 'cashier-1', paymentType);
+      console.log('Transaction completed:', transaction);
+      clearCart();
+      setDiscount(null); // Reset discount after successful transaction
+      alert(`Transaction completed successfully with ${paymentType} payment!`);
+    } catch (error) {
+      console.error('Transaction failed:', error);
+      alert('Transaction failed. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Calculate total items in cart
+  const getTotalItems = () => {
+    return cart.reduce((total, item) => total + item.quantity, 0);
+  };
+  
+  // Handle opening the cash drawer
+  const handleOpenCashDrawer = async () => {
+    try {
+      if (isSupported) {
+        await openDrawer();
+      } else {
+        // Use simulation for development or unsupported browsers
+        await simulateOpenCashDrawer();
+        alert('Cash drawer opened (simulated)');
+      }
+    } catch (error) {
+      console.error('Failed to open cash drawer:', error);
+      alert(`Failed to open cash drawer: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
 
   return (
-    <div className="pos-container">
-      <div className="pos-layout">
-        <div className="products-section">
-          <div className="search-filter">
-            <div className="search-box">
-              <svg className="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input 
-                type="text" 
-                placeholder="Search products..." 
-                className="search-input" 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            
-            <div className="category-filter">
-              {categories.map(category => (
-                <button 
-                  key={category} 
-                  className={`category-btn ${activeCategory === category ? 'active' : ''}`}
-                  onClick={() => setActiveCategory(category)}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
+    <div className="pos-page">
+      {/* POS Header */}
+      <div className="pos-header">
+        <div className="pos-header-left">
+          <div className="logo-container">
+            <div className="topbar-logo">K</div>
+            <span className="logo-text">Krios</span>
           </div>
-          
-          <div className="products-grid">
-            {filteredProducts.map(product => (
-              <div key={product.id} className="product-card" onClick={() => addToCart(product)}>
-                <div className="product-img-placeholder">
-                  <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <div className="product-info">
-                  <h3 className="product-name">{product.name}</h3>
-                  <p className="product-price">${product.price.toFixed(2)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <button 
+            className="back-to-admin"
+            onClick={() => setShowPasswordModal(true)}
+          >
+            Dashboard
+          </button>
         </div>
         
-        <div className="cart-section">
-          <div className="cart-header">
-            <h2>Current Sale</h2>
-            {cart.length > 0 && (
-              <button className="clear-cart-btn">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Clear
-              </button>
-            )}
-          </div>
-          
-          {cart.length === 0 ? (
-            <div className="empty-cart">
-              <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+        <div className="pos-header-center">
+          <div className="topbar-actions">
+            
+            <button 
+              className="action-btn" 
+              onClick={handleOpenCashDrawer}
+              title="Open Cash Drawer"
+              disabled={isOpening}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
+                <line x1="2" y1="10" x2="22" y2="10"/>
+                <line x1="6" y1="14" x2="18" y2="14"/>
               </svg>
-              <p>No items in cart</p>
-              <p>Select products to add</p>
-            </div>
-          ) : (
-            <div className="cart-items">
-              {cart.map(item => (
-                <div key={item.id} className="cart-item">
-                  <div className="item-info">
-                    <h3 className="item-name">{item.name}</h3>
-                    <p className="item-price">${item.price.toFixed(2)}</p>
-                  </div>
-                  <div className="item-quantity">
-                    <button 
-                      className="quantity-btn"
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    >
-                      -
-                    </button>
-                    <span className="quantity-value">{item.quantity}</span>
-                    <button 
-                      className="quantity-btn"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <div className="item-total">
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </div>
-                  <button 
-                    className="remove-item-btn"
-                    onClick={() => removeFromCart(item.id)}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          
-          <div className="cart-summary">
-            <div className="summary-row">
-              <span>Subtotal</span>
-              <span>${calculateTotal().toFixed(2)}</span>
-            </div>
-            <div className="summary-row">
-              <span>Tax (10%)</span>
-              <span>${(calculateTotal() * 0.1).toFixed(2)}</span>
-            </div>
-            <div className="summary-row total">
-              <span>Total</span>
-              <span>${(calculateTotal() * 1.1).toFixed(2)}</span>
-            </div>
-          </div>
-          
-          <div className="checkout-actions">
-            <button className="checkout-btn" disabled={cart.length === 0}>
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              Checkout
+              {isOpening && <span className="loading-indicator"></span>}
             </button>
-            <button className="hold-btn" disabled={cart.length === 0}>
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            
+            <button className="action-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 6 2 18 2 18 9"/>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                <rect x="6" y="14" width="12" height="8"/>
               </svg>
-              Hold
             </button>
+            
+            <button className="action-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 4v6h-6"/>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+              </svg>
+            </button>
+            
+            <button className="action-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+            </button>
+            
+            <button className="action-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </button>
+            
+            <div className="user-profile">
+              <div className="user-avatar">JD</div>
+            </div>
           </div>
         </div>
       </div>
+      
+      {/* POS Container */}
+      <div className="pos-container">
+        <div className="pos-layout">
+          {/* Products Section */}
+          <div className="products-section">
+            <div className="search-filter">
+              <div className="search-box">
+                <svg className="search-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input 
+                  type="text" 
+                  className="search-input" 
+                  placeholder="Search products..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              
+              <div className="category-filter">
+                <button 
+                  className={`category-btn ${selectedCategory === 'All' ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory('All')}
+                >
+                  All
+                </button>
+                {productCategories.map((category, index) => (
+                  <button 
+                    key={index}
+                    className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(category)}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="products-grid">
+              {filteredProducts.map((product) => (
+                <div 
+                  key={product.id} 
+                  className="product-card" 
+                  onClick={() => addToCart(product)}
+                >
+                  <div 
+                    className="product-img-placeholder"
+                    style={{ backgroundColor: generateBackgroundColor(product.name) }}
+                  >
+                    {!product.image && (
+                      <div className="product-initials">
+                        {getInitials(product.name)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="product-info">
+                    <h3 className="product-name">{product.name}</h3>
+                    <p className="product-price">${product.price.toFixed(2)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Cart Section */}
+          <div className="cart-section">
+            <div className="cart-header">
+              <h2>Current Order</h2>
+              <button className="clear-cart-btn" onClick={clearCart}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                  <line x1="10" y1="11" x2="10" y2="17"/>
+                  <line x1="14" y1="11" x2="14" y2="17"/>
+                </svg>
+                Clear All
+              </button>
+            </div>
+            
+            <div className="cart-items">
+              {cart.length === 0 ? (
+                <div className="empty-cart">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="9" cy="21" r="1"/>
+                    <circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                  </svg>
+                  <p>Your cart is empty</p>
+                </div>
+              ) : (
+                cart.map((item) => (
+                  <div key={item.id} className="cart-item">
+                    <div className="cart-item-info">
+                      <h3 className="cart-item-name">{item.name}</h3>
+                      <p className="cart-item-price">${item.price.toFixed(2)}</p>
+                    </div>
+                    <div className="cart-item-quantity">
+                      <button 
+                        className="quantity-btn" 
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                      </button>
+                      <span className="quantity-value">{item.quantity}</span>
+                      <button 
+                        className="quantity-btn" 
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="12" y1="5" x2="12" y2="19"/>
+                          <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="cart-item-total">
+                      ${(item.price * item.quantity).toFixed(2)}
+                    </div>
+                    <button 
+                      className="remove-item-btn" 
+                      onClick={() => removeFromCart(item.id)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+            
+            {/* Cart Summary */}
+            <div className="cart-summary">
+              <div className="summary-row">
+                <span>Subtotal</span>
+                <span>${calculateSubtotal().toFixed(2)}</span>
+              </div>
+              {discount && (
+                <div className="summary-row discount">
+                  <span>
+                    Discount {discount.type === 'percentage' ? `(${discount.value}%)` : '(Fixed)'}
+                  </span>
+                  <span>-${calculateDiscountAmount().toFixed(2)}</span>
+                </div>
+              )}
+              <div className="summary-row">
+                <span>Tax (10%)</span>
+                <span>${(calculateFinalSubtotal() * 0.1).toFixed(2)}</span>
+              </div>
+              <div className="summary-row total">
+                <span>Total</span>
+                <span>${(calculateFinalSubtotal() * 1.1).toFixed(2)}</span>
+              </div>
+              
+              <div className="checkout-actions">
+                <button 
+                  className="checkout-btn" 
+                  onClick={processTransaction}
+                  disabled={cart.length === 0 || isProcessing}
+                >
+                  {isProcessing ? 'Processing...' : `Checkout (${getTotalItems()} items)`}
+                </button>
+                <div className="payment-options">
+                  <button 
+                    className={`payment-option-btn ${paymentType === 'card' ? 'active' : ''}`}
+                    onClick={() => setPaymentType('card')}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                      <line x1="1" y1="10" x2="23" y2="10"/>
+                    </svg>
+                    Card
+                  </button>
+                  <button 
+                    className={`payment-option-btn ${paymentType === 'cash' ? 'active' : ''}`}
+                    onClick={() => setPaymentType('cash')}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="6" width="20" height="12" rx="2" ry="2"/>
+                      <circle cx="12" cy="12" r="2"/>
+                      <path d="M6 12h.01M18 12h.01"/>
+                    </svg>
+                    Cash
+                  </button>
+                  <button 
+                    className={`payment-option-btn ${discount ? 'active' : ''}`}
+                    onClick={() => setShowDiscountModal(true)}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="19" y1="5" x2="5" y2="19"></line>
+                      <circle cx="6.5" cy="6.5" r="2.5"></circle>
+                      <circle cx="17.5" cy="17.5" r="2.5"></circle>
+                    </svg>
+                    Discount
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Password Modal */}
+      <PasswordModal 
+        isOpen={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        onSuccess={() => {
+          setShowPasswordModal(false);
+          navigate('/admin');
+        }}
+      />
+      
+      {/* Discount Modal */}
+      <DiscountModal
+        isOpen={showDiscountModal}
+        onClose={() => setShowDiscountModal(false)}
+        onApplyDiscount={handleApplyDiscount}
+        subtotal={calculateSubtotal()}
+      />
     </div>
   );
 };

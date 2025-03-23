@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import './Users.css';
 import { mockUsers, defaultNewUser, User } from '../data/mockUsers';
 import Modal from './Modal';
@@ -14,16 +14,49 @@ const Users: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [newUser, setNewUser] = useState(defaultNewUser);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 5; // Number of users to display per page
 
   // Filter users based on search term and filters
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === '' || user.role === roleFilter;
-    const matchesStatus = statusFilter === '' || user.status === statusFilter;
-    
-    return matchesSearch && matchesRole && matchesStatus;
-  });
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRole = roleFilter === '' || user.role === roleFilter;
+      const matchesStatus = statusFilter === '' || user.status === statusFilter;
+      
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }, [users, searchTerm, roleFilter, statusFilter]);
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  
+  // Get current users for the page
+  const currentUsers = useMemo(() => {
+    const indexOfLastUser = currentPage * usersPerPage;
+    const indexOfFirstUser = indexOfLastUser - usersPerPage;
+    return filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  }, [filteredUsers, currentPage, usersPerPage]);
+  
+  // Handle page navigation
+  const goToPage = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+  
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   // Handle adding a new user
   const handleAddUser = () => {
@@ -47,10 +80,22 @@ const Users: React.FC = () => {
     setCurrentUser(null);
   };
 
+  // State for delete confirmation modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<number | null>(null);
+
+  // Handle opening delete confirmation modal
+  const openDeleteModal = (id: number) => {
+    setUserToDelete(id);
+    setShowDeleteModal(true);
+  };
+
   // Handle deleting a user
-  const handleDeleteUser = (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      setUsers(users.filter(user => user.id !== id));
+  const handleDeleteUser = () => {
+    if (userToDelete !== null) {
+      setUsers(users.filter(user => user.id !== userToDelete));
+      setShowDeleteModal(false);
+      setUserToDelete(null);
     }
   };
 
@@ -223,6 +268,29 @@ const Users: React.FC = () => {
         </div>
       </div>
 
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <Modal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          title="Confirm Delete"
+          size="small"
+          actions={
+            <>
+              <button onClick={() => setShowDeleteModal(false)} className="cancel-btn">Cancel</button>
+              <button onClick={handleDeleteUser} className="delete-btn">Delete</button>
+            </>
+          }
+        >
+          <div className="confirm-delete-content">
+            <svg className="warning-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+          </div>
+        </Modal>
+      )}
+
       <Table
         columns={[
           {
@@ -257,43 +325,49 @@ const Users: React.FC = () => {
             header: 'Actions',
             accessor: (user) => (
               <div className="actions-cell">
-                <button className="action-btn view">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                </button>
                 <button className="action-btn edit" onClick={() => openEditModal(user)}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
-                <button className="action-btn delete" onClick={() => handleDeleteUser(user.id)}>
+                <button className="action-btn delete" onClick={() => openDeleteModal(user.id)}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </button>
               </div>
-            ),
-            className: 'actions-cell'
+            )
           }
         ]}
-        data={filteredUsers}
-        className="users-table-container"
-        tableClassName="users-table"
-        emptyMessage="No users found matching your filters"
+        data={currentUsers}
       />
 
       <div className="pagination">
-        <button className="pagination-btn">
+        <button 
+          className="pagination-btn" 
+          onClick={goToPreviousPage} 
+          disabled={currentPage === 1}
+        >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <button className="pagination-btn active">1</button>
-        <button className="pagination-btn">2</button>
-        <button className="pagination-btn">3</button>
-        <button className="pagination-btn">
+        
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button 
+            key={index + 1}
+            className={`pagination-btn ${currentPage === index + 1 ? 'active' : ''}`}
+            onClick={() => goToPage(index + 1)}
+          >
+            {index + 1}
+          </button>
+        ))}
+        
+        <button 
+          className="pagination-btn" 
+          onClick={goToNextPage} 
+          disabled={currentPage === totalPages}
+        >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>

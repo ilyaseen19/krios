@@ -1,23 +1,30 @@
 import React, { useState } from 'react';
 import Table from './Table';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { getFilteredInventory, getInventorySummary } from '../services/inventoryService';
+
 import './Reports.css';
 
 const Reports: React.FC = () => {
-  const [reportType, setReportType] = useState<string>('sales');
+  const [reportType, setReportType] = useState<string>('');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const [timeRange, setTimeRange] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
+  const [reportDetailLevel, setReportDetailLevel] = useState<string>('');
+  const [generatedAt, setGeneratedAt] = useState<Date>(new Date());
+  const [filteredTransactions, setFilteredTransactions] = useState<any[]>([]);
+
+  const totalQty = filteredTransactions.reduce((sum, t) => sum + (t.quantity || 0), 0);
+  const totalPrice = filteredTransactions.reduce((sum, t) => sum + (t.price || 0), 0);
+  const totalTotal = filteredTransactions.reduce((sum, t) => sum + (t.total || 0), 0);
   
   // Sample data for the sales trend chart
   const salesTrendData = [
-    { name: 'Jan', sales: 4000, profit: 2400 },
-    { name: 'Feb', sales: 3000, profit: 1398 },
-    { name: 'Mar', sales: 2000, profit: 9800 },
-    { name: 'Apr', sales: 2780, profit: 3908 },
-    { name: 'May', sales: 1890, profit: 4800 },
-    { name: 'Jun', sales: 2390, profit: 3800 },
-    { name: 'Jul', sales: 3490, profit: 4300 },
+    { name: 'Jan', sales: 4000, profit: 2400, refunds: 200 },
+    { name: 'Feb', sales: 3000, profit: 1398, refunds: 150 },
+    { name: 'Mar', sales: 2000, profit: 9800, refunds: 50 },
+    { name: 'Apr', sales: 2780, profit: 3908, refunds: 180 },
+    { name: 'May', sales: 1890, profit: 4800, refunds: 90 },
+    { name: 'Jun', sales: 2390, profit: 3800, refunds: 120 },
+    { name: 'Jul', sales: 3490, profit: 4300, refunds: 210 },
   ];
   
   const handleReportTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -32,9 +39,31 @@ const Reports: React.FC = () => {
     setEndDate(e.target.value);
   };
   
-  const handleGenerateReport = () => {
-    // Here you would implement the logic to generate the report based on the selected filters
-    console.log('Generating report with:', { reportType, startDate, endDate });
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleGenerateReport = async () => {
+    if (!reportType || !reportDetailLevel) {
+      alert('Please select both a report type and style');
+      return;
+    }
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    setGeneratedAt(new Date());
+    
+    try {
+      let data;
+      if (reportType === 'inventory') {
+        data = await getFilteredInventory(start, end);
+      } else {
+        // For other report types like sales
+        data = await getFilteredTransactions(start, end);
+      }
+      setFilteredTransactions(data);
+    } catch (error) {
+      console.error(`Error fetching ${reportType} data:`, error);
+    }
   };
   return (
     <div className="reports-container">
@@ -42,20 +71,6 @@ const Reports: React.FC = () => {
         <div>
           <h2 className="section-title">Reports</h2>
           <p className="section-subtitle">Generate and analyze business reports</p>
-        </div>
-        <div className="report-actions">
-          <button className="export-btn">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Export
-          </button>
-          <button className="print-btn">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-            </svg>
-            Print
-          </button>
         </div>
       </div>
 
@@ -67,9 +82,9 @@ const Reports: React.FC = () => {
             value={reportType}
             onChange={handleReportTypeChange}
           >
+            <option value="" disabled>Select Report</option>
             <option value="sales">Sales Report</option>
             <option value="inventory">Inventory Report</option>
-            <option value="customers">Customer Report</option>
             <option value="profit">Profit & Loss</option>
           </select>
         </div>
@@ -78,14 +93,14 @@ const Reports: React.FC = () => {
           <label>Date Range</label>
           <div className="date-range">
             <input 
-              type="date" 
+              type="datetime-local" 
               className="date-input" 
               value={startDate}
               onChange={handleStartDateChange}
             />
-            <span>to</span>
+            <span style={{color: "#6e6b7b"}}>To</span>
             <input 
-              type="date" 
+              type="datetime-local" 
               className="date-input" 
               value={endDate}
               onChange={handleEndDateChange}
@@ -94,125 +109,221 @@ const Reports: React.FC = () => {
         </div>
         
         <div className="filter-group">
-          <label>Time Range</label>
-          <div className="time-range-buttons">
-            <button 
-              onClick={() => setTimeRange('daily')} 
-              className={`time-range-btn ${timeRange === 'daily' ? 'active' : ''}`}
-            >
-              Daily
-            </button>
-            <button 
-              onClick={() => setTimeRange('weekly')} 
-              className={`time-range-btn ${timeRange === 'weekly' ? 'active' : ''}`}
-            >
-              Weekly
-            </button>
-            <button 
-              onClick={() => setTimeRange('monthly')} 
-              className={`time-range-btn ${timeRange === 'monthly' ? 'active' : ''}`}
-            >
-              Monthly
-            </button>
-          </div>
+          <label>Report Style</label>
+          <select
+            className="filter-select"
+            value={reportDetailLevel}
+            onChange={(e) => setReportDetailLevel(e.target.value as 'summary' | 'detailed')}
+          >
+            <option value="" disabled>Select Style</option>
+            <option value="summary">Summary Report</option>
+            <option value="detailed">Detailed Report</option>
+          </select>
         </div>
         
-        <button className="generate-btn" onClick={handleGenerateReport}>
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          Generate Report
-        </button>
+        <div className="">
+          <label>-</label>
+          <button className="generate-btn" onClick={handleGenerateReport}>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </button>
+        </div>
       </div>
 
+      {reportType && reportDetailLevel && (
       <div className="report-content">
-        <div className="report-summary">
-          <div className="summary-card">
-            <h3>Total Sales</h3>
-            <p className="summary-value">$24,560</p>
-            <p className="summary-change positive">+8% from previous period</p>
+        {reportDetailLevel === 'summary' ? (
+          <div className="report-summary">
+            {reportType === 'sales' ? (
+              <div className="sales-summary-card">
+                <div className="summary-header">
+                  <h2>Krios Retail Solutions</h2>
+                  <div className="report-meta">
+                    <div>Report Generated</div>
+                    <span>{generatedAt.toLocaleString()}</span>
+                    <div>Date Range</div>
+                    <span>{new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}</span>
+                  </div>
+                </div>
+                
+                <div className="summary-grid">
+                  <div className="summary-item">
+                    <h3>Total Products Sold</h3>
+                    <p className="summary-value">
+                      {salesTrendData.reduce((acc, item) => acc + item.sales, 0).toLocaleString()}
+                    </p>
+                  </div>
+                  
+                  <div className="summary-item">
+                    <h3>Gross Revenue</h3>
+                    <p className="summary-value">
+                      ${salesTrendData.reduce((acc, item) => acc + item.sales, 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  
+                  <div className="summary-item">
+                    <h3>Total Refunds</h3>
+                    <p className="summary-value">
+                      ${salesTrendData.reduce((acc, item) => acc + item.refunds, 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  
+                  <div className="summary-item">
+                    <h3>Total Taxes</h3>
+                    <p className="summary-value">
+                      ${salesTrendData.reduce((acc, item) => acc + (item.sales * 0.08), 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  
+                  <div className="summary-item highlight">
+                    <h3>Net Revenue</h3>
+                    <p className="summary-value">
+                      ${salesTrendData.reduce((acc, item) => acc + (item.sales * 0.92 - item.refunds), 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : reportType === 'inventory' ? (
+              <div className="inventory-summary-card">
+                <div className="summary-header">
+                  <h2>Krios Retail Solutions</h2>
+                  <div className="report-meta">
+                    <div>Inventory Report Generated</div>
+                    <span>{generatedAt.toLocaleString()}</span>
+                    <div>Date Range</div>
+                    <span>{new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}</span>
+                  </div>
+                </div>
+                
+                <div className="summary-grid">
+                  <div className="summary-item">
+                    <h3>Total Products</h3>
+                    <p className="summary-value">
+                      {filteredTransactions.length}
+                    </p>
+                  </div>
+                  
+                  <div className="summary-item">
+                    <h3>Total Stock Value</h3>
+                    <p className="summary-value">
+                      ${filteredTransactions.reduce((acc, item) => acc + (item.stockValue || 0), 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  
+                  <div className="summary-item">
+                    <h3>Total Cost Value</h3>
+                    <p className="summary-value">
+                      ${filteredTransactions.reduce((acc, item) => acc + (item.costValue || 0), 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  
+                  <div className="summary-item">
+                    <h3>Low Stock Items</h3>
+                    <p className="summary-value">
+                      {filteredTransactions.filter(item => item.status === 'Low Stock').length}
+                    </p>
+                  </div>
+                  
+                  <div className="summary-item highlight">
+                    <h3>Potential Profit</h3>
+                    <p className="summary-value">
+                      ${filteredTransactions.reduce((acc, item) => acc + (item.potentialProfit || 0), 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Existing summary cards for other report types */
+              <>
+                <div className="summary-card">
+                  <h3>Total Sales</h3>
+                  <p className="summary-value">$24,560</p>
+                  <p className="summary-change positive">+8% from previous period</p>
+                </div>
+                <div className="summary-card">
+                  <h3>Total Orders</h3>
+                  <p className="summary-value">145</p>
+                  <p className="summary-change positive">+12% from previous period</p>
+                </div>
+                <div className="summary-card">
+                  <h3>Average Order Value</h3>
+                  <p className="summary-value">$169.38</p>
+                  <p className="summary-change negative">-3% from previous period</p>
+                </div>
+                <div className="summary-card">
+                  <h3>Net Profit</h3>
+                  <p className="summary-value">$8,596</p>
+                  <p className="summary-change positive">+5% from previous period</p>
+                </div>
+              </>
+            )}
           </div>
-          
-          <div className="summary-card">
-            <h3>Total Orders</h3>
-            <p className="summary-value">145</p>
-            <p className="summary-change positive">+12% from previous period</p>
+        ) : (
+          <div className="report-detailed-tables">
+            <h3 className="table-title">{reportType === 'inventory' ? 'Inventory Details' : 'Transaction Details'}</h3>
+            {reportType === 'inventory' ? (
+              <Table
+                columns={[
+                  { header: 'SKU', accessor: 'sku' },
+                  { header: 'Product', accessor: 'name' },
+                  { header: 'Category', accessor: 'category' },
+                  { 
+                    header: 'Status', 
+                    accessor: 'status',
+                    cell: (row) => (
+                      <span className={row.status === 'Low Stock' ? 'status-low' : 'status-ok'}>
+                        {row.status}
+                      </span>
+                    ),
+                    className: 'status-column'
+                  },
+                  { header: 'Current Stock', accessor: 'currentStock' },
+                  { header: 'Min Stock', accessor: 'minimumStock' },
+                  { 
+                    header: 'Stock Value', 
+                    accessor: 'stockValue',
+                    cell: (row) => `$${row.stockValue.toLocaleString('en-US', { minimumFractionDigits: 2 })}` 
+                  },
+                  { 
+                    header: 'Cost Value', 
+                    accessor: 'costValue',
+                    cell: (row) => `$${row.costValue.toLocaleString('en-US', { minimumFractionDigits: 2 })}` 
+                  },
+                  { 
+                    header: 'Potential Profit', 
+                    accessor: 'potentialProfit',
+                    cell: (row) => `$${row.potentialProfit.toLocaleString('en-US', { minimumFractionDigits: 2 })}` 
+                  }
+                ]}
+                data={filteredTransactions}
+                tableClassName="report-table"
+                emptyMessage="No inventory data found in selected date range"
+              />
+            ) : (
+              <Table
+                columns={[
+                  { header: 'ID', accessor: 'id' },
+                  { header: 'Product', accessor: 'product' },
+                  {
+                    header: 'Status',
+                    accessor: (row) => row.refunded ? 'Refunded' : 'Complete',
+                    className: 'status-column'
+                  },
+                  { header: 'Quantity', accessor: 'quantity', footer: totalQty.toLocaleString() },
+                  { header: 'Price', accessor: 'price', footer: `$${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}` },
+                  { header: 'Total', accessor: 'total', footer: `$${totalTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}` }
+                ]}
+                data={filteredTransactions}
+                tableClassName="report-table"
+                emptyMessage="No transactions found in selected date range"
+              />
+            )}
           </div>
-          
-          <div className="summary-card">
-            <h3>Average Order Value</h3>
-            <p className="summary-value">$169.38</p>
-            <p className="summary-change negative">-3% from previous period</p>
-          </div>
-          
-          <div className="summary-card">
-            <h3>Net Profit</h3>
-            <p className="summary-value">$8,596</p>
-            <p className="summary-change positive">+5% from previous period</p>
-          </div>
-        </div>
-        
-        <div className="report-chart">
-          <h3 className="chart-title">Sales Trend</h3>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={salesTrendData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#7367f0" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#7367f0" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#28c76f" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#28c76f" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <CartesianGrid strokeDasharray="3 3" />
-                <Tooltip />
-                <Area type="monotone" dataKey="sales" stroke="#7367f0" fillOpacity={1} fill="url(#colorSales)" />
-                <Area type="monotone" dataKey="profit" stroke="#28c76f" fillOpacity={1} fill="url(#colorProfit)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        
-        <div className="report-table-container">
-          <h3 className="table-title">Sales by Product Category</h3>
-          <Table
-            columns={[
-              {
-                header: 'Category',
-                accessor: 'category'
-              },
-              {
-                header: 'Sales',
-                accessor: 'sales'
-              },
-              {
-                header: 'Orders',
-                accessor: 'orders'
-              },
-              {
-                header: 'Avg. Price',
-                accessor: 'avgPrice'
-              },
-              {
-                header: '% of Total',
-                accessor: 'percentage'
-              }
-            ]}
-            data={[
-              { category: 'Electronics', sales: '$12,450', orders: 78, avgPrice: '$159.62', percentage: '50.7%' },
-              { category: 'Accessories', sales: '$8,320', orders: 45, avgPrice: '$184.89', percentage: '33.9%' },
-              { category: 'Clothing', sales: '$3,790', orders: 22, avgPrice: '$172.27', percentage: '15.4%' }
-            ]}
-            tableClassName="report-table"
-            emptyMessage="No data available"
-          />
-        </div>
+      )
+    }
       </div>
+    )}
     </div>
   );
 };

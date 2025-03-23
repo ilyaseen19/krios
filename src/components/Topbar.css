@@ -280,9 +280,50 @@
   color: #6b7280;
 }
 
+.topbar .notification-btn {
+  padding: 8px;
+  margin-left: 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.topbar .notification-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.notification-btn[href='/pos'] {
+  padding: 0.30rem 1.0rem;
+  background-color: var(--primary-color);
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.notification-btn[href='/pos']:hover {
+  background-color: #ff8c1a;
+}
+
+.notification-btn[href='/pos'] svg {
+  color: white;
+}
+
 .notification-btn:hover {
   background-color: #f3f4f6;
   color: #1a1a1a;
+}
+
+.notification-btn.pos-button {
+  padding: 0.75rem 2rem;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  margin-left: 1rem;
+}
+
+.notification-btn.pos-button:hover {
+  background-color: #333;
+}
+
+.notification-btn.pos-button svg {
+  color: white !important;
 }
 
 .notification-badge {
