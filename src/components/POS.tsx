@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCashDrawer, simulateOpenCashDrawer } from '../services/cashDrawerService';
 import PasswordModal from './PasswordModal';
 import DiscountModal from './DiscountModal';
+import ReceiptModal from './ReceiptModal';
 import './POS.css';
 
 const getInitials = (name: string) => {
@@ -23,7 +24,7 @@ const generateBackgroundColor = (str: string) => {
 };
 
 const POS: React.FC = () => {
-  const { userRole } = useAuth();
+  const { userRole, logout } = useAuth();
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(mockProducts);
@@ -33,7 +34,10 @@ const POS: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
   const [showDiscountModal, setShowDiscountModal] = useState<boolean>(false);
+  const [showReceiptModal, setShowReceiptModal] = useState<boolean>(false);
   const [discount, setDiscount] = useState<{type: 'percentage' | 'fixed', value: number} | null>(null);
+  const [currentTransaction, setCurrentTransaction] = useState<CartItem[]>([]);
+  const [shouldPrintReceipt, setShouldPrintReceipt] = useState<boolean>(false);
   
   // Initialize cash drawer hook
   const { openDrawer, isOpening, error: drawerError, isSupported } = useCashDrawer();
@@ -138,17 +142,13 @@ const POS: React.FC = () => {
     
     setIsProcessing(true);
     try {
-      // In a real app, you would use the actual cashier ID from auth context
-      // Pass the payment type and discount to the transaction
-      const transaction = await createTransaction(cart, 'cashier-1', paymentType);
-      console.log('Transaction completed:', transaction);
-      clearCart();
-      setDiscount(null); // Reset discount after successful transaction
-      alert(`Transaction completed successfully with ${paymentType} payment!`);
+      // Store the current cart items for the receipt
+      setCurrentTransaction([...cart]);
+      // Show the receipt modal
+      setShowReceiptModal(true);
     } catch (error) {
       console.error('Transaction failed:', error);
       alert('Transaction failed. Please try again.');
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -172,6 +172,101 @@ const POS: React.FC = () => {
       console.error('Failed to open cash drawer:', error);
       alert(`Failed to open cash drawer: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  };
+  
+  // Handle confirming payment
+  const handleConfirmPayment = async () => {
+    try {
+      // In a real app, you would use the actual cashier ID from auth context
+      const transaction = await createTransaction(currentTransaction, 'cashier-1', paymentType);
+      console.log('Transaction completed:', transaction);
+      
+      // Print receipt if option is selected
+      if (shouldPrintReceipt) {
+        await printReceipt(transaction);
+      }
+      
+      // Close the receipt modal
+      setShowReceiptModal(false);
+      // Clear the cart
+      clearCart();
+      // Reset discount
+      setDiscount(null);
+      // Reset processing state
+      setIsProcessing(false);
+      
+      // Open cash drawer for cash payments
+      if (paymentType === 'cash') {
+        await handleOpenCashDrawer();
+      }
+    } catch (error) {
+      console.error('Payment confirmation failed:', error);
+      alert('Payment confirmation failed. Please try again.');
+      setIsProcessing(false);
+    }
+  };
+  
+  // Print receipt function
+  const printReceipt = async (transaction: any) => {
+    try {
+      // Check if Web Serial API is supported
+      if ('serial' in navigator) {
+        // Request a port
+        const port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 9600 });
+        
+        // Create a text encoder
+        const encoder = new TextEncoder();
+        const writer = port.writable.getWriter();
+        
+        // Format receipt content
+        const receiptContent = formatReceiptForPrinting(transaction);
+        
+        // Write to the printer
+        await writer.write(encoder.encode(receiptContent));
+        
+        // Close the writer and port
+        writer.releaseLock();
+        await port.close();
+        
+        console.log('Receipt printed successfully');
+      } else {
+        console.log('Web Serial API not supported. Receipt printing simulated.');
+      }
+    } catch (error) {
+      console.error('Failed to print receipt:', error);
+    }
+  };
+  
+  // Format receipt for printing
+  const formatReceiptForPrinting = (transaction: any) => {
+    let receipt = '\n\n';
+    receipt += '      KRIOS POS SYSTEM      \n';
+    receipt += '----------------------------\n';
+    receipt += `Date: ${new Date().toLocaleString()}\n`;
+    receipt += `Transaction ID: ${transaction.id}\n`;
+    receipt += '----------------------------\n\n';
+    
+    // Add items
+    currentTransaction.forEach(item => {
+      receipt += `${item.name}\n`;
+      receipt += `  ${item.quantity} x $${item.price.toFixed(2)} = $${(item.quantity * item.price).toFixed(2)}\n`;
+    });
+    
+    receipt += '\n----------------------------\n';
+    receipt += `Subtotal: $${calculateSubtotal().toFixed(2)}\n`;
+    
+    if (discount) {
+      receipt += `Discount: -$${calculateDiscountAmount().toFixed(2)}\n`;
+    }
+    
+    receipt += `Tax (10%): $${(calculateFinalSubtotal() * 0.1).toFixed(2)}\n`;
+    receipt += `Total: $${(calculateFinalSubtotal() * 1.1).toFixed(2)}\n`;
+    receipt += `Payment Method: ${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}\n`;
+    receipt += '----------------------------\n';
+    receipt += '      Thank You!      \n\n\n';
+    
+    return receipt;
   };
 
   return (
@@ -231,10 +326,18 @@ const POS: React.FC = () => {
               </svg>
             </button>
             
-            <button className="action-btn">
+            <button 
+              className="action-btn" 
+              onClick={async () => {
+                await logout();
+                navigate('/');
+              }}
+              title="Logout"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
               </svg>
             </button>
             
@@ -466,6 +569,23 @@ const POS: React.FC = () => {
         onClose={() => setShowDiscountModal(false)}
         onApplyDiscount={handleApplyDiscount}
         subtotal={calculateSubtotal()}
+      />
+      
+      {/* Receipt Modal */}
+      <ReceiptModal
+        isOpen={showReceiptModal}
+        onClose={() => {
+          setShowReceiptModal(false);
+          setIsProcessing(false);
+        }}
+        onConfirmPayment={handleConfirmPayment}
+        items={currentTransaction}
+        subtotal={calculateSubtotal()}
+        discount={discount}
+        discountAmount={calculateDiscountAmount()}
+        tax={(calculateFinalSubtotal() * 0.1)}
+        total={(calculateFinalSubtotal() * 1.1)}
+        paymentType={paymentType}
       />
     </div>
   );

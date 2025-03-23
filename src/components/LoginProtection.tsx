@@ -18,7 +18,7 @@ const LoginProtection: React.FC<LoginProtectionProps> = ({ children }) => {
     if (userRole === 'admin') {
       return <Navigate to="/products" replace />;
     } else if (userRole === 'cashier') {
-      return <Navigate to="/cashier" replace />;
+      return <Navigate to="/pos" replace />;
     } else {
       // Default fallback route for any authenticated user
       return <Navigate to="/dashboard" replace />;

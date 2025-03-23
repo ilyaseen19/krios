@@ -36,7 +36,7 @@ function App() {
                 <AdminLayout>
                   <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="products" element={<Products />} />
+                    <Route path="products" element={<ProtectedRoute allowedRoles={['admin']}><Products /></ProtectedRoute>} />
                     <Route path="sales" element={<Sales />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="users" element={<Users />} />
