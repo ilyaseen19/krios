@@ -1,5 +1,6 @@
 import { Product } from '../types/product';
 import { mockProducts } from '../data/mockProducts';
+import { calculateTotalInventoryCost, calculateTotalStockValue, calculatePotentialProfit, countLowStockItems } from '../utils/inventoryUtils';
 
 // Function to get inventory data filtered by date range
 export const getFilteredInventory = async (startDate: Date, endDate: Date): Promise<any[]> => {
@@ -17,7 +18,7 @@ export const getFilteredInventory = async (startDate: Date, endDate: Date): Prom
     minimumStock: product.minimumStock,
     stockValue: product.stock * product.price,
     costValue: product.stock * product.cost,
-    potentialProfit: product.stock * (product.price - product.cost),
+    potentialProfit: (product.price - product.cost) * product.stock,
     status: product.stock <= product.minimumStock ? 'Low Stock' : 'In Stock',
     lastUpdated: new Date() // In a real app, this would be the actual update date
   }));
@@ -34,15 +35,14 @@ export const getInventorySummary = async (): Promise<{
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  const lowStockItems = mockProducts.filter(p => p.stock <= p.minimumStock).length;
-  const totalStockValue = mockProducts.reduce((sum, p) => sum + (p.stock * p.price), 0);
-  const totalCostValue = mockProducts.reduce((sum, p) => sum + (p.stock * p.cost), 0);
+  const totalStockValue = calculateTotalStockValue(mockProducts);
+  const totalCostValue = calculateTotalInventoryCost(mockProducts);
   
   return {
     totalProducts: mockProducts.length,
     totalStockValue,
     totalCostValue,
-    potentialProfit: totalStockValue - totalCostValue,
-    lowStockItems
+    potentialProfit: calculatePotentialProfit(mockProducts),
+    lowStockItems: countLowStockItems(mockProducts)
   };
 };

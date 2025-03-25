@@ -7,6 +7,7 @@ import Table from './Table';
 import { SketchPicker } from 'react-color';
 import { getProducts, createProduct, updateProduct, deleteProduct } from '../services/productService.offline';
 import { getCategories, createCategory, updateCategory, deleteCategory, Category } from '../services/categoryService.offline';
+import { calculateTotalInventoryCost, calculateTotalStockValue, calculatePotentialProfit, calculateExpectedRevenue, countTotalProductUnits, countLowStockItems } from '../utils/inventoryUtils';
 
 // Extended Product interface to match the mockProducts structure
 interface ExtendedProduct extends Product {
@@ -423,7 +424,7 @@ const Products: React.FC = () => {
             </div>
             <div className="stat-content">
               <span className="stat-label">Total Products</span>
-              <span className="stat-value">{products.length}</span>
+              <span className="stat-value">{countTotalProductUnits(products)}</span>
             </div>
           </div>
           <div className="summary-stat">
@@ -445,7 +446,7 @@ const Products: React.FC = () => {
             </div>
             <div className="stat-content">
               <span className="stat-label">Total Inventory Cost</span>
-              <span className="stat-value">${products.reduce((sum, product) => sum + (product.price * product.stock), 0).toFixed(2)}</span>
+              <span className="stat-value">${calculateTotalInventoryCost(products).toFixed(2)}</span>
             </div>
           </div>
           <div className="summary-stat">
@@ -456,7 +457,7 @@ const Products: React.FC = () => {
             </div>
             <div className="stat-content">
               <span className="stat-label">Expected Revenue</span>
-              <span className="stat-value">${products.reduce((sum, product) => sum + (product.price * product.stock * 1.5), 0).toFixed(2)}</span>
+              <span className="stat-value">${calculateExpectedRevenue(products, 1.5).toFixed(2)}</span>
             </div>
           </div>
         </div>
