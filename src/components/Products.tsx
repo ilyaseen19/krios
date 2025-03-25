@@ -1,11 +1,28 @@
-import React, { useState } from 'react';
-import { mockProducts, productCategories, sortOptions, Product } from '../data/mockProducts';
+import React, { useState, useEffect } from 'react';
+import { sortOptions } from '../data/mockProducts';
+import { Product } from '../types/product';
 import './Products.css';
 import Modal from './Modal';
 import Table from './Table';
+import { SketchPicker } from 'react-color';
+import { getProducts, createProduct, updateProduct, deleteProduct } from '../services/productService.offline';
+import { getCategories, createCategory, updateCategory, deleteCategory, Category } from '../services/categoryService.offline';
+import AddProductModal from './AddProductModal';
+
+// Extended Product interface to match the mockProducts structure
+interface ExtendedProduct extends Product {
+  category: string;
+  minimumStock: number;
+  tax: number;
+  cost: number;
+  barcode: string;
+  color: string;
+}
 
 const Products: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const [products, setProducts] = useState<ExtendedProduct[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -20,9 +37,10 @@ const Products: React.FC = () => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [newCategory, setNewCategory] = useState('');
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
-  const [categories, setCategories] = useState<string[]>(productCategories);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
   const [showAddProductModal, setShowAddProductModal] = useState(false);
-  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({ 
+  const [newProduct, setNewProduct] = useState<Omit<ExtendedProduct, 'id' | 'createdAt' | 'updatedAt'>>({ 
     name: '', 
     category: categories[0] || '', 
     price: 0, 
@@ -32,7 +50,7 @@ const Products: React.FC = () => {
     cost: 0, 
     barcode: '', 
     description: '', 
-    image: '' 
+    color: '#7367f0' 
   });
   const productsPerPage = 8;
   
@@ -85,28 +103,109 @@ const Products: React.FC = () => {
     setShowDeleteConfirm(true);
   };
   
+  // Load products and categories from IndexedDB on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setLoadingCategories(true);
+        
+        // Load products
+        const productsData = await getProducts();
+        // Convert the Product type to ExtendedProduct with default values for missing fields
+        const extendedProducts: ExtendedProduct[] = productsData.map(product => ({
+          ...product,
+          category: (product as any).category || 'Uncategorized',
+          minimumStock: (product as any).minimumStock || 0,
+          tax: (product as any).tax || 0,
+          cost: (product as any).cost || 0,
+          barcode: (product as any).barcode || '',
+          color: (product as any).color || '#7367f0'
+        }));
+        setProducts(extendedProducts);
+        
+        // Load categories
+        const categoriesData = await getCategories();
+        if (categoriesData.length > 0) {
+          setCategories(categoriesData.map(cat => cat.name));
+        } else {
+          // If no categories exist, create default ones
+          const defaultCategories = ['Electronics', 'Accessories', 'Clothing'];
+          const createdCategories: string[] = [];
+          
+          for (const catName of defaultCategories) {
+            try {
+              const newCat = await createCategory(catName);
+              createdCategories.push(newCat.name);
+            } catch (err) {
+              console.error(`Failed to create default category ${catName}:`, err);
+            }
+          }
+          
+          setCategories(createdCategories);
+        }
+        
+        setError(null);
+      } catch (err) {
+        console.error('Failed to load data:', err);
+        setError('Failed to load data. Please try again.');
+      } finally {
+        setLoading(false);
+        setLoadingCategories(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
   // Confirm delete product
-  const confirmDeleteProduct = () => {
+  const confirmDeleteProduct = async () => {
     if (selectedProduct) {
-      setProducts(products.filter(p => p.id !== selectedProduct.id));
-      setShowDeleteConfirm(false);
+      try {
+        await deleteProduct(selectedProduct.id);
+        setProducts(products.filter(p => p.id !== selectedProduct.id));
+        setShowDeleteConfirm(false);
+      } catch (err) {
+        console.error('Failed to delete product:', err);
+        alert('Failed to delete product. Please try again.');
+      }
     }
   };
   
   // Save edited product
-  const saveEditedProduct = () => {
+  const saveEditedProduct = async () => {
     if (editingProduct) {
-      setProducts(products.map(p => p.id === editingProduct.id ? editingProduct : p));
-      setShowEditModal(false);
-      setEditingProduct(null);
+      try {
+        const updatedProduct = await updateProduct(editingProduct.id, editingProduct);
+        setProducts(products.map(p => p.id === editingProduct.id ? {
+          ...updatedProduct,
+          category: editingProduct.category,
+          minimumStock: editingProduct.minimumStock,
+          tax: editingProduct.tax,
+          cost: editingProduct.cost,
+          barcode: editingProduct.barcode,
+          color: editingProduct.color
+        } : p));
+        setShowEditModal(false);
+        setEditingProduct(null);
+      } catch (err) {
+        console.error('Failed to update product:', err);
+        alert('Failed to update product. Please try again.');
+      }
     }
   };
 
   // Add new category
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     if (newCategory.trim() !== '' && !categories.includes(newCategory.trim())) {
-      setCategories([...categories, newCategory.trim()]);
-      setNewCategory('');
+      try {
+        await createCategory(newCategory.trim());
+        setCategories([...categories, newCategory.trim()]);
+        setNewCategory('');
+      } catch (err) {
+        console.error('Failed to add category:', err);
+        alert('Failed to add category. Please try again.');
+      }
     }
   };
 
@@ -117,92 +216,121 @@ const Products: React.FC = () => {
   };
 
   // Save edited category
-  const saveEditedCategory = () => {
+  const saveEditedCategory = async () => {
     if (editingCategory && newCategory.trim() !== '') {
-      // Update category in categories list
-      const updatedCategories = categories.map(cat => 
-        cat === editingCategory ? newCategory.trim() : cat
-      );
-      setCategories(updatedCategories);
+      try {
+        // Find the category ID
+        const categoriesData = await getCategories();
+        const categoryToUpdate = categoriesData.find(cat => cat.name === editingCategory);
+        
+        if (categoryToUpdate) {
+          // Update category in IndexedDB
+          await updateCategory(categoryToUpdate.id, newCategory.trim());
+          
+          // Update category in categories list
+          const updatedCategories = categories.map(cat => 
+            cat === editingCategory ? newCategory.trim() : cat
+          );
+          setCategories(updatedCategories);
 
-      // Update category in products
-      const updatedProducts = products.map(product => {
-        if (product.category === editingCategory) {
-          return { ...product, category: newCategory.trim() };
+          // Update category in products
+          const updatedProducts = await Promise.all(products.map(async product => {
+            if (product.category === editingCategory) {
+              const updatedProduct = { ...product, category: newCategory.trim() };
+              await updateProduct(product.id, updatedProduct as any);
+              return updatedProduct;
+            }
+            return product;
+          }));
+          setProducts(updatedProducts);
+
+          // Reset state
+          setEditingCategory(null);
+          setNewCategory('');
         }
-        return product;
-      });
-      setProducts(updatedProducts);
-
-      // Reset state
-      setEditingCategory(null);
-      setNewCategory('');
+      } catch (err) {
+        console.error('Failed to update category:', err);
+        alert('Failed to update category. Please try again.');
+      }
     }
   };
 
   // Delete category
-  const handleDeleteCategory = (categoryToDelete: string) => {
+  const handleDeleteCategory = async (categoryToDelete: string) => {
     if (window.confirm(`Are you sure you want to delete the category "${categoryToDelete}"? This will remove the category from all products.`)) {
-      // Remove category from list
-      const updatedCategories = categories.filter(cat => cat !== categoryToDelete);
-      setCategories(updatedCategories);
+      try {
+        // Find the category ID
+        const categoriesData = await getCategories();
+        const categoryToRemove = categoriesData.find(cat => cat.name === categoryToDelete);
+        
+        if (categoryToRemove) {
+          // Delete category from IndexedDB
+          await deleteCategory(categoryToRemove.id);
+          
+          // Remove category from list
+          const updatedCategories = categories.filter(cat => cat !== categoryToDelete);
+          setCategories(updatedCategories);
 
-      // Update products with this category to use the first available category or empty string
-      const defaultCategory = updatedCategories.length > 0 ? updatedCategories[0] : '';
-      const updatedProducts = products.map(product => {
-        if (product.category === categoryToDelete) {
-          return { ...product, category: defaultCategory };
+          // Update products with this category to use the first available category or empty string
+          const defaultCategory = updatedCategories.length > 0 ? updatedCategories[0] : '';
+          const updatedProducts = await Promise.all(products.map(async product => {
+            if (product.category === categoryToDelete) {
+              const updatedProduct = { ...product, category: defaultCategory };
+              await updateProduct(product.id, updatedProduct as any);
+              return updatedProduct;
+            }
+            return product;
+          }));
+          setProducts(updatedProducts);
         }
-        return product;
-      });
-      setProducts(updatedProducts);
+      } catch (err) {
+        console.error('Failed to delete category:', err);
+        alert('Failed to delete category. Please try again.');
+      }
     }
   };
 
   // Add new product
-  const handleAddProduct = () => {
-    // Validate required fields
-    if (newProduct.name.trim() === '') {
-      alert('Product name is required');
-      return;
+  const handleAddProduct = async (productData: Omit<ExtendedProduct, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      // Create product in IndexedDB
+      const createdProduct = await createProduct({
+        name: productData.name,
+        price: productData.price,
+        stock: productData.stock,
+        description: productData.description,
+        // Add the extended properties
+        category: productData.category,
+        minimumStock: productData.minimumStock,
+        tax: productData.tax,
+        cost: productData.cost,
+        barcode: productData.barcode,
+        color: productData.color
+      } as any);
+      
+      // Add the new product to the state
+      setProducts([...products, {
+        ...createdProduct,
+        category: productData.category,
+        minimumStock: productData.minimumStock,
+        tax: productData.tax,
+        cost: productData.cost,
+        barcode: productData.barcode,
+        color: productData.color
+      }]);
+      
+      // Close the modal
+      setShowAddProductModal(false);
+    } catch (err) {
+      console.error('Failed to add product:', err);
+      alert('Failed to add product. Please try again.');
     }
-    if (!newProduct.category) {
-      alert('Category is required');
-      return;
-    }
-    if (newProduct.price <= 0) {
-      alert('Price must be greater than 0');
-      return;
-    }
-    if (newProduct.stock < 0) {
-      alert('Stock cannot be negative');
-      return;
-    }
-    if (newProduct.minimumStock < 0) {
-      alert('Minimum stock cannot be negative');
-      return;
-    }
-
-    const id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-    const productToAdd = { id, ...newProduct };
-    setProducts([...products, productToAdd]);
-    setNewProduct({ 
-      name: '', 
-      category: categories[0] || '', 
-      price: 0, 
-      stock: 0, 
-      minimumStock: 0, 
-      tax: 0, 
-      cost: 0, 
-      barcode: '', 
-      description: '', 
-      image: '' 
-    });
-    setShowAddProductModal(false);
   };
 
   return (
     <div className="products-container">
+      {loading && <div className="loading-indicator">Loading products...</div>}
+      {error && <div className="error-message">{error}</div>}
       <div className="products-header">
         <h2 className="section-title">Products</h2>
         <div className="header-actions">
@@ -269,7 +397,7 @@ const Products: React.FC = () => {
             </div>
             <div className="stat-content">
               <span className="stat-label">Total Categories</span>
-              <span className="stat-value">{productCategories.length}</span>
+              <span className="stat-value">{categories.length}</span>
             </div>
           </div>
           <div className="summary-stat">
@@ -298,7 +426,7 @@ const Products: React.FC = () => {
         <div className="category-breakdown">
           <h4 className="breakdown-title">Products by Category</h4>
           <div className="category-stats">
-            {productCategories.map(category => {
+            {categories.map(category => {
               const count = products.filter(product => product.category === category).length;
               return (
                 <div key={category} className="category-stat">
@@ -332,7 +460,7 @@ const Products: React.FC = () => {
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
             <option value="">All Categories</option>
-            {productCategories.map((category, index) => (
+            {categories.map((category, index) => (
               <option key={index} value={category}>{category}</option>
             ))}
           </select>
@@ -555,10 +683,8 @@ const Products: React.FC = () => {
           }
         >
           <div className="product-details-content">
-            <div className="product-detail-img">
-              <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
+            <div className="product-detail-img" style={{ backgroundColor: selectedProduct.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ color: '#fff', fontWeight: 'bold' }}>Color Preview</div>
             </div>
             
             <div className="product-detail-info">
@@ -566,6 +692,7 @@ const Products: React.FC = () => {
               <p className="product-detail-category">Category: {selectedProduct.category}</p>
               <p className="product-detail-price">Price: ${selectedProduct.price.toFixed(2)}</p>
               <p className="product-detail-stock">Stock: {selectedProduct.stock}</p>
+              <p className="product-detail-color">Color: <span style={{ display: 'inline-block', width: '20px', height: '20px', backgroundColor: selectedProduct.color, borderRadius: '4px', verticalAlign: 'middle', marginLeft: '5px', border: '1px solid #ddd' }}></span></p>
               <div className="product-detail-status">
                 <span className={`product-stock ${getStockStatus(selectedProduct.stock).class}`}>
                   {getStockStatus(selectedProduct.stock).text}
@@ -617,7 +744,7 @@ const Products: React.FC = () => {
                 value={editingProduct.category}
                 onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
               >
-                {productCategories.map((category, index) => (
+                {categories.map((category, index) => (
                   <option key={index} value={category}>{category}</option>
                 ))}
               </select>
@@ -640,6 +767,18 @@ const Products: React.FC = () => {
                 value={editingProduct.stock}
                 onChange={(e) => setEditingProduct({...editingProduct, stock: parseInt(e.target.value)})}
               />
+            </div>
+            
+            <div className="form-group">
+              <label>Product Color</label>
+              <div className="color-picker-container">
+                <div className="color-preview" style={{ backgroundColor: editingProduct.color, width: '40px', height: '40px', borderRadius: '4px', marginBottom: '10px', border: '1px solid #ddd' }}></div>
+                <SketchPicker
+                  color={editingProduct.color}
+                  onChangeComplete={(color) => setEditingProduct({...editingProduct, color: color.hex})}
+                  disableAlpha={true}
+                />
+              </div>
             </div>
           </div>
         </Modal>
@@ -754,159 +893,12 @@ const Products: React.FC = () => {
       )}
 
       {/* Add Product Modal */}
-      {showAddProductModal && (
-        <Modal
-          isOpen={showAddProductModal}
-          onClose={() => setShowAddProductModal(false)}
-          title="Add New Product"
-          size="large"
-          actions={
-            <>
-              <button onClick={() => setShowAddProductModal(false)} className="cancel-btn">Cancel</button>
-              <button onClick={handleAddProduct} className="save-btn">Add Product</button>
-            </>
-          }
-        >
-          <div className="add-product-form">
-            <div className="form-card">
-              <h4 className="form-card-title">Product Information</h4>
-              
-              <div className="form-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Product Name <span className="required">*</span></label>
-                  <input
-                    type="text"
-                    value={newProduct.name}
-                    onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
-                    placeholder="Enter product name"
-                    required
-                  />
-                </div>
-                
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Category <span className="required">*</span></label>
-                  <select
-                    value={newProduct.category}
-                    onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
-                    required
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map((category, index) => (
-                      <option key={index} value={category}>{category}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              
-              <div className="form-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Price <span className="required">*</span></label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={newProduct.price}
-                    onChange={(e) => setNewProduct({...newProduct, price: parseFloat(e.target.value)})}
-                    placeholder="0.00"
-                    required
-                  />
-                </div>
-                
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Tax</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={newProduct.tax}
-                    onChange={(e) => setNewProduct({...newProduct, tax: parseFloat(e.target.value)})}
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
-              
-              <div className="form-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Cost</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={newProduct.cost}
-                    onChange={(e) => setNewProduct({...newProduct, cost: parseFloat(e.target.value)})}
-                    placeholder="0.00"
-                  />
-                </div>
-                
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Stock <span className="required">*</span></label>
-                  <input
-                    type="number"
-                    value={newProduct.stock}
-                    onChange={(e) => setNewProduct({...newProduct, stock: parseInt(e.target.value)})}
-                    placeholder="0"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="form-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Minimum Stock <span className="required">*</span></label>
-                  <input
-                    type="number"
-                    value={newProduct.minimumStock}
-                    onChange={(e) => setNewProduct({...newProduct, minimumStock: parseInt(e.target.value)})}
-                    placeholder="0"
-                    required
-                  />
-                </div>
-                
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Barcode Number</label>
-                  <input
-                    type="text"
-                    value={newProduct.barcode}
-                    onChange={(e) => setNewProduct({...newProduct, barcode: e.target.value})}
-                    placeholder="Enter barcode number"
-                  />
-                </div>
-              </div>
-              
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  value={newProduct.description}
-                  onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
-                  placeholder="Enter product description"
-                  rows={4}
-                ></textarea>
-              </div>
-              
-              <div className="form-group">
-                <label>Product Image</label>
-                <div className="image-upload-container">
-                  <div className="image-upload-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="40" height="40">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <p className="image-upload-text">Drag & drop image here</p>
-                  <p className="image-upload-subtext">Supports: JPG, JPEG, PNG</p>
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    style={{ display: 'none' }} 
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files[0]) {
-                        // In a real app, you would handle file upload here
-                        setNewProduct({...newProduct, image: URL.createObjectURL(e.target.files[0])})
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Modal>
-      )}
+      <AddProductModal
+        isOpen={showAddProductModal}
+        onClose={() => setShowAddProductModal(false)}
+        onAddProduct={handleAddProduct}
+        categories={categories}
+      />
     </div>
   );
 };

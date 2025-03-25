@@ -12,6 +12,7 @@
   "dependencies": {
     "react": "^19.0.0",
     "react-barcode-scanner": "^3.2.1",
+    "react-color": "^2.19.3",
     "react-dom": "^19.0.0",
     "react-qr-barcode-scanner": "^2.0.0",
     "react-router-dom": "^7.3.0",

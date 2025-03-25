@@ -1,0 +1,28 @@
+.offline-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.offline-indicator.offline {
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #b91c1c;
+}
+
+.offline-indicator.online {
+  background-color: #f0fdf4;
+  border: 1px solid #dcfce7;
+  color: #166534;
+}
+
+.offline-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

@@ -1,6 +1,32 @@
 /* Products Page Styles */
 .products-container {
-  padding: 20px;
+  padding: 1.5rem;
+  background-color: #f8f8f8;
+  min-height: 100vh;
+}
+
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #7367f0;
+  background-color: rgba(115, 103, 240, 0.1);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  font-size: 1rem;
+  color: #ea5455;
+  background-color: rgba(234, 84, 85, 0.1);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 /* Header Section */
@@ -895,6 +921,15 @@
   border-radius: 8px;
   padding: 20px;
   text-align: center;
+}
+
+.color-picker-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f8f8ff;
   cursor: pointer;
   transition: border-color 0.3s;
 }

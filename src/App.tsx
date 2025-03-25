@@ -1,9 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { OfflineProvider } from './contexts/OfflineContext';
 import Login from './components/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginProtection from './components/LoginProtection';
 import AdminLayout from './components/AdminLayout';
+import OfflineIndicator from './components/OfflineIndicator';
+import ToastContainer from './components/ToastContainer';
 import './App.css';
 
 // Import page components
@@ -18,8 +21,13 @@ import Settings from './components/Settings';
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
+      <OfflineProvider>
+        <Router>
+          <ToastContainer />
+          <div style={{ padding: '0.5rem 1rem' }}>
+            <OfflineIndicator />
+          </div>
+          <Routes>
           <Route path="/login" element={<LoginProtection><Login /></LoginProtection>} />
           <Route
             path="pos"
@@ -48,8 +56,9 @@ function App() {
             }
           />
           <Route path="/" element={<LoginProtection><Login /></LoginProtection>} />
-        </Routes>
-      </Router>
+          </Routes>
+        </Router>
+      </OfflineProvider>
     </AuthProvider>
   )
 }

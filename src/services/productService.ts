@@ -1,72 +1,69 @@
 import { Product } from '../types/product';
-
-// Mock product data
-let mockProducts: Product[] = [
-  {
-    id: '1',
-    name: 'Product 1',
-    price: 10.99,
-    stock: 100,
-    description: 'Description for product 1',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: '2',
-    name: 'Product 2',
-    price: 20.99,
-    stock: 50,
-    description: 'Description for product 2',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-];
+import { STORES, addItem, getAllItems, getItemById, updateItem, deleteItem } from './dbService';
 
 export const getProducts = async (): Promise<Product[]> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return mockProducts;
+  try {
+    const products = await getAllItems<Product>(STORES.PRODUCTS);
+    return products;
+  } catch (error) {
+    console.error('Error getting products:', error);
+    throw error;
+  }
 };
 
 export const getProduct = async (id: string): Promise<Product> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const product = mockProducts.find(p => p.id === id);
-  if (!product) {
-    throw new Error('Product not found');
+  try {
+    const product = await getItemById<Product>(STORES.PRODUCTS, id);
+    if (!product) {
+      throw new Error('Product not found');
+    }
+    return product;
+  } catch (error) {
+    console.error(`Error getting product ${id}:`, error);
+    throw error;
   }
-  return product;
 };
 
 export const createProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const newProduct: Product = {
-    ...product,
-    id: String(mockProducts.length + 1),
-    createdAt: new Date(),
-    updatedAt: new Date()
-  };
-  mockProducts.push(newProduct);
-  return newProduct;
+  try {
+    const newProduct: Product = {
+      ...product,
+      id: `prod_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    await addItem<Product>(STORES.PRODUCTS, newProduct);
+    return newProduct;
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
 };
 
 export const updateProduct = async (id: string, updates: Partial<Product>): Promise<Product> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const index = mockProducts.findIndex(p => p.id === id);
-  if (index === -1) {
-    throw new Error('Product not found');
+  try {
+    const existingProduct = await getItemById<Product>(STORES.PRODUCTS, id);
+    if (!existingProduct) {
+      throw new Error('Product not found');
+    }
+    const updatedProduct: Product = {
+      ...existingProduct,
+      ...updates,
+      updatedAt: new Date()
+    };
+    await updateItem<Product>(STORES.PRODUCTS, updatedProduct);
+    return updatedProduct;
+  } catch (error) {
+    console.error(`Error updating product ${id}:`, error);
+    throw error;
   }
-  mockProducts[index] = {
-    ...mockProducts[index],
-    ...updates,
-    updatedAt: new Date()
-  };
-  return mockProducts[index];
 };
 
 export const deleteProduct = async (id: string): Promise<void> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const index = mockProducts.findIndex(p => p.id === id);
-  if (index === -1) {
-    throw new Error('Product not found');
+  try {
+    await deleteItem(STORES.PRODUCTS, id);
+  } catch (error) {
+    console.error(`Error deleting product ${id}:`, error);
+    throw error;
   }
-  mockProducts = mockProducts.filter(p => p.id !== id);
 };

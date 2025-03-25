@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Product, CartItem } from '../types/product';
 import { mockProducts, productCategories } from '../data/mockProducts';
+import { mockSales } from '../data/mockSales';
 import { createTransaction, calculateTax } from '../services/transactionService';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -207,20 +208,20 @@ const POS: React.FC = () => {
   };
   
   // Print receipt function
-  const printReceipt = async (transaction: any) => {
+  const printReceipt = async (transaction?: any) => {
     try {
+      // Get latest transaction from sales data if not provided
+      const latestTransaction = transaction || mockSales.sort((a, b) => b.timestamp - a.timestamp)[0];
+      
       // Check if Web Serial API is supported
       if ('serial' in navigator) {
-        // Request a port
         const port = await navigator.serial.requestPort();
         await port.open({ baudRate: 9600 });
         
-        // Create a text encoder
         const encoder = new TextEncoder();
         const writer = port.writable.getWriter();
         
-        // Format receipt content
-        const receiptContent = formatReceiptForPrinting(transaction);
+        const receiptContent = formatReceiptForPrinting(latestTransaction);
         
         // Write to the printer
         await writer.write(encoder.encode(receiptContent));
@@ -303,7 +304,10 @@ const POS: React.FC = () => {
               {isOpening && <span className="loading-indicator"></span>}
             </button>
             
-            <button className="action-btn">
+            <button className="action-btn"
+            onClick={() => printReceipt()}
+            disabled={isProcessing}
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 6 2 18 2 18 9"/>
                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
