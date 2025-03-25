@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { getProducts } from '../services/productService.offline';
 import './Topbar.css';
 
 interface TopbarProps {
@@ -11,8 +12,46 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [notifications, setNotifications] = useState<{message: string, time: string, isNew?: boolean}[]>([]);
   const { logout } = useAuth();
   const navigate = useNavigate();
+  
+  // Check for low stock products when component mounts
+  useEffect(() => {
+    const checkLowStockProducts = async () => {
+      try {
+        const products = await getProducts();
+        const lowStockProducts = products.filter(product => {
+          const minimumStock = (product as any).minimumStock || 10;
+          return product.stock < minimumStock && product.stock > 0;
+        });
+        
+        const outOfStockProducts = products.filter(product => product.stock === 0);
+        
+        // Create notifications for low stock products
+        const newNotifications = [
+          ...lowStockProducts.map(product => ({
+            message: `${product.name} is low on stock!`,
+            time: 'Just now',
+            isNew: true
+          })),
+          ...outOfStockProducts.map(product => ({
+            message: `${product.name} is out of stock!`,
+            time: 'Just now',
+            isNew: true
+          }))
+        ];
+        
+        if (newNotifications.length > 0) {
+          setNotifications(prev => [...newNotifications, ...prev]);
+        }
+      } catch (error) {
+        console.error('Failed to check low stock products:', error);
+      }
+    };
+    
+    checkLowStockProducts();
+  }, []);
 
   return (
     <div className="topbar">
@@ -78,7 +117,7 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.73 21a2 2 0 01-3.46 0M18.63 13A17.888 17.888 0 0118 8.5 6 6 0 006 8.5c0 1.61.22 3.175.63 4.5m11.37 0l1.34 1.34a1 1 0 01.293.707V16a1 1 0 01-1 1H5.37a1 1 0 01-1-1v-1.453a1 1 0 01.293-.707L6 13a17.89 17.89 0 01.63-4.5m11.37 4.5H6" />
               </svg>
-              <span className="notification-badge">3</span>
+              <span className="notification-badge">{notifications.length}</span>
             </button>
 
             {isNotificationsOpen && (
@@ -87,39 +126,27 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
                   <h6>Notifications</h6>
                   <a href="#" className="dropdown-link">Mark all as read</a>
                 </div>
-                <div className="notification-item">
-                  <div className="notification-icon new">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                {notifications.length > 0 ? (
+                  notifications.map((notification, index) => (
+                    <div key={index} className="notification-item">
+                      <div className={`notification-icon ${notification.isNew ? 'new' : ''}`}>
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                      </div>
+                      <div className="notification-content">
+                        <p>{notification.message}</p>
+                        <span>{notification.time}</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="notification-item">
+                    <div className="notification-content">
+                      <p>No new notifications</p>
+                    </div>
                   </div>
-                  <div className="notification-content">
-                    <p>New user registered</p>
-                    <span>2 min ago</span>
-                  </div>
-                </div>
-                <div className="notification-item">
-                  <div className="notification-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <div className="notification-content">
-                    <p>Server update completed</p>
-                    <span>1 hour ago</span>
-                  </div>
-                </div>
-                <div className="notification-item">
-                  <div className="notification-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="notification-content">
-                    <p>Daily sales report generated</p>
-                    <span>3 hours ago</span>
-                  </div>
-                </div>
+                )}
                 <div className="dropdown-footer">
                   <a href="#" className="view-all">View all notifications</a>
                 </div>

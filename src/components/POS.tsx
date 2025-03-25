@@ -6,9 +6,7 @@ import { createTransaction, calculateTax } from '../services/transactionService'
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useCashDrawer, simulateOpenCashDrawer } from '../services/cashDrawerService';
-import PasswordModal from './PasswordModal';
-import DiscountModal from './DiscountModal';
-import ReceiptModal from './ReceiptModal';
+import { PasswordModal, DiscountModal, ReceiptModal } from './modals';
 import './POS.css';
 
 const getInitials = (name: string) => {

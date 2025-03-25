@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { mockSales, Sale, saleStatuses } from '../data/mockSales';
 import './Sales.css';
-import Modal from './Modal';
+import { Modal } from './modals';
 import Table from './Table';
 
 interface OrderSummary {

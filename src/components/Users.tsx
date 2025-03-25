@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import './Users.css';
 import { mockUsers, defaultNewUser, User } from '../data/mockUsers';
-import Modal from './Modal';
+import { Modal } from './modals';
 import Table, { TableColumn } from './Table';
 
 const Users: React.FC = () => {

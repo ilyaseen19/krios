@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { sortOptions } from '../data/mockProducts';
 import { Product } from '../types/product';
 import './Products.css';
-import Modal from './Modal';
+import { Modal, AddProductModal, EditProductModal, ManageCategoriesModal } from './modals';
 import Table from './Table';
 import { SketchPicker } from 'react-color';
 import { getProducts, createProduct, updateProduct, deleteProduct } from '../services/productService.offline';
 import { getCategories, createCategory, updateCategory, deleteCategory, Category } from '../services/categoryService.offline';
-import AddProductModal from './AddProductModal';
 
 // Extended Product interface to match the mockProducts structure
 interface ExtendedProduct extends Product {
@@ -79,10 +78,10 @@ const Products: React.FC = () => {
   const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
   
   // Get stock status
-  const getStockStatus = (stock: number) => {
-    if (stock > 50) return { class: 'stock-high', text: 'In Stock' };
-    if (stock > 10) return { class: 'stock-medium', text: 'Low Stock' };
-    return { class: 'stock-low', text: 'Out of Stock' };
+  const getStockStatus = (stock: number, minimumStock: number = 10) => {
+    if (stock === 0) return { class: 'stock-low', text: 'Out of Stock' };
+    if (stock < minimumStock) return { class: 'stock-medium', text: 'Low Stock' };
+    return { class: 'stock-high', text: 'In Stock' };
   };
   
   // Handle view product details
@@ -177,20 +176,40 @@ const Products: React.FC = () => {
     if (editingProduct) {
       try {
         const updatedProduct = await updateProduct(editingProduct.id, editingProduct);
-        setProducts(products.map(p => p.id === editingProduct.id ? {
+        // Use the updatedProduct directly from the database to ensure consistency
+        const extendedUpdatedProduct = {
           ...updatedProduct,
-          category: editingProduct.category,
-          minimumStock: editingProduct.minimumStock,
-          tax: editingProduct.tax,
-          cost: editingProduct.cost,
-          barcode: editingProduct.barcode,
-          color: editingProduct.color
-        } : p));
+          category: (updatedProduct as any).category || 'Uncategorized',
+          minimumStock: (updatedProduct as any).minimumStock || 0,
+          tax: (updatedProduct as any).tax || 0,
+          cost: (updatedProduct as any).cost || 0,
+          barcode: (updatedProduct as any).barcode || '',
+          color: (updatedProduct as any).color || '#7367f0'
+        };
+        
+        // Update products state
+        setProducts(products.map(p => p.id === updatedProduct.id ? extendedUpdatedProduct : p));
+        
+        // Check if product is low on stock or out of stock
+        if (extendedUpdatedProduct.stock === 0) {
+          if (window.toast) {
+            window.toast.warning(`${extendedUpdatedProduct.name} is out of stock!`);
+          }
+        } else if (extendedUpdatedProduct.stock < extendedUpdatedProduct.minimumStock) {
+          if (window.toast) {
+            window.toast.warning(`${extendedUpdatedProduct.name} is low on stock!`);
+          }
+        }
+        
         setShowEditModal(false);
         setEditingProduct(null);
       } catch (err) {
         console.error('Failed to update product:', err);
-        alert('Failed to update product. Please try again.');
+        if (window.toast) {
+          window.toast.error('Failed to update product. Please try again.');
+        } else {
+          alert('Failed to update product. Please try again.');
+        }
       }
     }
   };
@@ -308,8 +327,8 @@ const Products: React.FC = () => {
         color: productData.color
       } as any);
       
-      // Add the new product to the state
-      setProducts([...products, {
+      // Create extended product with all properties
+      const extendedProduct = {
         ...createdProduct,
         category: productData.category,
         minimumStock: productData.minimumStock,
@@ -317,13 +336,31 @@ const Products: React.FC = () => {
         cost: productData.cost,
         barcode: productData.barcode,
         color: productData.color
-      }]);
+      };
+      
+      // Add the new product to the state
+      setProducts([...products, extendedProduct]);
+      
+      // Check if product is low on stock or out of stock
+      if (extendedProduct.stock === 0) {
+        if (window.toast) {
+          window.toast.warning(`${extendedProduct.name} is out of stock!`);
+        }
+      } else if (extendedProduct.stock < extendedProduct.minimumStock) {
+        if (window.toast) {
+          window.toast.warning(`${extendedProduct.name} is low on stock!`);
+        }
+      }
       
       // Close the modal
       setShowAddProductModal(false);
     } catch (err) {
       console.error('Failed to add product:', err);
-      alert('Failed to add product. Please try again.');
+      if (window.toast) {
+        window.toast.error('Failed to add product. Please try again.');
+      } else {
+        alert('Failed to add product. Please try again.');
+      }
     }
   };
 
@@ -704,85 +741,16 @@ const Products: React.FC = () => {
       )}
 
       {/* Edit Product Modal */}
-      {showEditModal && editingProduct && (
-        <Modal
-          isOpen={showEditModal}
-          onClose={() => {
-            setShowEditModal(false);
-            setEditingProduct(null);
-          }}
-          title="Edit Product"
-          size="medium"
-          actions={
-            <>
-              <button 
-                onClick={() => {
-                  setShowEditModal(false);
-                  setEditingProduct(null);
-                }} 
-                className="cancel-btn"
-              >
-                Cancel
-              </button>
-              <button onClick={saveEditedProduct} className="save-btn">Save Changes</button>
-            </>
-          }
-        >
-          <div className="space-y-4">
-            <div className="form-group">
-              <label>Product Name</label>
-              <input
-                type="text"
-                value={editingProduct.name}
-                onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Category</label>
-              <select
-                value={editingProduct.category}
-                onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
-              >
-                {categories.map((category, index) => (
-                  <option key={index} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
-            
-            <div className="form-group">
-              <label>Price</label>
-              <input
-                type="number"
-                step="0.01"
-                value={editingProduct.price}
-                onChange={(e) => setEditingProduct({...editingProduct, price: parseFloat(e.target.value)})}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Stock</label>
-              <input
-                type="number"
-                value={editingProduct.stock}
-                onChange={(e) => setEditingProduct({...editingProduct, stock: parseInt(e.target.value)})}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Product Color</label>
-              <div className="color-picker-container">
-                <div className="color-preview" style={{ backgroundColor: editingProduct.color, width: '40px', height: '40px', borderRadius: '4px', marginBottom: '10px', border: '1px solid #ddd' }}></div>
-                <SketchPicker
-                  color={editingProduct.color}
-                  onChangeComplete={(color) => setEditingProduct({...editingProduct, color: color.hex})}
-                  disableAlpha={true}
-                />
-              </div>
-            </div>
-          </div>
-        </Modal>
-      )}
+      <EditProductModal
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingProduct(null);
+        }}
+        onSaveProduct={saveEditedProduct}
+        product={editingProduct as ExtendedProduct}
+        categories={categories}
+      />
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && selectedProduct && (
@@ -803,94 +771,18 @@ const Products: React.FC = () => {
       )}
 
       {/* Category Management Modal */}
-      {showCategoryModal && (
-        <Modal
-          isOpen={showCategoryModal}
-          onClose={() => {
-            setShowCategoryModal(false);
-            setEditingCategory(null);
-            setNewCategory('');
-          }}
-          title="Manage Categories"
-          size="large"
-          actions={
-            <button onClick={() => {
-              setShowCategoryModal(false);
-              setEditingCategory(null);
-              setNewCategory('');
-            }} className="save-btn">
-              Done
-            </button>
-          }
-        >
-          <div className="category-form mb-4">
-            <h4 className="text-lg font-medium mb-2">{editingCategory ? 'Edit Category' : 'Add New Category'}</h4>
-            <input
-              type="text"
-              className="form-input flex-1"
-              placeholder="Category name"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-            />
-            <button 
-              className="save-btn"
-              onClick={editingCategory ? saveEditedCategory : handleAddCategory}
-            >
-              {editingCategory ? 'Update' : 'Add'}
-            </button>
-            {editingCategory && (
-              <button 
-                className="cancel-btn"
-                onClick={() => {
-                  setEditingCategory(null);
-                  setNewCategory('');
-                }}
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-
-          <div className="categories-list">
-            <h4 className="text-lg font-medium mb-2">Current Categories</h4>
-            {categories.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {categories.map((category) => {
-                  const productCount = products.filter(p => p.category === category).length;
-                  return (
-                    <div key={category} className="category-item">
-                      <div className="category-info">
-                        <span className="category-name">{category}</span>
-                        <span className="category-count">{productCount}</span>
-                      </div>
-                      <div className="category-actions">
-                        <button 
-                          className="action-btn edit"
-                          onClick={() => handleEditCategory(category)}
-                        >
-                          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </button>
-                        <button 
-                          className="action-btn delete"
-                          onClick={() => handleDeleteCategory(category)}
-                        >
-                          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p>No categories found. Add some categories to get started.</p>
-            )}
-          </div>
-        </Modal>
-      )}
+      <ManageCategoriesModal
+        isOpen={showCategoryModal}
+        onClose={() => {
+          setShowCategoryModal(false);
+          setEditingCategory(null);
+          setNewCategory('');
+        }}
+        categories={categories}
+        onCategoriesChange={(updatedCategories) => {
+          setCategories(updatedCategories);
+        }}
+      />
 
       {/* Add Product Modal */}
       <AddProductModal
