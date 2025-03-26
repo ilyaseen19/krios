@@ -21,15 +21,21 @@ const Login: React.FC = () => {
     try {
       await login(username, password);
       const storedRole = localStorage.getItem('userRole');
-      if (storedRole === 'admin') {
-        navigate('/admin/products');
-      } else if (storedRole === 'cashier') {
-        navigate('/cashier');
+      if (storedRole && storedRole.toLowerCase() === 'admin') {
+        navigate('/products');
+      } else if (storedRole && storedRole.toLowerCase() === 'cashier') {
+        navigate('/pos');
+      } else if (storedRole) {
+        navigate('/dashboard');
       } else {
         setError('Invalid user role');
       }
-    } catch (err) {
-      setError('Invalid username or password');
+    } catch (err: any) {
+      if (err.message === 'Account inactive') {
+        setError('Your account is inactive. Please contact an administrator.');
+      } else {
+        setError('Invalid username or password');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -47,11 +53,11 @@ const Login: React.FC = () => {
         {error && <div className="error-message">{error}</div>}
         
         <div className="form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">Name</label>
           <input
             type="text"
             id="username"
-            placeholder="Enter your username"
+            placeholder="Enter your name"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required

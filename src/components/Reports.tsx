@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Table from './Table';
-import { getFilteredInventory, getInventorySummary } from '../services/inventoryService';
+import { getFilteredTransactions, getFilteredInventory } from '../services/reportService';
+import { ToastType } from './Toast';
 
 import './Reports.css';
 
@@ -11,21 +12,43 @@ const Reports: React.FC = () => {
   const [reportDetailLevel, setReportDetailLevel] = useState<string>('');
   const [generatedAt, setGeneratedAt] = useState<Date>(new Date());
   const [filteredTransactions, setFilteredTransactions] = useState<any[]>([]);
+  const [isReportGenerated, setIsReportGenerated] = useState<boolean>(false);
 
   const totalQty = filteredTransactions.reduce((sum, t) => sum + (t.quantity || 0), 0);
   const totalPrice = filteredTransactions.reduce((sum, t) => sum + (t.price || 0), 0);
   const totalTotal = filteredTransactions.reduce((sum, t) => sum + (t.total || 0), 0);
   
-  // Sample data for the sales trend chart
-  const salesTrendData = [
-    { name: 'Jan', sales: 4000, profit: 2400, refunds: 200 },
-    { name: 'Feb', sales: 3000, profit: 1398, refunds: 150 },
-    { name: 'Mar', sales: 2000, profit: 9800, refunds: 50 },
-    { name: 'Apr', sales: 2780, profit: 3908, refunds: 180 },
-    { name: 'May', sales: 1890, profit: 4800, refunds: 90 },
-    { name: 'Jun', sales: 2390, profit: 3800, refunds: 120 },
-    { name: 'Jul', sales: 3490, profit: 4300, refunds: 210 },
-  ];
+  // Calculate summary data from filtered transactions
+  const calculateSummaryData = () => {
+    if (!filteredTransactions.length) return {
+      totalSales: 0,
+      totalProfit: 0,
+      totalRefunds: 0,
+      totalTaxes: 0,
+      netRevenue: 0
+    };
+
+    return filteredTransactions.reduce((acc, transaction) => {
+      const sales = transaction.total || 0;
+      const taxes = transaction.tax || 0;
+      const profit = sales * 0.2; // Assuming 20% profit margin
+      const refunds = 0; // Refunds not implemented yet
+
+      return {
+        totalSales: acc.totalSales + sales,
+        totalProfit: acc.totalProfit + profit,
+        totalRefunds: acc.totalRefunds + refunds,
+        totalTaxes: acc.totalTaxes + taxes,
+        netRevenue: acc.netRevenue + (sales - taxes - refunds)
+      };
+    }, {
+      totalSales: 0,
+      totalProfit: 0,
+      totalRefunds: 0,
+      totalTaxes: 0,
+      netRevenue: 0
+    });
+  };
   
   const handleReportTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setReportType(e.target.value);
@@ -45,12 +68,17 @@ const Reports: React.FC = () => {
 
   const handleGenerateReport = async () => {
     if (!reportType || !reportDetailLevel) {
-      alert('Please select both a report type and style');
+      window.toast?.warning('Please select both a report type and style');
+      return;
+    }
+    if (!startDate || !endDate) {
+      window.toast?.warning('Please select a date range');
       return;
     }
     const start = new Date(startDate);
     const end = new Date(endDate);
     setGeneratedAt(new Date());
+    setIsReportGenerated(true);
     
     try {
       let data;
@@ -121,17 +149,32 @@ const Reports: React.FC = () => {
           </select>
         </div>
         
-        <div className="">
-          <label>-</label>
+        <div className="filter-act-btn">
+          <label></label>
           <button className="generate-btn" onClick={handleGenerateReport}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
           </button>
+          <button 
+            className="generate-btn" 
+            onClick={() => {
+              setReportType('');
+              setStartDate('');
+              setEndDate('');
+              setReportDetailLevel('');
+              setIsReportGenerated(false);
+              setFilteredTransactions([]);
+            }}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       </div>
 
-      {reportType && reportDetailLevel && (
+      {reportType && reportDetailLevel && isReportGenerated && (
       <div className="report-content">
         {reportDetailLevel === 'summary' ? (
           <div className="report-summary">
@@ -151,35 +194,35 @@ const Reports: React.FC = () => {
                   <div className="summary-item">
                     <h3>Total Products Sold</h3>
                     <p className="summary-value">
-                      {salesTrendData.reduce((acc, item) => acc + item.sales, 0).toLocaleString()}
+                      {filteredTransactions.reduce((acc, t) => acc + t.items.reduce((sum, item) => sum + item.quantity, 0), 0).toLocaleString()}
                     </p>
                   </div>
                   
                   <div className="summary-item">
                     <h3>Gross Revenue</h3>
                     <p className="summary-value">
-                      ${salesTrendData.reduce((acc, item) => acc + item.sales, 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      ${calculateSummaryData().totalSales.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </p>
                   </div>
                   
                   <div className="summary-item">
                     <h3>Total Refunds</h3>
                     <p className="summary-value">
-                      ${salesTrendData.reduce((acc, item) => acc + item.refunds, 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      ${calculateSummaryData().totalRefunds.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </p>
                   </div>
                   
                   <div className="summary-item">
                     <h3>Total Taxes</h3>
                     <p className="summary-value">
-                      ${salesTrendData.reduce((acc, item) => acc + (item.sales * 0.08), 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      ${calculateSummaryData().totalTaxes.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </p>
                   </div>
                   
                   <div className="summary-item highlight">
                     <h3>Net Revenue</h3>
                     <p className="summary-value">
-                      ${salesTrendData.reduce((acc, item) => acc + (item.sales * 0.92 - item.refunds), 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      ${calculateSummaryData().netRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </p>
                   </div>
                 </div>

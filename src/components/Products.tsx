@@ -8,6 +8,7 @@ import { SketchPicker } from 'react-color';
 import { getProducts, createProduct, updateProduct, deleteProduct } from '../services/productService.offline';
 import { getCategories, createCategory, updateCategory, deleteCategory, Category } from '../services/categoryService.offline';
 import { calculateTotalInventoryCost, calculateTotalStockValue, calculatePotentialProfit, calculateExpectedRevenue, countTotalProductUnits, countLowStockItems } from '../utils/inventoryUtils';
+import { usePriceFormatter } from '../utils/priceUtils';
 
 // Extended Product interface to match the mockProducts structure
 interface ExtendedProduct extends Product {
@@ -53,6 +54,9 @@ const Products: React.FC = () => {
     color: '#7367f0' 
   });
   const productsPerPage = 8;
+  
+  // Use the price formatter
+  const { formatPrice } = usePriceFormatter();
   
   // Filter and sort products
   const filteredProducts = products.filter(product => {

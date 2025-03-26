@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useSettings } from '../contexts/SettingsContext';
 import { getProducts } from '../services/productService.offline';
 import './Topbar.css';
 
@@ -14,6 +15,7 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [notifications, setNotifications] = useState<{message: string, time: string, isNew?: boolean}[]>([]);
   const { logout } = useAuth();
+  const { generalSettings } = useSettings();
   const navigate = useNavigate();
   
   // Check for low stock products when component mounts
@@ -62,41 +64,12 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
           </svg>
         </button>
         <div className="logo-container">
-          <img src="/src/assets/logo.svg" alt="Krios" className="topbar-logo" />
-          <span className="logo-text">Krios</span>
+          <img src="/src/assets/logo.svg" alt={generalSettings.storeName} className="topbar-logo" />
+          <span className="logo-text">{generalSettings.storeName}</span>
         </div>
       </div>
 
       <div className="topbar-right">
-        <div className="search-section">
-          <button 
-            className="search-toggle-btn" 
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
-          >
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </button>
-          {isSearchOpen && (
-            <div className="search-dropdown">
-              <div className="search-wrapper">
-                <svg className="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input type="text" placeholder="Search here..." className="search-input" />
-              </div>
-              <div className="search-recent">
-                <h6 className="search-title">Recent Searches</h6>
-                <ul className="search-tags">
-                  <li><a href="#">Products</a></li>
-                  <li><a href="#">Sales</a></li>
-                  <li><a href="#">Reports</a></li>
-                </ul>
-              </div>
-            </div>
-          )}
-        </div>
-
         <button
           className="notification-btn pos-button"
           onClick={() => navigate('/pos')}

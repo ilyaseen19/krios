@@ -39,8 +39,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (username: string, password: string) => {
     try {
       const user = await authenticateUser(username, password);
-      localStorage.setItem('token', user.token);
+      // Generate a simple token for the user session
+      const token = `token_${user.id}_${Date.now()}`;
+      localStorage.setItem('token', token);
       localStorage.setItem('userRole', user.role);
+      localStorage.setItem('username', user.name); // Store username for other components
       setIsAuthenticated(true);
       setUserRole(user.role);
     } catch (error) {

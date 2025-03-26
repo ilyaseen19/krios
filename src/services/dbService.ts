@@ -122,7 +122,7 @@ export const getAllItems = <T>(storeName: string): Promise<T[]> => {
 };
 
 // Generic function to get an item by ID
-export const getItemById = <T>(storeName: string, id: string): Promise<T | null> => {
+export const getItemById = <T>(storeName: string, id: string | number): Promise<T | null> => {
   return new Promise((resolve, reject) => {
     initDB().then(db => {
       const transaction = db.transaction(storeName, 'readonly');
@@ -170,7 +170,7 @@ export const updateItem = <T>(storeName: string, item: T): Promise<T> => {
 };
 
 // Generic function to delete an item
-export const deleteItem = (storeName: string, id: string): Promise<void> => {
+export const deleteItem = (storeName: string, id: string | number): Promise<void> => {
   return new Promise((resolve, reject) => {
     initDB().then(db => {
       const transaction = db.transaction(storeName, 'readwrite');

@@ -1,6 +1,7 @@
 // Offline Service - Manages switching between online and offline modes
 
 import { initDB, STORES, getPendingOperations, deletePendingOperation } from './dbService';
+import { initializeDefaultAdmin } from './initDbData';
 import { NETWORK_EVENTS } from './networkService';
 
 // Import offline implementations
@@ -32,6 +33,15 @@ export const initOfflineSystem = async (): Promise<void> => {
   try {
     // Initialize the IndexedDB database
     await initDB();
+    
+    // Initialize default admin user if no users exist
+    // Always check if there are users in the database
+    await initializeDefaultAdmin();
+    
+    // Set the flag to indicate that the database has been initialized
+    if (!localStorage.getItem('dbInitialized')) {
+      localStorage.setItem('dbInitialized', 'true');
+    }
     
     // Set initial mode based on network status
     setOfflineMode(!navigator.onLine);

@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
-import { mockSales, Sale, saleStatuses } from '../data/mockSales';
+import React, { useState, useEffect } from 'react';
+import { Transaction } from '../types/product';
+import { getTransactions } from '../services/transactionService.offline';
 import './Sales.css';
 import { Modal } from './modals';
 import Table from './Table';
+
+type SaleStatus = 'Completed' | 'Pending' | 'Cancelled';
+const saleStatuses: SaleStatus[] = ['Completed', 'Pending', 'Cancelled'];
+
+interface Sale {
+  id: string;
+  date: string;
+  customer: string;
+  total: number;
+  status: SaleStatus;
+  items?: CartItem[];
+  tax?: number;
+}
 
 interface OrderSummary {
   total: number;
@@ -12,7 +26,27 @@ interface OrderSummary {
 }
 
 const Sales: React.FC = () => {
-  const [sales, setSales] = useState<Sale[]>(mockSales);
+  const [sales, setSales] = useState<Sale[]>([]);
+
+  useEffect(() => {
+    const loadSales = async () => {
+      try {
+        const transactions = await getTransactions();
+        const formattedSales: Sale[] = transactions.map(transaction => ({
+          id: transaction.id,
+          date: transaction.createdAt.toISOString(),
+          customer: transaction.cashierId, // Using cashierId as customer for now
+          total: transaction.total,
+          status: transaction.paymentType === 'cash' ? 'Completed' : 'Pending' // Simple status mapping
+        }));
+        setSales(formattedSales);
+      } catch (error) {
+        console.error('Error loading sales:', error);
+      }
+    };
+    
+    loadSales();
+  }, []);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
@@ -69,9 +103,21 @@ const Sales: React.FC = () => {
   const totalPages = Math.ceil(filteredSales.length / ordersPerPage);
   
   // Handle view order details
-  const handleViewOrder = (order: Sale) => {
-    setSelectedOrder(order);
-    setShowOrderDetails(true);
+  const handleViewOrder = async (order: Sale) => {
+    try {
+      const transactions = await getTransactions();
+      const transaction = transactions.find(t => t.id === order.id);
+      if (transaction) {
+        setSelectedOrder({
+          ...order,
+          items: transaction.items,
+          tax: transaction.tax
+        });
+        setShowOrderDetails(true);
+      }
+    } catch (error) {
+      console.error('Error loading transaction details:', error);
+    }
   };
   
   // Get customer initials for avatar
@@ -249,11 +295,6 @@ const Sales: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </button>
-                  <button className="action-btn edit">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </button>
                   <button className="action-btn print">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -314,11 +355,6 @@ const Sales: React.FC = () => {
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </button>
-                  <button className="action-btn edit">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
                   <button className="action-btn print">
@@ -396,46 +432,7 @@ const Sales: React.FC = () => {
       <Modal
         isOpen={showOrderDetails}
         onClose={() => setShowOrderDetails(false)}
-        title={`Order #${selectedOrder?.id || ''}`}
-        size="medium"
-        actions={
-          <div className="receipt-actions">
-              <button 
-                className="action-btn refund"
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to refund this order?')) {
-                    // Add refund logic here
-                    alert('Order refunded successfully!');
-                  }
-                }}
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                </svg>
-              </button>
-              <button 
-                className="action-btn print" 
-                onClick={() => window.print()}
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-              </button>
-              <button 
-                className="action-btn delete" 
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to delete this order?')) {
-                    setSales(sales.filter(s => s.id !== selectedOrder.id));
-                    setShowOrderDetails(false);
-                  }
-                }}
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
-            </div>
-        }
+        title="Order Details"
       >
         {selectedOrder && (
           <div className="receipt-container">

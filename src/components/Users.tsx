@@ -1,11 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import './Users.css';
-import { mockUsers, defaultNewUser, User } from '../data/mockUsers';
-import { Modal } from './modals';
+import { User } from '../types/user';
+import { userRoles, userStatuses } from '../constants/userConstants';
+import { Modal, AddUserModal, EditUserModal } from './modals';
 import Table, { TableColumn } from './Table';
+import { getUsers, createUser, updateUser, deleteUser } from '../services/userService';
 
 const Users: React.FC = () => {
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
@@ -13,7 +17,28 @@ const Users: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [newUser, setNewUser] = useState(defaultNewUser);
+  
+  // Load users from IndexedDB on component mount
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        setLoading(true);
+        const loadedUsers = await getUsers();
+        
+        // Set users from IndexedDB
+        setUsers(loadedUsers);
+        
+        setError(null);
+      } catch (err) {
+        console.error('Failed to load users:', err);
+        setError('Failed to load users. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadUsers();
+  }, []);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -58,26 +83,16 @@ const Users: React.FC = () => {
     }
   };
 
-  // Handle adding a new user
-  const handleAddUser = () => {
-    const id = users.length > 0 ? Math.max(...users.map(user => user.id)) + 1 : 1;
-    const userToAdd = { id, ...newUser };
-    setUsers([...users, userToAdd]);
-    setNewUser({ name: '', email: '', role: 'Cashier', status: 'Active' });
-    setShowAddModal(false);
+  // Handle user added from AddUserModal
+  const handleUserAdded = (newUser: User) => {
+    setUsers(prevUsers => [...prevUsers, newUser]);
   };
 
-  // Handle editing a user
-  const handleEditUser = () => {
-    if (!currentUser) return;
-    
-    const updatedUsers = users.map(user => 
-      user.id === currentUser.id ? currentUser : user
+  // Handle user updated from EditUserModal
+  const handleUserUpdated = (updatedUser: User) => {
+    setUsers(prevUsers => 
+      prevUsers.map(user => user.id === updatedUser.id ? updatedUser : user)
     );
-    
-    setUsers(updatedUsers);
-    setShowEditModal(false);
-    setCurrentUser(null);
   };
 
   // State for delete confirmation modal
@@ -91,133 +106,42 @@ const Users: React.FC = () => {
   };
 
   // Handle deleting a user
-  const handleDeleteUser = () => {
+  const handleDeleteUser = async () => {
     if (userToDelete !== null) {
-      setUsers(users.filter(user => user.id !== userToDelete));
-      setShowDeleteModal(false);
-      setUserToDelete(null);
+      try {
+        await deleteUser(userToDelete);
+        setUsers(users.filter(user => user.id !== userToDelete));
+        setShowDeleteModal(false);
+        setUserToDelete(null);
+      } catch (err) {
+        console.error('Failed to delete user:', err);
+        alert('Failed to delete user. Please try again.');
+      }
     }
   };
 
   // Open edit modal with user data
-  const openEditModal = (user) => {
-    setCurrentUser({...user});
+  const openEditModal = (user: User) => {
+    setCurrentUser(user);
     setShowEditModal(true);
   };
 
   return (
     <div className="users-container">
       {/* Add User Modal */}
-      {showAddModal && (
-        <Modal
-          isOpen={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          title="Add New User"
-          size="medium"
-          actions={
-            <>
-              <button onClick={() => setShowAddModal(false)} className="cancel-btn">Cancel</button>
-              <button onClick={handleAddUser} className="save-btn">Add User</button>
-            </>
-          }
-        >
-          <div className="form-group">
-            <label>Name</label>
-            <input 
-              type="text" 
-              value={newUser.name} 
-              onChange={(e) => setNewUser({...newUser, name: e.target.value})}
-              placeholder="Enter name"
-            />
-          </div>
-          <div className="form-group">
-            <label>Email</label>
-            <input 
-              type="email" 
-              value={newUser.email} 
-              onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-              placeholder="Enter email"
-            />
-          </div>
-          <div className="form-group">
-            <label>Role</label>
-            <select 
-              value={newUser.role} 
-              onChange={(e) => setNewUser({...newUser, role: e.target.value})}
-            >
-              <option value="Admin">Admin</option>
-              <option value="Manager">Manager</option>
-              <option value="Cashier">Cashier</option>
-              <option value="Inventory">Inventory</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Status</label>
-            <select 
-              value={newUser.status} 
-              onChange={(e) => setNewUser({...newUser, status: e.target.value})}
-            >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-          </div>
-        </Modal>
-      )}
+      <AddUserModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onUserAdded={handleUserAdded}
+      />
 
       {/* Edit User Modal */}
-      {showEditModal && currentUser && (
-        <Modal
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
-          title="Edit User"
-          size="medium"
-          actions={
-            <>
-              <button onClick={() => setShowEditModal(false)} className="cancel-btn">Cancel</button>
-              <button onClick={handleEditUser} className="save-btn">Save Changes</button>
-            </>
-          }
-        >
-          <div className="form-group">
-            <label>Name</label>
-            <input 
-              type="text" 
-              value={currentUser.name} 
-              onChange={(e) => setCurrentUser({...currentUser, name: e.target.value})}
-            />
-          </div>
-          <div className="form-group">
-            <label>Email</label>
-            <input 
-              type="email" 
-              value={currentUser.email} 
-              onChange={(e) => setCurrentUser({...currentUser, email: e.target.value})}
-            />
-          </div>
-          <div className="form-group">
-            <label>Role</label>
-            <select 
-              value={currentUser.role} 
-              onChange={(e) => setCurrentUser({...currentUser, role: e.target.value})}
-            >
-              <option value="Admin">Admin</option>
-              <option value="Manager">Manager</option>
-              <option value="Cashier">Cashier</option>
-              <option value="Inventory">Inventory</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Status</label>
-            <select 
-              value={currentUser.status} 
-              onChange={(e) => setCurrentUser({...currentUser, status: e.target.value})}
-            >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-          </div>
-        </Modal>
-      )}
+      <EditUserModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        user={currentUser}
+        onUserUpdated={handleUserUpdated}
+      />
 
       <div className="users-header">
         <h2 className="section-title">User Management</h2>
@@ -228,6 +152,20 @@ const Users: React.FC = () => {
           Add New User
         </button>
       </div>
+      
+      {/* Loading and Error States */}
+      {loading && (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading users...</p>
+        </div>
+      )}
+      
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
 
       <div className="filter-section">
         <div className="search-box">

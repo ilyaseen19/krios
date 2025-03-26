@@ -1,31 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { defaultGeneralSettings, defaultNotificationSettings, GeneralSettings, NotificationSettings, dateFormats, timeZones } from '../data/mockSettings';
+import { useSettings } from '../contexts/SettingsContext';
 import './Settings.css';
 
 const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('general');
-  const [generalSettings, setGeneralSettings] = useState<GeneralSettings>(defaultGeneralSettings);
-  
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>(defaultNotificationSettings);
+  const { 
+    generalSettings, 
+    notificationSettings, 
+    updateGeneralSettings, 
+    updateNotificationSettings,
+    isLoading 
+  } = useSettings();
 
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setGeneralSettings(prev => ({
-      ...prev,
+    updateGeneralSettings({
       [name]: value
-    }));
+    });
   };
 
   const handleNotificationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setNotificationSettings(prev => ({
-      ...prev,
+    updateNotificationSettings({
       [name]: checked
-    }));
+    });
   };
 
   const handleSaveSettings = () => {
-    // Here you would implement the logic to save settings to backend
+    // Settings are automatically saved when changed
     alert('Settings saved successfully!');
   };
 
@@ -124,14 +127,24 @@ const Settings: React.FC = () => {
               <div className="settings-form-grid">
                 <div className="form-group">
                   <label htmlFor="currencySymbol">Currency Symbol</label>
-                  <input
-                    type="text"
+                  <select
                     id="currencySymbol"
                     name="currencySymbol"
                     value={generalSettings.currencySymbol}
                     onChange={handleGeneralChange}
-                    className="settings-input"
-                  />
+                    className="settings-select"
+                  >
+                    <option value="$">$ (USD)</option>
+                    <option value="€">€ (EUR)</option>
+                    <option value="£">£ (GBP)</option>
+                    <option value="¥">¥ (JPY/CNY)</option>
+                    <option value="₹">₹ (INR)</option>
+                    <option value="₽">₽ (RUB)</option>
+                    <option value="₩">₩ (KRW)</option>
+                    <option value="A$">A$ (AUD)</option>
+                    <option value="C$">C$ (CAD)</option>
+                    <option value="Fr">Fr (CHF)</option>
+                  </select>
                 </div>
                 
                 <div className="form-group">

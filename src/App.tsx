@@ -1,12 +1,15 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { OfflineProvider } from './contexts/OfflineContext';
+import { SettingsProvider } from './contexts/SettingsContext';
 import Login from './components/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginProtection from './components/LoginProtection';
 import AdminLayout from './components/AdminLayout';
 import OfflineIndicator from './components/OfflineIndicator';
 import ToastContainer from './components/ToastContainer';
+import Unauthorized from './components/Unauthorized';
 import './App.css';
 
 // Import page components
@@ -18,21 +21,23 @@ import POS from './components/POS';
 import Users from './components/Users';
 import Settings from './components/Settings';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <OfflineProvider>
-        <Router>
-          <ToastContainer />
-          <div style={{ padding: '0.5rem 1rem' }}>
-            <OfflineIndicator />
-          </div>
-          <Routes>
+    <Router>
+      <AuthProvider>
+        <OfflineProvider>
+          <SettingsProvider>
+            <ToastContainer />
+            <div style={{ padding: '0.5rem 1rem' }}>
+              <OfflineIndicator />
+            </div>
+            <Routes>
           <Route path="/login" element={<LoginProtection><Login /></LoginProtection>} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
           <Route
             path="pos"
             element={
-              <ProtectedRoute allowedRoles={['admin', 'user', 'cashier']}>
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'cashier', 'supervispor']}>
                 <POS />
               </ProtectedRoute>
             }
@@ -40,7 +45,7 @@ function App() {
           <Route
             path="/*"
             element={
-              <ProtectedRoute allowedRoles={['admin', 'user', 'cashier']}>
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'inventory']}>
                 <AdminLayout>
                   <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
@@ -56,11 +61,12 @@ function App() {
             }
           />
           <Route path="/" element={<LoginProtection><Login /></LoginProtection>} />
-          </Routes>
-        </Router>
-      </OfflineProvider>
-    </AuthProvider>
-  )
+            </Routes>
+          </SettingsProvider>
+        </OfflineProvider>
+      </AuthProvider>
+    </Router>
+  );
 }
 
 export default App

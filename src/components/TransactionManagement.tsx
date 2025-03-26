@@ -88,7 +88,9 @@ const TransactionManagement: React.FC = () => {
   const handleCheckout = async () => {
     if (!user) return;
     try {
-      await createTransaction(cart, user.username);
+      // Get the username from localStorage instead of user object
+      const cashierId = localStorage.getItem('username') || 'unknown';
+      await createTransaction(cart, cashierId);
       setCart([]);
       loadProducts(); // Reload products to get updated stock
     } catch (err) {

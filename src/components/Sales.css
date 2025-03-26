@@ -817,9 +817,11 @@
 /* Search Box */
 .search-box {
   position: relative;
-  flex: 1;
-  min-width: 200px;
-  max-width: 400px;
+  flex: 0 1 auto;
+  min-width: 150px;
+  max-width: 300px;
+  width: 200px;
+  margin-top: 15px;
 }
 
 @media print {
@@ -889,7 +891,7 @@
 }
 
 .search-input {
-  width: 100%;
+  width: 85% !important;
   padding: 10px 10px 10px 40px;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
