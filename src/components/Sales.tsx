@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Transaction } from '../types/product';
+import { Transaction, CartItem } from '../types/product';
 import { getTransactions } from '../services/transactionService.offline';
 import './Sales.css';
 import { Modal } from './modals';
 import Table from './Table';
+import { usePriceFormatter } from '../utils/priceUtils';
+import { useSettings } from '../contexts/SettingsContext';
+import { formatDate } from '../utils/formatUtils';
 
 type SaleStatus = 'Completed' | 'Pending' | 'Cancelled';
 const saleStatuses: SaleStatus[] = ['Completed', 'Pending', 'Cancelled'];
@@ -27,6 +30,8 @@ interface OrderSummary {
 
 const Sales: React.FC = () => {
   const [sales, setSales] = useState<Sale[]>([]);
+  const { formatPrice } = usePriceFormatter();
+  const { generalSettings } = useSettings();
 
   useEffect(() => {
     const loadSales = async () => {
@@ -37,6 +42,8 @@ const Sales: React.FC = () => {
           date: transaction.createdAt.toISOString(),
           customer: transaction.cashierId, // Using cashierId as customer for now
           total: transaction.total,
+          tax: transaction.tax,
+          items: transaction.items,
           status: transaction.paymentType === 'cash' ? 'Completed' : 'Pending' // Simple status mapping
         }));
         setSales(formattedSales);
@@ -276,7 +283,7 @@ const Sales: React.FC = () => {
                 <div className="order-details">
                   <div className="order-detail-item">
                     <span className="detail-label">Amount</span>
-                    <span className="detail-value">${order.total.toFixed(2)}</span>
+                    <span className="detail-value">{formatPrice(order.total)}</span>
                   </div>
                   <div className="order-detail-item">
                     <span className="detail-label">Payment</span>
@@ -337,7 +344,7 @@ const Sales: React.FC = () => {
             },
             {
               header: 'Amount',
-              accessor: (order) => `$${order.total.toFixed(2)}`
+              accessor: (order) => formatPrice(order.total)
             },
             {
               header: 'Status',
@@ -437,11 +444,11 @@ const Sales: React.FC = () => {
         {selectedOrder && (
           <div className="receipt-container">
             <div className="receipt-header">
-              <div className="company-name">Krios Store</div>
+              <div className="company-name">{generalSettings.storeName}</div>
               <div className="order-number">{`Order #${selectedOrder.id}`}</div>
-              <div className="order-date">{formatDate(selectedOrder.date)}</div>
+              <div className="order-date">{formatDate(new Date(selectedOrder.date), generalSettings.dateFormat)}</div>
               <div className="cashier-info">
-                <div>Cashier: John Doe</div>
+                <div>Cashier: {selectedOrder.customer}</div>
                 <div>Time: {new Date(selectedOrder.date).toLocaleTimeString()}</div>
               </div>
             </div>
@@ -455,7 +462,7 @@ const Sales: React.FC = () => {
               </div>
               <div className="order-detail-item">
                 <span className="detail-label">Payment Method</span>
-                <span className="detail-value">Credit Card</span>
+                <span className="detail-value">{selectedOrder.status === 'Completed' ? 'Cash' : 'Credit Card'}</span>
               </div>
             </div>
 
@@ -466,23 +473,35 @@ const Sales: React.FC = () => {
                 <span>Qty</span>
                 <span>Price</span>
               </div>
-              {/* Sample items - replace with actual data */}
-              <div className="item-row">
-                <span>Sample Item 1</span>
-                <span>2</span>
-                <span>$20.00</span>
-              </div>
-              <div className="item-row">
-                <span>Sample Item 2</span>
-                <span>1</span>
-                <span>$15.00</span>
-              </div>
+              {selectedOrder.items && selectedOrder.items.map((item, index) => (
+                <div className="item-row" key={index}>
+                  <span>{item.name}</span>
+                  <span>{item.quantity}</span>
+                  <span>{formatPrice(item.price * item.quantity)}</span>
+                </div>
+              ))}
             </div>
+
+            <div className="summary-row">
+              <span className="detail-label">Subtotal</span>
+              <span className="detail-value">
+                {formatPrice(selectedOrder.total - (selectedOrder.tax || 0))}
+              </span>
+            </div>
+            
+            {selectedOrder.tax && (
+              <div className="summary-row">
+                <span className="detail-label">Tax ({generalSettings.taxRate}%)</span>
+                <span className="detail-value">
+                  {formatPrice(selectedOrder.tax)}
+                </span>
+              </div>
+            )}
 
             <div className="summary-row">
               <span className="detail-label">Total Amount</span>
               <span className="detail-value" style={{ color: '#7367f0', fontSize: '1.2rem' }}>
-                ${selectedOrder.total.toFixed(2)}
+                {formatPrice(selectedOrder.total)}
               </span>
             </div>
           </div>
