@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { sortOptions } from '../data/mockProducts';
 import { Product } from '../types/product';
 import './Products.css';
-import { Modal, AddProductModal, EditProductModal, ManageCategoriesModal } from './modals';
+import { Modal, AddProductModal, EditProductModal, ManageCategoriesModal, DeleteConfirmationModal } from './modals';
 import Table from './Table';
 import { SketchPicker } from 'react-color';
 import { getProducts, createProduct, updateProduct, deleteProduct } from '../services/productService.offline';
@@ -450,7 +450,7 @@ const Products: React.FC = () => {
             </div>
             <div className="stat-content">
               <span className="stat-label">Total Inventory Cost</span>
-              <span className="stat-value">${calculateTotalInventoryCost(products).toFixed(2)}</span>
+              <span className="stat-value">{formatPrice(calculateTotalInventoryCost(products))}</span>
             </div>
           </div>
           <div className="summary-stat">
@@ -461,7 +461,7 @@ const Products: React.FC = () => {
             </div>
             <div className="stat-content">
               <span className="stat-label">Expected Revenue</span>
-              <span className="stat-value">${calculateExpectedRevenue(products, 1.5).toFixed(2)}</span>
+              <span className="stat-value">{formatPrice(calculateExpectedRevenue(products))}</span>
             </div>
           </div>
         </div>
@@ -567,7 +567,7 @@ const Products: React.FC = () => {
                   <span className={`product-stock ${stockStatus.class}`}>{stockStatus.text}</span>
                   <h3 className="product-name">{product.name}</h3>
                   <p className="product-category">{product.category}</p>
-                  <p className="product-price">${product.price.toFixed(2)}</p>
+                  <p className="product-price">{formatPrice(product.price)}</p>
                   <div className="product-actions">
                     <button className="action-btn delete" onClick={() => handleDeleteProduct(product)}>
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -605,7 +605,7 @@ const Products: React.FC = () => {
             },
             {
               header: 'Price',
-              accessor: (product) => `$${product.price.toFixed(2)}`
+              accessor: (product) => formatPrice(product.price)
             },
             {
               header: 'Stock',
@@ -732,7 +732,7 @@ const Products: React.FC = () => {
             <div className="product-detail-info">
               <h4 className="product-detail-name">{selectedProduct.name}</h4>
               <p className="product-detail-category">Category: {selectedProduct.category}</p>
-              <p className="product-detail-price">Price: ${selectedProduct.price.toFixed(2)}</p>
+              <p className="product-detail-price">Price: {formatPrice(selectedProduct.price)}</p>
               <p className="product-detail-stock">Stock: {selectedProduct.stock}</p>
               <p className="product-detail-color">Color: <span style={{ display: 'inline-block', width: '20px', height: '20px', backgroundColor: selectedProduct.color, borderRadius: '4px', verticalAlign: 'middle', marginLeft: '5px', border: '1px solid #ddd' }}></span></p>
               <div className="product-detail-status">
@@ -759,20 +759,13 @@ const Products: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && selectedProduct && (
-        <Modal
+        <DeleteConfirmationModal
           isOpen={showDeleteConfirm}
           onClose={() => setShowDeleteConfirm(false)}
-          title="Confirm Delete"
-          size="small"
-          actions={
-            <>
-              <button onClick={() => setShowDeleteConfirm(false)} className="cancel-btn">Cancel</button>
-              <button onClick={confirmDeleteProduct} className="save-btn bg-red-600 hover:bg-red-700">Delete</button>
-            </>
-          }
-        >
-          <p className="mb-4">Are you sure you want to delete <strong>{selectedProduct.name}</strong>? This action cannot be undone.</p>
-        </Modal>
+          onConfirm={confirmDeleteProduct}
+          itemName={selectedProduct.name}
+          itemType="product"
+        />
       )}
 
       {/* Category Management Modal */}

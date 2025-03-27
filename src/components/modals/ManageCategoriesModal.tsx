@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
 import './ManageCategoriesModal.css';
 import { Category, getCategories, createCategory, updateCategory, deleteCategory } from '../../services/categoryService.offline';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 interface ManageCategoriesModalProps {
   isOpen: boolean;
@@ -22,6 +23,8 @@ const ManageCategoriesModal: React.FC<ManageCategoriesModalProps> = ({
   const [editedName, setEditedName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
 
   // Load categories from IndexedDB when modal opens
   useEffect(() => {
@@ -146,44 +149,59 @@ const ManageCategoriesModal: React.FC<ManageCategoriesModalProps> = ({
   };
 
   const handleDeleteCategory = async (category: Category) => {
-    if (window.confirm(`Are you sure you want to delete the category "${category.name}"? This will remove the category from all products.`)) {
-      try {
-        setLoading(true);
-        setError(null);
-        await deleteCategory(category.id);
-        
-        // Update category list
-        setCategoryList(categoryList.filter(cat => cat.id !== category.id));
-        
-        // Update categories in parent component
-        const updatedCategories = categories.filter(cat => cat !== category.name);
-        onCategoriesChange(updatedCategories);
-        
-        // Show success toast if window.toast is available
-        if (window.toast) {
-          window.toast.success('Category deleted successfully');
-        }
-      } catch (err) {
-        console.error('Failed to delete category:', err);
-        setError('Failed to delete category. Please try again.');
-        
-        // Show error toast if window.toast is available
-        if (window.toast) {
-          window.toast.error('Failed to delete category');
-        }
-      } finally {
-        setLoading(false);
+    setCategoryToDelete(category);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteCategory = async () => {
+    if (!categoryToDelete) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      await deleteCategory(categoryToDelete.id);
+      
+      // Update category list
+      setCategoryList(categoryList.filter(cat => cat.id !== categoryToDelete.id));
+      
+      // Update categories in parent component
+      const updatedCategories = categories.filter(cat => cat !== categoryToDelete.name);
+      onCategoriesChange(updatedCategories);
+      
+      // Show success toast if window.toast is available
+      if (window.toast) {
+        window.toast.success('Category deleted successfully');
       }
+    } catch (err) {
+      console.error('Failed to delete category:', err);
+      setError('Failed to delete category. Please try again.');
+      
+      // Show error toast if window.toast is available
+      if (window.toast) {
+        window.toast.error('Failed to delete category');
+      }
+    } finally {
+      setLoading(false);
+      setShowDeleteModal(false);
+      setCategoryToDelete(null);
     }
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Manage Categories"
-      size="medium"
-    >
+    <>
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDeleteCategory}
+        itemName={categoryToDelete?.name || ''}
+        itemType="category"
+      />
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title="Manage Categories"
+        size="medium"
+      >
       <div className="categories-modal-content">
         {error && (
           <div className="error-message-box">
@@ -280,7 +298,8 @@ const ManageCategoriesModal: React.FC<ManageCategoriesModalProps> = ({
           <button className="close-btn" onClick={onClose}>Close</button>
         </div>
       </div>
-    </Modal>
+      </Modal>
+    </>
   );
 };
 

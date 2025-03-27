@@ -49,18 +49,11 @@ export const getTotalProducts = async (): Promise<number> => {
   }
 };
 
-// Get total number of categories
+// Get total number of categories directly from the categories store
 export const getTotalCategories = async (): Promise<number> => {
   try {
-    const products = await getAllItems<Product>(STORES.PRODUCTS);
-    const uniqueCategories = new Set();
-    
-    products.forEach(product => {
-      const category = product.category || 'Uncategorized';
-      uniqueCategories.add(category);
-    });
-    
-    return uniqueCategories.size;
+    const categories = await getAllItems(STORES.CATEGORIES);
+    return categories.length;
   } catch (error) {
     console.error('Error getting total categories:', error);
     return 0;
