@@ -7,6 +7,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useCashDrawer, simulateOpenCashDrawer } from '../services/cashDrawerService';
 import { PasswordModal, DiscountModal, ReceiptModal } from './modals';
+import { usePriceFormatter } from '../utils/priceUtils';
+import { useSettings } from '../contexts/SettingsContext';
 import './POS.css';
 
 const getInitials = (name: string) => {
@@ -40,6 +42,9 @@ const POS: React.FC = () => {
   
   // Initialize cash drawer hook
   const { openDrawer, isOpening, error: drawerError, isSupported } = useCashDrawer();
+  
+  // Use the price formatter
+  const { formatPrice } = usePriceFormatter();
 
   // Filter products based on category and search query
   useEffect(() => {
@@ -239,6 +244,9 @@ const POS: React.FC = () => {
   
   // Format receipt for printing
   const formatReceiptForPrinting = (transaction: any) => {
+    const { generalSettings } = useSettings();
+    const currencySymbol = generalSettings.currencySymbol;
+    
     let receipt = '\n\n';
     receipt += '      KRIOS POS SYSTEM      \n';
     receipt += '----------------------------\n';
@@ -249,18 +257,18 @@ const POS: React.FC = () => {
     // Add items
     currentTransaction.forEach(item => {
       receipt += `${item.name}\n`;
-      receipt += `  ${item.quantity} x $${item.price.toFixed(2)} = $${(item.quantity * item.price).toFixed(2)}\n`;
+      receipt += `  ${item.quantity} x ${currencySymbol}${item.price.toFixed(2)} = ${currencySymbol}${(item.quantity * item.price).toFixed(2)}\n`;
     });
     
     receipt += '\n----------------------------\n';
-    receipt += `Subtotal: $${calculateSubtotal().toFixed(2)}\n`;
+    receipt += `Subtotal: ${currencySymbol}${calculateSubtotal().toFixed(2)}\n`;
     
     if (discount) {
-      receipt += `Discount: -$${calculateDiscountAmount().toFixed(2)}\n`;
+      receipt += `Discount: -${currencySymbol}${calculateDiscountAmount().toFixed(2)}\n`;
     }
     
-    receipt += `Tax (10%): $${(calculateFinalSubtotal() * 0.1).toFixed(2)}\n`;
-    receipt += `Total: $${(calculateFinalSubtotal() * 1.1).toFixed(2)}\n`;
+    receipt += `Tax (10%): ${currencySymbol}${(calculateFinalSubtotal() * 0.1).toFixed(2)}\n`;
+    receipt += `Total: ${currencySymbol}${(calculateFinalSubtotal() * 1.1).toFixed(2)}\n`;
     receipt += `Payment Method: ${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}\n`;
     receipt += '----------------------------\n';
     receipt += '      Thank You!      \n\n\n';
@@ -408,7 +416,7 @@ const POS: React.FC = () => {
                   </div>
                   <div className="product-info">
                     <h3 className="product-name">{product.name}</h3>
-                    <p className="product-price">${product.price.toFixed(2)}</p>
+                    <p className="product-price">{formatPrice(product.price)}</p>
                   </div>
                 </div>
               ))}
@@ -445,7 +453,7 @@ const POS: React.FC = () => {
                   <div key={item.id} className="cart-item">
                     <div className="cart-item-info">
                       <h3 className="cart-item-name">{item.name}</h3>
-                      <p className="cart-item-price">${item.price.toFixed(2)}</p>
+                      <p className="cart-item-price">{formatPrice(item.price)}</p>
                     </div>
                     <div className="cart-item-quantity">
                       <button 
@@ -468,7 +476,7 @@ const POS: React.FC = () => {
                       </button>
                     </div>
                     <div className="cart-item-total">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      {formatPrice(item.price * item.quantity)}
                     </div>
                     <button 
                       className="remove-item-btn" 
@@ -488,23 +496,23 @@ const POS: React.FC = () => {
             <div className="cart-summary">
               <div className="summary-row">
                 <span>Subtotal</span>
-                <span>${calculateSubtotal().toFixed(2)}</span>
+                <span>{formatPrice(calculateSubtotal())}</span>
               </div>
               {discount && (
                 <div className="summary-row discount">
                   <span>
                     Discount {discount.type === 'percentage' ? `(${discount.value}%)` : '(Fixed)'}
                   </span>
-                  <span>-${calculateDiscountAmount().toFixed(2)}</span>
+                  <span>-{formatPrice(calculateDiscountAmount())}</span>
                 </div>
               )}
               <div className="summary-row">
                 <span>Tax (10%)</span>
-                <span>${(calculateFinalSubtotal() * 0.1).toFixed(2)}</span>
+                <span>{formatPrice(calculateFinalSubtotal() * 0.1)}</span>
               </div>
               <div className="summary-row total">
                 <span>Total</span>
-                <span>${(calculateFinalSubtotal() * 1.1).toFixed(2)}</span>
+                <span>{formatPrice(calculateFinalSubtotal() * 1.1)}</span>
               </div>
               
               <div className="checkout-actions">

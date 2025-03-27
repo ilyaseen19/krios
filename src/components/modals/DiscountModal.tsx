@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
 import './DiscountModal.css';
+import { usePriceFormatter } from '../../utils/priceUtils';
+import { useSettings } from '../../contexts/SettingsContext';
 
 interface DiscountModalProps {
   isOpen: boolean;
@@ -18,6 +20,8 @@ const DiscountModal: React.FC<DiscountModalProps> = ({
   const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
   const [discountValue, setDiscountValue] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const { formatPrice } = usePriceFormatter();
+  const { generalSettings } = useSettings();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,7 +115,7 @@ const DiscountModal: React.FC<DiscountModalProps> = ({
                 autoFocus
               />
               <span className="discount-symbol">
-                {discountType === 'percentage' ? '%' : '$'}
+                {discountType === 'percentage' ? '%' : generalSettings.currencySymbol}
               </span>
             </div>
           </div>

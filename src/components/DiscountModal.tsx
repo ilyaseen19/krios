@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
 import './DiscountModal.css';
+import { usePriceFormatter } from '../utils/priceUtils';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface DiscountModalProps {
   isOpen: boolean;
@@ -18,6 +20,8 @@ const DiscountModal: React.FC<DiscountModalProps> = ({
   const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
   const [discountValue, setDiscountValue] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const { formatPrice } = usePriceFormatter();
+  const { generalSettings } = useSettings();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,7 +93,7 @@ const DiscountModal: React.FC<DiscountModalProps> = ({
                 className={`discount-type-btn ${discountType === 'fixed' ? 'active' : ''}`}
                 onClick={() => setDiscountType('fixed')}
               >
-                Fixed Amount ($)
+                Fixed Amount ({generalSettings.currencySymbol})
               </button>
             </div>
           </div>
@@ -111,7 +115,7 @@ const DiscountModal: React.FC<DiscountModalProps> = ({
                 autoFocus
               />
               <span className="discount-symbol">
-                {discountType === 'percentage' ? '%' : '$'}
+                {discountType === 'percentage' ? '%' : generalSettings.currencySymbol}
               </span>
             </div>
           </div>
@@ -120,23 +124,23 @@ const DiscountModal: React.FC<DiscountModalProps> = ({
           
           <div className="discount-preview">
             <p>
-              Subtotal: <span>${subtotal.toFixed(2)}</span>
+              Subtotal: <span>{formatPrice(subtotal)}</span>
             </p>
             {discountValue && !isNaN(parseFloat(discountValue)) && (
               <p>
                 Discount: <span>
                   {discountType === 'percentage' 
-                    ? `${parseFloat(discountValue).toFixed(2)}% (${(subtotal * parseFloat(discountValue) / 100).toFixed(2)}$)` 
-                    : `$${parseFloat(discountValue).toFixed(2)}`}
+                    ? `${parseFloat(discountValue).toFixed(2)}% (${formatPrice(subtotal * parseFloat(discountValue) / 100)})` 
+                    : formatPrice(parseFloat(discountValue))}
                 </span>
               </p>
             )}
             {discountValue && !isNaN(parseFloat(discountValue)) && (
               <p className="discount-total">
                 New Subtotal: <span>
-                  ${discountType === 'percentage'
-                    ? (subtotal - (subtotal * parseFloat(discountValue) / 100)).toFixed(2)
-                    : (subtotal - parseFloat(discountValue)).toFixed(2)}
+                  {formatPrice(discountType === 'percentage'
+                    ? (subtotal - (subtotal * parseFloat(discountValue) / 100))
+                    : (subtotal - parseFloat(discountValue)))}
                 </span>
               </p>
             )}

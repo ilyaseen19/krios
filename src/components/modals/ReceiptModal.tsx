@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import './ReceiptModal.css';
 import { useAuth } from '../../hooks/useAuth';
+import { usePriceFormatter } from '../../utils/priceUtils';
 
 interface ReceiptModalProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
 }) => {
   const [shouldPrintReceipt, setShouldPrintReceipt] = useState<boolean>(false);
   const { userRole, isAuthenticated } = useAuth();
+  const { formatPrice } = usePriceFormatter();
 
   const handleConfirmPayment = () => {
     onConfirmPayment();
@@ -80,7 +82,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
               <div key={index} className="receipt-item">
                 <div className="receipt-item-name">{item.name}</div>
                 <div className="receipt-item-quantity">x{item.quantity}</div>
-                <div className="receipt-item-price">₦{(item.price * item.quantity).toLocaleString()}</div>
+                <div className="receipt-item-price">{formatPrice(item.price * item.quantity)}</div>
               </div>
             ))}
           </div>
@@ -88,7 +90,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
           <div className="receipt-summary">
             <div className="receipt-summary-row">
               <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>{formatPrice(subtotal)}</span>
             </div>
             
             {discount && (
@@ -96,18 +98,18 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
                 <span>
                   Discount {discount.type === 'percentage' ? `(${discount.value}%)` : '(Fixed)'}
                 </span>
-                <span>-${discountAmount.toFixed(2)}</span>
+                <span>-{formatPrice(discountAmount)}</span>
               </div>
             )}
             
             <div className="receipt-summary-row">
               <span>Tax (10%)</span>
-              <span>${tax.toFixed(2)}</span>
+              <span>{formatPrice(tax)}</span>
             </div>
             
             <div className="receipt-summary-row total">
               <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>{formatPrice(total)}</span>
             </div>
             
             <div className="receipt-payment-method">

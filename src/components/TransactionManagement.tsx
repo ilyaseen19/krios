@@ -3,6 +3,7 @@ import { Product, CartItem } from '../types/product';
 import { getProducts } from '../services/productService';
 import { createTransaction } from '../services/transactionService';
 import { useAuth } from '../contexts/AuthContext';
+import { usePriceFormatter } from '../utils/priceUtils';
 
 const TransactionManagement: React.FC = () => {
   const { user } = useAuth();
@@ -10,6 +11,7 @@ const TransactionManagement: React.FC = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { formatPrice } = usePriceFormatter();
 
   React.useEffect(() => {
     loadProducts();
@@ -110,7 +112,7 @@ const TransactionManagement: React.FC = () => {
           {products.map(product => (
             <div key={product.id} className="p-4 border rounded">
               <h3 className="text-lg font-semibold">{product.name}</h3>
-              <p>Price: ${product.price}</p>
+              <p>Price: {formatPrice(product.price)}</p>
               <p>Stock: {product.stock}</p>
               <button
                 onClick={() => addToCart(product)}
@@ -136,7 +138,7 @@ const TransactionManagement: React.FC = () => {
                 <div>
                   <h3 className="font-semibold">{item.name}</h3>
                   <p>Quantity: {item.quantity}</p>
-                  <p>Price: ${item.price * item.quantity}</p>
+                  <p>Price: {formatPrice(item.price * item.quantity)}</p>
                 </div>
                 <button
                   onClick={() => removeFromCart(item.id)}
@@ -151,9 +153,9 @@ const TransactionManagement: React.FC = () => {
           {cart.length > 0 && (
             <div className="mt-4">
               <div className="text-lg">
-                <p>Subtotal: ${calculateSubtotal().toFixed(2)}</p>
-                <p>Tax (10%): ${calculateTax().toFixed(2)}</p>
-                <p className="font-bold">Total: ${calculateTotal().toFixed(2)}</p>
+                <p>Subtotal: {formatPrice(calculateSubtotal())}</p>
+                <p>Tax (10%): {formatPrice(calculateTax())}</p>
+                <p className="font-bold">Total: {formatPrice(calculateTotal())}</p>
               </div>
               <button
                 onClick={handleCheckout}
