@@ -10,14 +10,19 @@ interface TopbarProps {
 }
 
 const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [notifications, setNotifications] = useState<{message: string, time: string, isNew?: boolean}[]>([]);
+  const [username, setUsername] = useState<string>('');
   const { logout } = useAuth();
   const { generalSettings } = useSettings();
   const navigate = useNavigate();
   
+  // Get username from localStorage when component mounts
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username') || 'User';
+    setUsername(storedUsername);
+  }, []);
+
   // Check for low stock products when component mounts
   useEffect(() => {
     const checkLowStockProducts = async () => {
@@ -128,9 +133,10 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
               className="profile-btn"
             >
               <img
-                src="https://ui-avatars.com/api/?name=Admin+User&background=ff9f43&color=fff"
+                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=ff9f43&color=fff`}
                 alt="Profile"
                 className="profile-img"
+                title={username}
               />
             </span>
           </div>

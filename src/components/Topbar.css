@@ -41,7 +41,7 @@
 
 /* Mobile menu button - only visible on small screens */
 .mobile-menu-btn {
-  display: none;
+  display: none; /* Hidden by default */
   padding: 0.5rem;
   margin-right: 0.75rem;
   color: #6b7280;
@@ -106,6 +106,7 @@
     width: 100%;
   }
   
+  /* Show mobile menu button only on small screens */
   .mobile-menu-btn {
     display: block;
   }
