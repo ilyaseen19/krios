@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Product, CartItem } from '../types/product';
 import { mockProducts, productCategories } from '../data/mockProducts';
 import { mockSales } from '../data/mockSales';
@@ -46,6 +46,32 @@ const POS: React.FC = () => {
   // Use the price formatter
   const { formatPrice } = usePriceFormatter();
 
+  // Prevent navigation back to admin side using browser back button
+  useEffect(() => {
+    // Function to handle popstate (back/forward button) events
+    const handlePopState = (event: PopStateEvent) => {
+      // Prevent the default action
+      event.preventDefault();
+      
+      // Show password modal instead of navigating back
+      setShowPasswordModal(true);
+      
+      // Push the current state again to replace the one that was popped
+      window.history.pushState(null, '', window.location.pathname);
+    };
+    
+    // Push a new state to the history stack to ensure we have something to prevent going back to
+    window.history.pushState(null, '', window.location.pathname);
+    
+    // Add event listener for the popstate event
+    window.addEventListener('popstate', handlePopState);
+    
+    // Clean up the event listener when component unmounts
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+  
   // Filter products based on category and search query
   useEffect(() => {
     let result = products;
