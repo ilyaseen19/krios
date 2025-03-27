@@ -68,8 +68,10 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       const updatedSettings = { ...generalSettings, ...settings };
       setGeneralSettings(updatedSettings);
       await saveGeneralSettings(updatedSettings);
+      window.toast?.success('General settings updated successfully!');
     } catch (error) {
       console.error('Error updating general settings:', error);
+      window.toast?.error('Failed to update general settings');
       throw error;
     }
   };
@@ -80,8 +82,10 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       const updatedSettings = { ...notificationSettings, ...settings };
       setNotificationSettings(updatedSettings);
       await saveNotificationSettings(updatedSettings);
+      window.toast?.success('Notification settings updated successfully!');
     } catch (error) {
       console.error('Error updating notification settings:', error);
+      window.toast?.error('Failed to update notification settings');
       throw error;
     }
   };

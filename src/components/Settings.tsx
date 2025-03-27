@@ -29,7 +29,7 @@ const Settings: React.FC = () => {
 
   const handleSaveSettings = () => {
     // Settings are automatically saved when changed
-    alert('Settings saved successfully!');
+    window.toast?.success('Settings saved successfully!');
   };
 
   return (
