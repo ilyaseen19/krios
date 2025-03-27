@@ -12,10 +12,7 @@ export interface GeneralSettings {
 }
 
 export interface NotificationSettings {
-  emailNotifications: boolean;
-  smsNotifications: boolean;
   lowStockAlerts: boolean;
-  orderConfirmations: boolean;
   dailyReports: boolean;
   weeklyReports: boolean;
   monthlyReports: boolean;
@@ -33,10 +30,7 @@ export const defaultGeneralSettings: GeneralSettings = {
 };
 
 export const defaultNotificationSettings: NotificationSettings = {
-  emailNotifications: true,
-  smsNotifications: false,
   lowStockAlerts: true,
-  orderConfirmations: true,
   dailyReports: true,
   weeklyReports: true,
   monthlyReports: true,

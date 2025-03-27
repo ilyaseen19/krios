@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Table from './Table';
 import { getFilteredTransactions, getFilteredInventory } from '../services/reportService';
+import { getTransactions } from '../services/transactionService.offline';
+import { usePriceFormatter } from '../utils/priceUtils';
 import { ToastType } from './Toast';
 
 import './Reports.css';
@@ -13,9 +15,26 @@ const Reports: React.FC = () => {
   const [generatedAt, setGeneratedAt] = useState<Date>(new Date());
   const [filteredTransactions, setFilteredTransactions] = useState<any[]>([]);
   const [isReportGenerated, setIsReportGenerated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  // Use the price formatter utility
+  const { formatPrice } = usePriceFormatter();
 
-  const totalQty = filteredTransactions.reduce((sum, t) => sum + (t.quantity || 0), 0);
-  const totalPrice = filteredTransactions.reduce((sum, t) => sum + (t.price || 0), 0);
+  // Calculate totals for transaction items
+  const totalQty = filteredTransactions.reduce((sum, t) => {
+    if (t.items) {
+      return sum + t.items.reduce((itemSum, item) => itemSum + (item.quantity || 0), 0);
+    }
+    return sum + (t.quantity || 0);
+  }, 0);
+  
+  const totalPrice = filteredTransactions.reduce((sum, t) => {
+    if (t.items) {
+      return sum + t.items.reduce((itemSum, item) => itemSum + (item.price || 0), 0);
+    }
+    return sum + (t.price || 0);
+  }, 0);
+  
   const totalTotal = filteredTransactions.reduce((sum, t) => sum + (t.total || 0), 0);
   
   // Calculate summary data from filtered transactions
@@ -79,18 +98,26 @@ const Reports: React.FC = () => {
     const end = new Date(endDate);
     setGeneratedAt(new Date());
     setIsReportGenerated(true);
+    setIsLoading(true);
     
     try {
       let data;
       if (reportType === 'inventory') {
         data = await getFilteredInventory(start, end);
       } else {
-        // For other report types like sales
-        data = await getFilteredTransactions(start, end);
+        // For other report types like sales, use IndexedDB data
+        const transactions = await getTransactions();
+        data = transactions.filter(transaction => {
+          const transactionDate = new Date(transaction.createdAt);
+          return transactionDate >= start && transactionDate <= end;
+        });
       }
       setFilteredTransactions(data);
     } catch (error) {
       console.error(`Error fetching ${reportType} data:`, error);
+      window.toast?.error(`Failed to load ${reportType} data`);
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -201,28 +228,28 @@ const Reports: React.FC = () => {
                   <div className="summary-item">
                     <h3>Gross Revenue</h3>
                     <p className="summary-value">
-                      ${calculateSummaryData().totalSales.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      {formatPrice(calculateSummaryData().totalSales)}
                     </p>
                   </div>
                   
                   <div className="summary-item">
                     <h3>Total Refunds</h3>
                     <p className="summary-value">
-                      ${calculateSummaryData().totalRefunds.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      {formatPrice(calculateSummaryData().totalRefunds)}
                     </p>
                   </div>
                   
                   <div className="summary-item">
                     <h3>Total Taxes</h3>
                     <p className="summary-value">
-                      ${calculateSummaryData().totalTaxes.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      {formatPrice(calculateSummaryData().totalTaxes)}
                     </p>
                   </div>
                   
                   <div className="summary-item highlight">
                     <h3>Net Revenue</h3>
                     <p className="summary-value">
-                      ${calculateSummaryData().netRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      {formatPrice(calculateSummaryData().netRevenue)}
                     </p>
                   </div>
                 </div>
@@ -250,14 +277,14 @@ const Reports: React.FC = () => {
                   <div className="summary-item">
                     <h3>Total Stock Value</h3>
                     <p className="summary-value">
-                      ${filteredTransactions.reduce((acc, item) => acc + (item.stockValue || 0), 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      {formatPrice(filteredTransactions.reduce((acc, item) => acc + (item.stockValue || 0), 0))}
                     </p>
                   </div>
                   
                   <div className="summary-item">
                     <h3>Total Cost Value</h3>
                     <p className="summary-value">
-                      ${filteredTransactions.reduce((acc, item) => acc + (item.costValue || 0), 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      {formatPrice(filteredTransactions.reduce((acc, item) => acc + (item.costValue || 0), 0))}
                     </p>
                   </div>
                   
@@ -271,7 +298,7 @@ const Reports: React.FC = () => {
                   <div className="summary-item highlight">
                     <h3>Potential Profit</h3>
                     <p className="summary-value">
-                      ${filteredTransactions.reduce((acc, item) => acc + (item.potentialProfit || 0), 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      {formatPrice(filteredTransactions.reduce((acc, item) => acc + (item.potentialProfit || 0), 0))}
                     </p>
                   </div>
                 </div>
@@ -347,15 +374,38 @@ const Reports: React.FC = () => {
               <Table
                 columns={[
                   { header: 'ID', accessor: 'id' },
-                  { header: 'Product', accessor: 'product' },
+                  { 
+                    header: 'Date', 
+                    accessor: 'createdAt',
+                    cell: (row) => new Date(row.createdAt).toLocaleString()
+                  },
+                  {
+                    header: 'Items',
+                    accessor: (row) => row.items ? row.items.length : 0,
+                    cell: (row) => row.items ? row.items.length : 0
+                  },
                   {
                     header: 'Status',
                     accessor: (row) => row.refunded ? 'Refunded' : 'Complete',
                     className: 'status-column'
                   },
-                  { header: 'Quantity', accessor: 'quantity', footer: totalQty.toLocaleString() },
-                  { header: 'Price', accessor: 'price', footer: `$${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}` },
-                  { header: 'Total', accessor: 'total', footer: `$${totalTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}` }
+                  { 
+                    header: 'Quantity', 
+                    accessor: (row) => row.items ? row.items.reduce((sum, item) => sum + item.quantity, 0) : 0,
+                    footer: totalQty.toLocaleString() 
+                  },
+                  { 
+                    header: 'Tax', 
+                    accessor: 'tax',
+                    cell: (row) => formatPrice(row.tax || 0),
+                    footer: formatPrice(filteredTransactions.reduce((sum, t) => sum + (t.tax || 0), 0))
+                  },
+                  { 
+                    header: 'Total', 
+                    accessor: 'total',
+                    cell: (row) => formatPrice(row.total || 0),
+                    footer: formatPrice(totalTotal)
+                  }
                 ]}
                 data={filteredTransactions}
                 tableClassName="report-table"

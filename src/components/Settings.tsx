@@ -201,33 +201,9 @@ const Settings: React.FC = () => {
         {activeTab === 'notifications' && (
           <div className="notification-settings">
             <div className="settings-group">
-              <h3 className="settings-group-title">Notification Preferences</h3>
+              <h3 className="settings-group-title">Inventory Alerts</h3>
               
               <div className="settings-form-grid checkbox-grid">
-                <div className="form-check">
-                  <input
-                    type="checkbox"
-                    id="emailNotifications"
-                    name="emailNotifications"
-                    checked={notificationSettings.emailNotifications}
-                    onChange={handleNotificationChange}
-                    className="settings-checkbox"
-                  />
-                  <label htmlFor="emailNotifications">Email Notifications</label>
-                </div>
-                
-                <div className="form-check">
-                  <input
-                    type="checkbox"
-                    id="smsNotifications"
-                    name="smsNotifications"
-                    checked={notificationSettings.smsNotifications}
-                    onChange={handleNotificationChange}
-                    className="settings-checkbox"
-                  />
-                  <label htmlFor="smsNotifications">SMS Notifications</label>
-                </div>
-                
                 <div className="form-check">
                   <input
                     type="checkbox"
@@ -237,19 +213,7 @@ const Settings: React.FC = () => {
                     onChange={handleNotificationChange}
                     className="settings-checkbox"
                   />
-                  <label htmlFor="lowStockAlerts">Low Stock Alerts</label>
-                </div>
-                
-                <div className="form-check">
-                  <input
-                    type="checkbox"
-                    id="orderConfirmations"
-                    name="orderConfirmations"
-                    checked={notificationSettings.orderConfirmations}
-                    onChange={handleNotificationChange}
-                    className="settings-checkbox"
-                  />
-                  <label htmlFor="orderConfirmations">Order Confirmations</label>
+                  <label htmlFor="lowStockAlerts" className="notification-label">Low Stock Alerts</label>
                 </div>
               </div>
             </div>
@@ -267,7 +231,7 @@ const Settings: React.FC = () => {
                     onChange={handleNotificationChange}
                     className="settings-checkbox"
                   />
-                  <label htmlFor="dailyReports">Daily Reports</label>
+                  <label htmlFor="dailyReports" className="notification-label">Daily Reports</label>
                 </div>
                 
                 <div className="form-check">
@@ -279,7 +243,7 @@ const Settings: React.FC = () => {
                     onChange={handleNotificationChange}
                     className="settings-checkbox"
                   />
-                  <label htmlFor="weeklyReports">Weekly Reports</label>
+                  <label htmlFor="weeklyReports" className="notification-label">Weekly Reports</label>
                 </div>
                 
                 <div className="form-check">
@@ -291,7 +255,7 @@ const Settings: React.FC = () => {
                     onChange={handleNotificationChange}
                     className="settings-checkbox"
                   />
-                  <label htmlFor="monthlyReports">Monthly Reports</label>
+                  <label htmlFor="monthlyReports" className="notification-label">Monthly Reports</label>
                 </div>
               </div>
             </div>
