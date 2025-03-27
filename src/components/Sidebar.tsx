@@ -45,29 +45,31 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleCollapse, isMobileOpen = fals
           style={{ cursor: isCollapsed ? 'pointer' : 'default' }}
         >
           <img src="/src/assets/logo.svg" alt="Krios" className="logo" />
+          <img src="/src/assets/logo-small.svg" alt="Krios" className="sidebar-small-logo" />
           {!isCollapsed && <span className="logo-text">Krios</span>}
         </div>
-        <button
-          className="collapse-btn"
-          onClick={() => {
-            const newCollapsedState = !isCollapsed;
-            setIsCollapsed(newCollapsedState);
-          }}
-        >
-          <svg
-            className={`w-6 h-6 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        {!isCollapsed && (
+          <button
+            className="collapse-btn"
+            onClick={() => {
+              setIsCollapsed(true);
+            }}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
+            <svg
+              className="w-6 h-6 transition-transform duration-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        )}
       </div>
 
       <nav className="sidebar-nav">
