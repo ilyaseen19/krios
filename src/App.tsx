@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import InstallPWA from './components/InstallPWA';
 import { AuthProvider } from './contexts/AuthContext';
 import { OfflineProvider } from './contexts/OfflineContext';
 import { SettingsProvider } from './contexts/SettingsContext';
@@ -30,6 +31,7 @@ const App: React.FC = () => {
             <ToastContainer />
             <div style={{ padding: '0.5rem 1rem' }}>
               <OfflineIndicator />
+              <InstallPWA />
             </div>
             <Routes>
           <Route path="/login" element={<LoginProtection><Login /></LoginProtection>} />
