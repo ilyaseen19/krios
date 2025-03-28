@@ -7,6 +7,6 @@ export const defaultNewUser = {
   name: '',
   email: '',
   password: '',
-  role: 'Cashier',
+  role: 'cashier',
   status: 'Active'
 };

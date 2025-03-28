@@ -188,10 +188,10 @@ const Users: React.FC = () => {
             onChange={(e) => setRoleFilter(e.target.value)}
           >
             <option value="">All Roles</option>
-            <option value="Admin">Admin</option>
-            <option value="Manager">Manager</option>
-            <option value="Cashier">Cashier</option>
-            <option value="Inventory">Inventory</option>
+            <option value="admin">Admin</option>
+            <option value="manager">Manager</option>
+            <option value="cashier">Cashier</option>
+            <option value="inventory">Inventory</option>
           </select>
           
           <select 
