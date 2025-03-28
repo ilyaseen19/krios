@@ -460,6 +460,7 @@ const POS: React.FC = () => {
                   <div className="product-info">
                     <h3 className="product-name">{product.name}</h3>
                     <p className="product-price">{formatPrice(product.price)}</p>
+                    <p className="product-stock">Qty: {product.stock}</p>
                   </div>
                 </div>
               ))}
