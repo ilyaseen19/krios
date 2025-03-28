@@ -237,7 +237,7 @@ const POS: React.FC = () => {
     try {
       // Use the actual cashier ID from auth context
       const transaction = await transactionService.createTransaction(currentTransaction, userRole || 'cashier-1', paymentType);
-      console.log('Transaction completed:', transaction);
+      // console.log('Transaction completed:', transaction);
       
       // Print receipt if option is selected
       if (shouldPrintReceipt) {
@@ -258,7 +258,7 @@ const POS: React.FC = () => {
         await handleOpenCashDrawer();
       }
     } catch (error) {
-      console.error('Payment confirmation failed:', error);
+      // console.error('Payment confirmation failed:', error);
       alert('Payment confirmation failed. Please try again.');
       setIsProcessing(false);
     }

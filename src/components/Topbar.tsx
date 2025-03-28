@@ -69,7 +69,7 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
           </svg>
         </button>
         <div className="logo-container">
-          <img src="/src/assets/logo.svg" alt={generalSettings.storeName} className="topbar-logo" />
+          <img src="../assets/logo.svg" alt={generalSettings.storeName} className="topbar-logo" />
           <span className="logo-text">{generalSettings.storeName}</span>
         </div>
       </div>

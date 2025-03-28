@@ -44,8 +44,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleCollapse, isMobileOpen = fals
           }}
           style={{ cursor: isCollapsed ? 'pointer' : 'default' }}
         >
-          <img src="/src/assets/logo.svg" alt="Krios" className="logo" />
-          <img src="/src/assets/logo-small.svg" alt="Krios" className="sidebar-small-logo" />
+          <img src="../assets/logo.svg" alt="Krios" className="logo" />
+          <img src="../assets/logo-small.svg" alt="Krios" className="sidebar-small-logo" />
           {!isCollapsed && <span className="logo-text">Krios</span>}
         </div>
         {!isCollapsed && (

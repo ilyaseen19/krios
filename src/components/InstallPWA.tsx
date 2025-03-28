@@ -17,9 +17,18 @@ const InstallPWA: React.FC = () => {
       // Stash the event so it can be triggered later
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsInstallable(true);
+      console.log('Install prompt captured and ready to use');
     };
 
-    window.addEventListener('beforeinstallprompt', handler as EventListener);
+    // Check if the app is already installed
+    const isAppInstalled = window.matchMedia('(display-mode: standalone)').matches;
+    if (isAppInstalled) {
+      console.log('App is already installed');
+      setIsInstallable(false);
+    } else {
+      console.log('App is not installed, listening for install prompt');
+      window.addEventListener('beforeinstallprompt', handler as EventListener);
+    }
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handler as EventListener);
@@ -46,6 +55,11 @@ const InstallPWA: React.FC = () => {
     setIsInstallable(false);
   };
 
+  // Debug log to help troubleshoot installation issues
+  useEffect(() => {
+    console.log('InstallPWA component state:', { isInstallable, deferredPrompt: !!deferredPrompt });
+  }, [isInstallable, deferredPrompt]);
+  
   if (!isInstallable) return null;
 
   return (

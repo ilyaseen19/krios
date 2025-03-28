@@ -1,9 +1,31 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { resolve } from 'path'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig({  
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src')
+    }
+  },
+  build: {
+    assetsInlineLimit: 0, // Ensure SVGs are processed as assets
+    rollupOptions: {
+      output: {
+        assetFileNames: (assetInfo) => {
+          // Keep the original directory structure for assets
+          const info = assetInfo.name.split('/');
+          const extType = info[info.length - 1].split('.')[1];
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            return `assets/[name][extname]`;
+          }
+          return `[name][extname]`;
+        },
+      }
+    }
+  },
   plugins: [
     react(),
     VitePWA({
@@ -33,7 +55,21 @@ export default defineConfig({
         scope: '/'
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        navigateFallback: 'index.html',
+        runtimeCaching: [
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images',
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+            },
+          },
+        ]
       }
     })
   ]
