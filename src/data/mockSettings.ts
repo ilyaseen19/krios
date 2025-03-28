@@ -9,6 +9,7 @@ export interface GeneralSettings {
   taxRate: string;
   dateFormat: string;
   timeZone: string;
+  receiptCounter: number;
 }
 
 export interface NotificationSettings {
@@ -27,6 +28,7 @@ export const defaultGeneralSettings: GeneralSettings = {
   taxRate: '10',
   dateFormat: 'MM/DD/YYYY',
   timeZone: 'UTC-5 (Eastern Time)',
+  receiptCounter: 1,
 };
 
 export const defaultNotificationSettings: NotificationSettings = {

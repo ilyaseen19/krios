@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Product, CartItem } from '../types/product';
-import { mockProducts, productCategories } from '../data/mockProducts';
-import { mockSales } from '../data/mockSales';
-import { createTransaction, calculateTax } from '../services/transactionService';
+import * as productService from '../services/productService.offline';
+import * as categoryService from '../services/categoryService.offline';
+import * as transactionService from '../services/transactionService.offline';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useCashDrawer, simulateOpenCashDrawer } from '../services/cashDrawerService';
@@ -27,8 +27,10 @@ const generateBackgroundColor = (str: string) => {
 const POS: React.FC = () => {
   const { userRole, logout } = useAuth();
   const navigate = useNavigate();
-  const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(mockProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const { generalSettings } = useSettings();
+  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -70,6 +72,27 @@ const POS: React.FC = () => {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
+  }, []);
+  
+  // Load products and categories from IndexedDB when component mounts
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        // Load products
+        const fetchedProducts = await productService.getProducts();
+        setProducts(fetchedProducts);
+        setFilteredProducts(fetchedProducts);
+        
+        // Load categories
+        const fetchedCategories = await categoryService.getCategories();
+        const categoryNames = fetchedCategories.map(category => category.name);
+        setCategories(categoryNames);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+    
+    loadData();
   }, []);
   
   // Filter products based on category and search query
@@ -182,6 +205,11 @@ const POS: React.FC = () => {
       setIsProcessing(false);
     }
   };
+  
+  // Create transaction record
+  const createTransaction = async (items: CartItem[], cashierId: string, paymentMethod: string) => {
+    return await transactionService.createTransaction(items, cashierId, paymentMethod, discount);
+  };
 
   // Calculate total items in cart
   const getTotalItems = () => {
@@ -207,8 +235,8 @@ const POS: React.FC = () => {
   // Handle confirming payment
   const handleConfirmPayment = async () => {
     try {
-      // In a real app, you would use the actual cashier ID from auth context
-      const transaction = await createTransaction(currentTransaction, 'cashier-1', paymentType);
+      // Use the actual cashier ID from auth context
+      const transaction = await transactionService.createTransaction(currentTransaction, userRole || 'cashier-1', paymentType);
       console.log('Transaction completed:', transaction);
       
       // Print receipt if option is selected
@@ -270,13 +298,15 @@ const POS: React.FC = () => {
   
   // Format receipt for printing
   const formatReceiptForPrinting = (transaction: any) => {
-    const { generalSettings } = useSettings();
     const currencySymbol = generalSettings.currencySymbol;
+    const taxRate = parseFloat(generalSettings.taxRate);
+    const storeName = generalSettings.storeName;
     
     let receipt = '\n\n';
-    receipt += '      KRIOS POS SYSTEM      \n';
+    receipt += `      ${storeName}      \n`;
     receipt += '----------------------------\n';
     receipt += `Date: ${new Date().toLocaleString()}\n`;
+    receipt += `Receipt #: ${transaction.receiptNumber}\n`;
     receipt += `Transaction ID: ${transaction.id}\n`;
     receipt += '----------------------------\n\n';
     
@@ -293,8 +323,8 @@ const POS: React.FC = () => {
       receipt += `Discount: -${currencySymbol}${calculateDiscountAmount().toFixed(2)}\n`;
     }
     
-    receipt += `Tax (10%): ${currencySymbol}${(calculateFinalSubtotal() * 0.1).toFixed(2)}\n`;
-    receipt += `Total: ${currencySymbol}${(calculateFinalSubtotal() * 1.1).toFixed(2)}\n`;
+    receipt += `Tax (${taxRate}%): ${currencySymbol}${(calculateFinalSubtotal() * (taxRate/100)).toFixed(2)}\n`;
+    receipt += `Total: ${currencySymbol}${(calculateFinalSubtotal() * (1 + taxRate/100)).toFixed(2)}\n`;
     receipt += `Payment Method: ${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}\n`;
     receipt += '----------------------------\n';
     receipt += '      Thank You!      \n\n\n';
@@ -309,7 +339,7 @@ const POS: React.FC = () => {
         <div className="pos-header-left">
           <div className="logo-container">
             <div className="topbar-logo">K</div>
-            <span className="logo-text">Krios</span>
+            <span className="logo-text">{generalSettings.storeName}</span>
           </div>
           <button 
             className="back-to-admin"
@@ -347,21 +377,6 @@ const POS: React.FC = () => {
               </svg>
             </button>
             
-            <button className="action-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M23 4v6h-6"/>
-                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-              </svg>
-            </button>
-            
-            <button className="action-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="20" x2="18" y2="10"/>
-                <line x1="12" y1="20" x2="12" y2="4"/>
-                <line x1="6" y1="20" x2="6" y2="14"/>
-              </svg>
-            </button>
-            
             <button 
               className="action-btn" 
               onClick={async () => {
@@ -378,7 +393,9 @@ const POS: React.FC = () => {
             </button>
             
             <div className="user-profile">
-              <div className="user-avatar">JD</div>
+              <div className="user-avatar" style={{ backgroundColor: generateBackgroundColor(localStorage.getItem('username') || 'User') }}>
+                {getInitials(localStorage.getItem('username') || 'User')}
+              </div>
             </div>
           </div>
         </div>
@@ -411,7 +428,7 @@ const POS: React.FC = () => {
                 >
                   All
                 </button>
-                {productCategories.map((category, index) => (
+                {categories.map((category, index) => (
                   <button 
                     key={index}
                     className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
@@ -533,12 +550,12 @@ const POS: React.FC = () => {
                 </div>
               )}
               <div className="summary-row">
-                <span>Tax (10%)</span>
-                <span>{formatPrice(calculateFinalSubtotal() * 0.1)}</span>
+                <span>Tax ({generalSettings.taxRate}%)</span>
+                <span>{formatPrice(calculateFinalSubtotal() * (parseFloat(generalSettings.taxRate)/100))}</span>
               </div>
               <div className="summary-row total">
                 <span>Total</span>
-                <span>{formatPrice(calculateFinalSubtotal() * 1.1)}</span>
+                <span>{formatPrice(calculateFinalSubtotal() * (1 + parseFloat(generalSettings.taxRate)/100))}</span>
               </div>
               
               <div className="checkout-actions">
@@ -619,8 +636,8 @@ const POS: React.FC = () => {
         subtotal={calculateSubtotal()}
         discount={discount}
         discountAmount={calculateDiscountAmount()}
-        tax={(calculateFinalSubtotal() * 0.1)}
-        total={(calculateFinalSubtotal() * 1.1)}
+        tax={(calculateFinalSubtotal() * (parseFloat(generalSettings.taxRate)/100))}
+        total={(calculateFinalSubtotal() * (1 + parseFloat(generalSettings.taxRate)/100))}
         paymentType={paymentType}
       />
     </div>

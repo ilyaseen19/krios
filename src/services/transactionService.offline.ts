@@ -1,5 +1,6 @@
 import { CartItem, Transaction, Product } from '../types/product';
 import { STORES, addItem, getAllItems, getItemById, updateItem, addPendingOperation, getPendingOperations, deletePendingOperation } from './dbService';
+import { getGeneralSettings, saveGeneralSettings } from './settingsService';
 
 // Check if we're online
 const isOnline = (): boolean => {
@@ -11,29 +12,76 @@ export const calculateTax = (subtotal: number): number => {
   return subtotal * 0.1; // 10% tax rate
 };
 
+// Generate a 6-digit receipt number
+const generateReceiptNumber = async (): Promise<string> => {
+  try {
+    // Get current receipt counter from settings
+    const settings = await getGeneralSettings();
+    if (!settings) {
+      throw new Error('Settings not found');
+    }
+    
+    // Get current counter value (default to 1 if not set)
+    const counter = settings.receiptCounter || 1;
+    
+    // Format as 6-digit number with leading zeros
+    const receiptNumber = counter.toString().padStart(6, '0');
+    
+    // Increment counter for next receipt
+    await saveGeneralSettings({
+      ...settings,
+      receiptCounter: counter + 1
+    });
+    
+    return receiptNumber;
+  } catch (error) {
+    console.error('Error generating receipt number:', error);
+    // Fallback to a random 6-digit number if settings can't be accessed
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+};
+
 // Create a transaction and store it in IndexedDB
-export const createTransaction = async (items: CartItem[], cashierId: string, paymentType: string = 'cash'): Promise<Transaction> => {
+export const createTransaction = async (items: CartItem[], cashierId: string, paymentType: string = 'cash', discount: {type: 'percentage' | 'fixed', value: number} | null = null): Promise<Transaction> => {
   try {
     // Calculate total and tax
     const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const tax = calculateTax(subtotal);
-    const total = subtotal + tax;
+    
+    // Calculate discount amount if applicable
+    let discountAmount = 0;
+    if (discount) {
+      discountAmount = discount.type === 'percentage'
+        ? subtotal * (discount.value / 100)
+        : discount.value;
+    }
+    
+    const total = subtotal + tax - discountAmount;
 
     // Generate a unique ID for the transaction
     const id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
+    // Generate a unique receipt number
+    const receiptNumber = await generateReceiptNumber();
+    
     const transaction: Transaction = {
       id,
+      receiptNumber,
       items,
       total,
       tax,
       cashierId,
       paymentType,
+      discount,
+      discountAmount,
       createdAt: new Date()
     };
 
     // Add the transaction to IndexedDB
     await addItem<Transaction>(STORES.SALES, transaction);
+    
+    // Update product quantities in IndexedDB immediately
+    await updateLocalStock(items);
     
     // If offline, add to pending operations
     if (!isOnline()) {
@@ -178,8 +226,8 @@ export const syncTransactions = async (): Promise<void> => {
   }
 };
 
-// Helper function to update local stock after a transaction is synced
-const updateLocalStock = async (items: CartItem[]): Promise<void> => {
+// Helper function to update local stock after a transaction is created or synced
+export const updateLocalStock = async (items: CartItem[]): Promise<void> => {
   try {
     for (const item of items) {
       // Get the current product

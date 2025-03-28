@@ -15,9 +15,16 @@ export interface CartItem extends Product {
 
 export interface Transaction {
   id: string;
+  receiptNumber: string;
   items: CartItem[];
   total: number;
   tax: number;
   cashierId: string;
   createdAt: Date;
+  paymentType?: string;
+  discount?: {
+    type: 'percentage' | 'fixed';
+    value: number;
+  } | null;
+  discountAmount?: number;
 }

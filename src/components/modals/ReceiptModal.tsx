@@ -72,7 +72,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
       <div className="receipt-modal-content">
         <div className="receipt receipt-container">
           <div className="receipt-header">
-            <h3>Krios POS System</h3>
+            <h3>{formatPrice(0).startsWith('$') ? 'Krios POS System' : formatPrice(0).charAt(0) + ' POS System'}</h3>
             <p>{new Date().toLocaleString()}</p>
             <p>Cashier: {isAuthenticated ? userRole : 'Guest'}</p>
           </div>
@@ -103,7 +103,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
             )}
             
             <div className="receipt-summary-row">
-              <span>Tax (10%)</span>
+              <span>Tax ({formatPrice(0).startsWith('$') ? '10' : formatPrice(0).charAt(0) === '€' ? '20' : '10'}%)</span>
               <span>{formatPrice(tax)}</span>
             </div>
             
