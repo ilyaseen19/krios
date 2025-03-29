@@ -10,23 +10,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -62,23 +65,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -95,23 +101,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -135,23 +144,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -279,23 +291,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -314,23 +329,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -348,23 +366,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -384,23 +405,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -424,23 +448,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -456,23 +483,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -493,23 +523,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -525,23 +558,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -557,23 +593,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -589,23 +628,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -621,23 +663,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -655,23 +700,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -686,23 +734,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -720,23 +771,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -753,23 +807,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -794,23 +851,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -831,23 +891,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -870,23 +933,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -908,23 +974,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -939,23 +1008,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -972,23 +1044,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1011,23 +1086,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1044,23 +1122,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1081,23 +1162,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1115,23 +1199,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1156,23 +1243,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1190,23 +1280,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1223,23 +1316,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1255,23 +1351,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1290,23 +1389,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1326,23 +1428,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1358,23 +1463,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1393,23 +1501,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1426,23 +1537,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1458,23 +1572,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1489,23 +1606,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1523,23 +1643,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1563,23 +1686,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1594,23 +1720,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1621,23 +1750,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1655,23 +1787,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1687,23 +1822,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1720,23 +1858,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1753,23 +1894,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1789,23 +1933,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1821,23 +1968,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1853,23 +2003,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1885,23 +2038,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1919,23 +2075,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1960,23 +2119,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -1994,23 +2156,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2025,23 +2190,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2056,23 +2224,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2087,23 +2258,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2118,23 +2292,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2149,23 +2326,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2180,23 +2360,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2211,23 +2394,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2250,23 +2436,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2297,23 +2486,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2330,23 +2522,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2367,23 +2562,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2402,23 +2600,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2433,23 +2634,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2464,23 +2668,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2497,23 +2704,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2526,23 +2736,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2558,23 +2771,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2590,23 +2806,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2625,23 +2844,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2657,23 +2879,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2689,23 +2914,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2721,23 +2949,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2754,23 +2985,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2790,23 +3024,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2832,23 +3069,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2866,23 +3106,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2899,23 +3142,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2931,23 +3177,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -2964,23 +3213,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 }
@@ -2992,23 +3244,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -3025,23 +3280,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3057,23 +3315,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3089,23 +3350,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3121,23 +3385,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3153,23 +3420,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3185,23 +3455,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3216,23 +3489,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3248,23 +3524,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3279,23 +3558,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3311,23 +3593,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3343,23 +3628,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3374,23 +3662,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 }
@@ -3402,23 +3693,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 
@@ -3434,23 +3728,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3499,23 +3796,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3531,23 +3831,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
   
@@ -3562,23 +3865,26 @@
   
   .receipt-container,
   .receipt-container * {
-    visibility: visible;
+    visibility: visible !important;
+    display: block !important;
   }
   
   .receipt-container {
-    position: relative !important;
-    left: 0;
-    top: 0;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 80mm !important;
     height: auto !important;
     min-height: fit-content !important;
-    padding: 0 !important;
+    padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: white !important;
     font-family: 'Monospace' !important;
     line-height: 1.1 !important;
-    page-break-after: auto !important;
+    page-break-after: always !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
 }
