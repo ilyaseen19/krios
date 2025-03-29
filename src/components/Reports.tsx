@@ -3,6 +3,7 @@ import Table from './Table';
 import { getFilteredTransactions, getFilteredInventory } from '../services/reportService';
 import { getTransactions } from '../services/transactionService.offline';
 import { usePriceFormatter } from '../utils/priceUtils';
+import { useSettings } from '../contexts/SettingsContext';
 import { ToastType } from './Toast';
 
 import './Reports.css';
@@ -16,6 +17,9 @@ const Reports: React.FC = () => {
   const [filteredTransactions, setFilteredTransactions] = useState<any[]>([]);
   const [isReportGenerated, setIsReportGenerated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  // Get settings for currency symbol
+  const { generalSettings } = useSettings();
   
   // Use the price formatter utility
   const { formatPrice } = usePriceFormatter();
@@ -353,17 +357,17 @@ const Reports: React.FC = () => {
                   { 
                     header: 'Stock Value', 
                     accessor: 'stockValue',
-                    cell: (row) => `$${row.stockValue.toLocaleString('en-US', { minimumFractionDigits: 2 })}` 
+                    cell: (row) => formatPrice(row.stockValue) 
                   },
                   { 
                     header: 'Cost Value', 
                     accessor: 'costValue',
-                    cell: (row) => `$${row.costValue.toLocaleString('en-US', { minimumFractionDigits: 2 })}` 
+                    cell: (row) => formatPrice(row.costValue) 
                   },
                   { 
                     header: 'Potential Profit', 
                     accessor: 'potentialProfit',
-                    cell: (row) => `$${row.potentialProfit.toLocaleString('en-US', { minimumFractionDigits: 2 })}` 
+                    cell: (row) => formatPrice(row.potentialProfit) 
                   }
                 ]}
                 data={filteredTransactions}

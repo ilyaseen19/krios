@@ -16,13 +16,38 @@ export const getFilteredTransactions = async (startDate: Date, endDate: Date): P
   }
 };
 
-// Get filtered inventory data based on date range
+// Get filtered inventory data based on date range with calculated values
 export const getFilteredInventory = async (startDate: Date, endDate: Date): Promise<any[]> => {
   try {
     const products = await getAllItems(STORES.PRODUCTS);
-    return products.filter(product => {
+    
+    // Filter products by date range
+    const filteredProducts = products.filter(product => {
       const productDate = new Date(product.updatedAt);
       return productDate >= startDate && productDate <= endDate;
+    });
+    
+    // Calculate additional inventory metrics for each product
+    return filteredProducts.map(product => {
+      // Assume cost is 70% of price (30% margin)
+      const costPrice = product.price * 0.7;
+      const stockValue = product.price * product.stock;
+      const costValue = costPrice * product.stock;
+      const potentialProfit = stockValue - costValue;
+      
+      // Determine stock status (assuming low stock threshold is 10)
+      const status = product.stock < 10 ? 'Low Stock' : 'In Stock';
+      
+      return {
+        ...product,
+        sku: product.id.substring(0, 8), // Use part of ID as SKU
+        currentStock: product.stock,
+        minimumStock: 10, // Default minimum stock level
+        stockValue,
+        costValue,
+        potentialProfit,
+        status
+      };
     });
   } catch (error) {
     console.error('Error getting filtered inventory:', error);
