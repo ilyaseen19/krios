@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DashboardStat } from '../data/mockDashboard';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
-         LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+         PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import './Dashboard.css';
 import { getTotalRevenue, getTotalOrders, getTotalCategories, getTotalProducts, 
          getSalesData, getTopSellingProducts, getProductCategoryDistribution, 
@@ -10,11 +10,19 @@ import { usePriceFormatter } from '../utils/priceUtils';
 import LoadingSpinner from './LoadingSpinner';
 
 const Dashboard: React.FC = () => {
-  const { formatPrice } = usePriceFormatter();
+  const { formatPrice, generalSettings } = usePriceFormatter();
   // Memoize the formatPrice function to prevent infinite renders
   const memoizedFormatPrice = useCallback((value: number) => {
     return formatPrice(value);
   }, []); // Remove formatPrice from dependencies to prevent infinite loop
+  
+  // Custom formatter for chart tooltips to ensure 2 decimal places
+  const formatTooltipValue = useCallback((value: any) => {
+    if (typeof value === 'number') {
+      return `${generalSettings?.currencySymbol || '$'}${value.toFixed(2)}`;
+    }
+    return value;
+  }, [generalSettings]);
   
   // Prepare data for charts
   const [timeRange, setTimeRange] = useState<'daily' | 'monthly' | 'yearly'>('monthly');
@@ -248,7 +256,7 @@ const Dashboard: React.FC = () => {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <CartesianGrid strokeDasharray="3 3" />
-                <Tooltip />
+                <Tooltip formatter={(value, name) => [formatTooltipValue(value), name]} />
                 <Area type="monotone" dataKey="sales" stroke="#7367f0" fillOpacity={1} fill="url(#colorSales)" />
                 <Area type="monotone" dataKey="profit" stroke="#28c76f" fillOpacity={1} fill="url(#colorProfit)" />
               </AreaChart>

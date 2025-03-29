@@ -95,6 +95,10 @@ export const getSalesData = async (timeRange: 'daily' | 'monthly' | 'yearly'): P
       // Estimate profit as 40% of sales for demonstration
       acc[key].profit += transaction.total * 0.4;
       
+      // Ensure values are rounded to 2 decimal places
+      acc[key].sales = parseFloat(acc[key].sales.toFixed(2));
+      acc[key].profit = parseFloat(acc[key].profit.toFixed(2));
+      
       return acc;
     }, {} as Record<string, { name: string; sales: number; profit: number }>);
     
@@ -137,6 +141,8 @@ export const getTopSellingProducts = async (limit: number = 5): Promise<any[]> =
           };
         }
         productSales[item.id].value += item.price * item.quantity;
+        // Ensure value is rounded to 2 decimal places
+        productSales[item.id].value = parseFloat(productSales[item.id].value.toFixed(2));
       });
     });
     
