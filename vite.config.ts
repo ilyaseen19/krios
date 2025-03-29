@@ -34,7 +34,7 @@ export default defineConfig({
       manifest: {
         name: 'Krios',
         short_name: 'Krios',
-        description: 'Krios Progressive Web Application',
+        description: 'Krios POS System',
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',
