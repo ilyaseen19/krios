@@ -41,6 +41,7 @@ const POS: React.FC = () => {
   const [discount, setDiscount] = useState<{type: 'percentage' | 'fixed', value: number} | null>(null);
   const [currentTransaction, setCurrentTransaction] = useState<CartItem[]>([]);
   const [shouldPrintReceipt, setShouldPrintReceipt] = useState<boolean>(false);
+  const [transaction, setTransaction] = useState<any>(null);
   
   // Initialize cash drawer hook
   const { openDrawer, isOpening, error: drawerError, isSupported } = useCashDrawer();
@@ -236,12 +237,14 @@ const POS: React.FC = () => {
   const handleConfirmPayment = async () => {
     try {
       // Use the actual cashier ID from auth context
-      const transaction = await transactionService.createTransaction(currentTransaction, userRole || 'cashier-1', paymentType);
-      // console.log('Transaction completed:', transaction);
+      const newTransaction = await transactionService.createTransaction(currentTransaction, userRole || 'cashier-1', paymentType);
+      // Store the transaction in state
+      setTransaction(newTransaction);
+      // console.log('Transaction completed:', newTransaction);
       
       // Print receipt if option is selected
       if (shouldPrintReceipt) {
-        await printReceipt(transaction);
+        await printReceipt(newTransaction);
       }
       
       // Close the receipt modal

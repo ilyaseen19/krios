@@ -28,7 +28,8 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
   discountAmount,
   tax,
   total,
-  paymentType
+  paymentType,
+  receiptNumber
 }) => {
   const [shouldPrintReceipt, setShouldPrintReceipt] = useState<boolean>(false);
   const { userRole, isAuthenticated } = useAuth();
@@ -76,7 +77,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
             <h3>{formatPrice(0).startsWith('$') ? 'Krios POS System' : formatPrice(0).charAt(0) + ' POS System'}</h3>
             <p>{new Date().toLocaleString()}</p>
             <p>Cashier: {isAuthenticated ? userRole : 'Guest'}</p>
-            {props.receiptNumber && <p className="receipt-number">Receipt #: {props.receiptNumber}</p>}
+            {receiptNumber && <p className="receipt-number">Receipt #: {receiptNumber}</p>}
           </div>
           
           <div className="receipt-items">
