@@ -64,6 +64,11 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
         </div>
         
         <div className="printable-receipt-items">
+          <div className="printable-receipt-column-headers">
+            <div className="printable-receipt-column-header-item">Item</div>
+            <div className="printable-receipt-column-header-qty">Qty</div>
+            <div className="printable-receipt-column-header-price">Price</div>
+          </div>
           {items.map((item, index) => (
             <div key={index} className="printable-receipt-item">
               <div className="printable-receipt-item-name">{item.name}</div>
@@ -101,6 +106,11 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
           <div className="printable-receipt-payment-method">
             <span>Payment Method:</span>
             <span>{paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}</span>
+          </div>
+          
+          <div className="printable-receipt-footer">
+            <p>Thank you for your purchase!</p>
+            <p>{new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
           </div>
         </div>
       </div>
