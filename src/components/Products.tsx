@@ -177,10 +177,13 @@ const Products: React.FC = () => {
   };
   
   // Save edited product
-  const saveEditedProduct = async () => {
-    if (editingProduct) {
+  const saveEditedProduct = async (productToSave?: ExtendedProduct) => {
+    // If productToSave is provided, use it; otherwise use editingProduct
+    const productToUpdate = productToSave || editingProduct;
+    
+    if (productToUpdate) {
       try {
-        const updatedProduct = await updateProduct(editingProduct.id, editingProduct);
+        const updatedProduct = await updateProduct(productToUpdate.id, productToUpdate);
         // Use the updatedProduct directly from the database to ensure consistency
         const extendedUpdatedProduct = {
           ...updatedProduct,
