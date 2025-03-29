@@ -640,6 +640,7 @@ const POS: React.FC = () => {
         tax={(calculateFinalSubtotal() * (parseFloat(generalSettings.taxRate)/100))}
         total={(calculateFinalSubtotal() * (1 + parseFloat(generalSettings.taxRate)/100))}
         paymentType={paymentType}
+        receiptNumber={transaction?.receiptNumber}
       />
     </div>
   );

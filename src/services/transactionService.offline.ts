@@ -36,8 +36,8 @@ const generateReceiptNumber = async (): Promise<string> => {
     return receiptNumber;
   } catch (error) {
     console.error('Error generating receipt number:', error);
-    // Fallback to a random 6-digit number if settings can't be accessed
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    // Fallback to a 6-digit number starting from 000001 if settings can't be accessed
+    return '000001';
   }
 };
 

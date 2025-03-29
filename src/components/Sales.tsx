@@ -19,6 +19,7 @@ interface Sale {
   status: SaleStatus;
   items?: CartItem[];
   tax?: number;
+  receiptNumber?: string;
 }
 
 interface OrderSummary {
@@ -44,6 +45,7 @@ const Sales: React.FC = () => {
           total: transaction.total,
           tax: transaction.tax,
           items: transaction.items,
+          receiptNumber: transaction.receiptNumber,
           status: transaction.paymentType === 'cash' ? 'Completed' : 'Pending' // Simple status mapping
         }));
         setSales(formattedSales);
@@ -118,7 +120,8 @@ const Sales: React.FC = () => {
         setSelectedOrder({
           ...order,
           items: transaction.items,
-          tax: transaction.tax
+          tax: transaction.tax,
+          receiptNumber: transaction.receiptNumber
         });
         setShowOrderDetails(true);
       }
@@ -266,7 +269,7 @@ const Sales: React.FC = () => {
           {currentOrders.map(order => (
             <div key={order.id} className="order-card">
               <div className="order-card-header">
-                <span className="order-number">#{order.id}</span>
+                <span className="order-number">Receipt #{order.receiptNumber || order.id}</span>
                 <span className="order-date">{formatDate(order.date)}</span>
               </div>
               <div className="order-card-body">
