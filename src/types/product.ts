@@ -22,6 +22,7 @@ export interface Transaction {
   cashierId: string;
   createdAt: Date;
   paymentType?: string;
+  status?: 'Completed' | 'Pending' | 'Cancelled';
   discount?: {
     type: 'percentage' | 'fixed';
     value: number;

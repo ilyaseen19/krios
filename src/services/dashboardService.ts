@@ -8,7 +8,10 @@ import { Product, Transaction } from '../types/product';
 export const getTotalRevenue = async (): Promise<number> => {
   try {
     const transactions = await getAllItems<Transaction>(STORES.SALES);
-    return transactions.reduce((sum, transaction) => sum + transaction.total, 0);
+    // Filter out cancelled/refunded transactions before calculating total revenue
+    return transactions
+      .filter(transaction => transaction.status !== 'Cancelled')
+      .reduce((sum, transaction) => sum + transaction.total, 0);
   } catch (error) {
     console.error('Error getting total revenue:', error);
     return 0;
@@ -19,7 +22,8 @@ export const getTotalRevenue = async (): Promise<number> => {
 export const getTotalOrders = async (): Promise<number> => {
   try {
     const transactions = await getAllItems<Transaction>(STORES.SALES);
-    return transactions.length;
+    // Filter out cancelled/refunded transactions before counting orders
+    return transactions.filter(transaction => transaction.status !== 'Cancelled').length;
   } catch (error) {
     console.error('Error getting total orders:', error);
     return 0;

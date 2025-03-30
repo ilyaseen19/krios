@@ -9,7 +9,8 @@ import { useSettings } from '../contexts/SettingsContext';
 import { formatDate } from '../utils/formatUtils';
 import DeleteConfirmationModal from './modals/DeleteConfirmationModal';
 import { updateProduct, getProduct } from '../services/productService.offline';
-import { STORES, deleteItem } from '../services/dbService';
+import { STORES, deleteItem, updateItem } from '../services/dbService';
+import Toast from './Toast';
 
 type SaleStatus = 'Completed' | 'Pending' | 'Cancelled';
 const saleStatuses: SaleStatus[] = ['Completed', 'Pending', 'Cancelled'];
@@ -52,7 +53,8 @@ const Sales: React.FC = () => {
           tax: transaction.tax,
           items: transaction.items,
           receiptNumber: transaction.receiptNumber,
-          status: transaction.paymentType === 'cash' ? 'Completed' : 'Pending' // Simple status mapping
+          // Use transaction.status if it exists, otherwise determine from paymentType
+          status: transaction.status || (transaction.paymentType === 'cash' ? 'Completed' : 'Pending')
         }));
         setSales(formattedSales);
       } catch (error) {
@@ -158,7 +160,14 @@ const Sales: React.FC = () => {
           }
         }
         
-        // Update transaction status to 'Cancelled'
+        // Update transaction status to 'Cancelled' in the database
+        const updatedTransaction = {
+          ...transaction,
+          status: 'Cancelled'
+        };
+        await updateItem(STORES.SALES, updatedTransaction);
+        
+        // Update local state
         const updatedSales = sales.map(s => {
           if (s.id === order.id) {
             return { ...s, status: 'Cancelled' as SaleStatus };
@@ -168,12 +177,12 @@ const Sales: React.FC = () => {
         
         setSales(updatedSales);
         
-        // Show success message
-        alert('Order refunded successfully');
+        // Show success message with toast instead of alert
+        window.toast?.success('Order refunded successfully');
       }
     } catch (error) {
       console.error('Error refunding order:', error);
-      alert('Error refunding order');
+      window.toast?.error('Error refunding order');
     }
   };
   
@@ -197,11 +206,11 @@ const Sales: React.FC = () => {
         setShowDeleteModal(false);
         setSaleToDelete(null);
         
-        // Show success message
-        alert('Order deleted successfully');
+        // Show success message with toast instead of alert
+        window.toast?.success('Order deleted successfully');
       } catch (error) {
         console.error('Error deleting order:', error);
-        alert('Error deleting order');
+        window.toast?.error('Error deleting order');
       }
     }
   };
