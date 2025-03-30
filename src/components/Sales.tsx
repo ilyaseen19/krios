@@ -7,6 +7,9 @@ import Table from './Table';
 import { usePriceFormatter } from '../utils/priceUtils';
 import { useSettings } from '../contexts/SettingsContext';
 import { formatDate } from '../utils/formatUtils';
+import DeleteConfirmationModal from './modals/DeleteConfirmationModal';
+import { updateProduct, getProduct } from '../services/productService.offline';
+import { STORES, deleteItem } from '../services/dbService';
 
 type SaleStatus = 'Completed' | 'Pending' | 'Cancelled';
 const saleStatuses: SaleStatus[] = ['Completed', 'Pending', 'Cancelled'];
@@ -33,6 +36,9 @@ const Sales: React.FC = () => {
   const [sales, setSales] = useState<Sale[]>([]);
   const { formatPrice } = usePriceFormatter();
   const { generalSettings } = useSettings();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [saleToDelete, setSaleToDelete] = useState<Sale | null>(null);
+  const [printableSale, setPrintableSale] = useState<Sale | null>(null);
 
   useEffect(() => {
     const loadSales = async () => {
@@ -127,6 +133,101 @@ const Sales: React.FC = () => {
       }
     } catch (error) {
       console.error('Error loading transaction details:', error);
+    }
+  };
+  
+  // Handle refund order
+  const handleRefundOrder = async (order: Sale) => {
+    try {
+      const transactions = await getTransactions();
+      const transaction = transactions.find(t => t.id === order.id);
+      
+      if (transaction && transaction.items) {
+        // Return products to inventory
+        for (const item of transaction.items) {
+          try {
+            const product = await getProduct(item.id);
+            if (product) {
+              // Update product stock by adding back the quantity
+              await updateProduct(item.id, {
+                stock: product.stock + item.quantity
+              });
+            }
+          } catch (error) {
+            console.error(`Error updating product ${item.id}:`, error);
+          }
+        }
+        
+        // Update transaction status to 'Cancelled'
+        const updatedSales = sales.map(s => {
+          if (s.id === order.id) {
+            return { ...s, status: 'Cancelled' as SaleStatus };
+          }
+          return s;
+        });
+        
+        setSales(updatedSales);
+        
+        // Show success message
+        alert('Order refunded successfully');
+      }
+    } catch (error) {
+      console.error('Error refunding order:', error);
+      alert('Error refunding order');
+    }
+  };
+  
+  // Handle delete order
+  const handleDeleteOrder = (order: Sale) => {
+    setSaleToDelete(order);
+    setShowDeleteModal(true);
+  };
+  
+  // Confirm delete order
+  const confirmDeleteOrder = async () => {
+    if (saleToDelete) {
+      try {
+        // Delete transaction from IndexedDB
+        await deleteItem(STORES.SALES, saleToDelete.id);
+        
+        // Update state to remove the deleted sale
+        setSales(sales.filter(s => s.id !== saleToDelete.id));
+        
+        // Close modal
+        setShowDeleteModal(false);
+        setSaleToDelete(null);
+        
+        // Show success message
+        alert('Order deleted successfully');
+      } catch (error) {
+        console.error('Error deleting order:', error);
+        alert('Error deleting order');
+      }
+    }
+  };
+  
+  // Handle print receipt
+  const handlePrintReceipt = async (order: Sale) => {
+    try {
+      const transactions = await getTransactions();
+      const transaction = transactions.find(t => t.id === order.id);
+      
+      if (transaction) {
+        setPrintableSale({
+          ...order,
+          items: transaction.items,
+          tax: transaction.tax,
+          receiptNumber: transaction.receiptNumber
+        });
+        
+        // Use setTimeout to ensure the state is updated before printing
+        setTimeout(() => {
+          window.print();
+          setPrintableSale(null);
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Error printing receipt:', error);
     }
   };
   
@@ -273,15 +374,6 @@ const Sales: React.FC = () => {
                 <span className="order-date">{formatDate(order.date)}</span>
               </div>
               <div className="order-card-body">
-                <div className="order-customer">
-                  <div className="customer-avatar">
-                    {getCustomerInitials(order.customer)}
-                  </div>
-                  <div className="customer-info">
-                    <h4 className="customer-name">{order.customer}</h4>
-                    <p className="customer-email">{order.customer.toLowerCase().replace(' ', '.') + '@example.com'}</p>
-                  </div>
-                </div>
                 
                 <div className="order-details">
                   <div className="order-detail-item">
@@ -305,14 +397,19 @@ const Sales: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </button>
-                  <button className="action-btn print">
+                  <button className="action-btn print" onClick={() => handlePrintReceipt(order)}>
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
                   </button>
-                  <button className="action-btn delete">
+                  <button className="action-btn delete" onClick={() => handleDeleteOrder(order)}>
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                  <button className="action-btn refund" onClick={() => handleRefundOrder(order)}>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
                     </svg>
                   </button>
                 </div>
@@ -367,14 +464,19 @@ const Sales: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </button>
-                  <button className="action-btn print">
+                  <button className="action-btn print" onClick={() => handlePrintReceipt(order)}>
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
                   </button>
-                  <button className="action-btn delete">
+                  <button className="action-btn delete" onClick={() => handleDeleteOrder(order)}>
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                  <button className="action-btn refund" onClick={() => handleRefundOrder(order)}>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
                     </svg>
                   </button>
                 </div>
@@ -510,6 +612,79 @@ const Sales: React.FC = () => {
           </div>
         )}
       </Modal>
+      
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setSaleToDelete(null);
+        }}
+        onConfirm={confirmDeleteOrder}
+        itemName={saleToDelete ? `Receipt #${saleToDelete.receiptNumber || saleToDelete.id}` : ''}
+        itemType="sale"
+      />
+      
+      {/* Printable Receipt */}
+      {printableSale && (
+        <div className="printable-receipt" style={{ display: 'none' }}>
+          <div className="receipt-container">
+            <div className="receipt-header">
+              <div className="company-name">{generalSettings.storeName}</div>
+              <div className="order-number">{`Receipt #${printableSale.receiptNumber || printableSale.id}`}</div>
+              <div className="order-date">{formatDate(new Date(printableSale.date), generalSettings.dateFormat)}</div>
+              <div className="cashier-info">
+                <div>Cashier: {printableSale.customer}</div>
+                <div>Time: {new Date(printableSale.date).toLocaleTimeString()}</div>
+              </div>
+            </div>
+
+            <div className="item-list">
+              <div className="item-row" style={{ fontWeight: '600', borderBottom: '2px solid #333' }}>
+                <span>Item</span>
+                <span>Qty</span>
+                <span>Price</span>
+              </div>
+              {printableSale.items && printableSale.items.map((item, index) => (
+                <div className="item-row" key={index}>
+                  <span>{item.name}</span>
+                  <span>{item.quantity}</span>
+                  <span>{formatPrice(item.price * item.quantity)}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="summary-row">
+              <span className="detail-label">Subtotal</span>
+              <span className="detail-value">
+                {formatPrice(printableSale.total - (printableSale.tax || 0))}
+              </span>
+            </div>
+            
+            {printableSale.tax && (
+              <div className="summary-row">
+                <span className="detail-label">Tax ({generalSettings.taxRate}%)</span>
+                <span className="detail-value">
+                  {formatPrice(printableSale.tax)}
+                </span>
+              </div>
+            )}
+
+            <div className="summary-row">
+              <span className="detail-label">Total Amount</span>
+              <span className="detail-value" style={{ color: '#7367f0', fontSize: '1.2rem' }}>
+                {formatPrice(printableSale.total)}
+              </span>
+            </div>
+            
+            <div className="receipt-footer">
+              <p>Thank you for your business!</p>
+              <p>{generalSettings.storeAddress || 'Store Address'}</p>
+              <p>{generalSettings.storePhone || 'Store Phone'}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
