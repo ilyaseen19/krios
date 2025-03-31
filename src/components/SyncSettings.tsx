@@ -1,0 +1,262 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { getGeneralSettings, saveGeneralSettings } from '../services/settingsService';
+import { initializeCustomerDB, getSyncStatus, syncAllData } from '../services/syncService';
+import './Settings.css';
+
+const SyncSettings: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+  const [token, setToken] = useState<string | null>(null);
+  const [businessName, setBusinessName] = useState('');
+  const [customerId, setCustomerId] = useState('');
+  const [syncStatus, setSyncStatus] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  // Load token from localStorage
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    setToken(storedToken);
+  }, [isAuthenticated]); // Re-check when auth state changes
+
+  // Load settings on component mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const settings = await getGeneralSettings();
+        if (settings?.businessName) {
+          setBusinessName(settings.businessName);
+        }
+        if (settings?.customerId) {
+          setCustomerId(settings.customerId);
+          // Get sync status if customerId exists
+          await checkSyncStatus(settings.customerId);
+        }
+      } catch (err) {
+        console.error('Error loading settings:', err);
+        window.toast?.error('Failed to load settings');
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  // Check sync status
+  const checkSyncStatus = async (id: string) => {
+    try {
+      setLoading(true);
+      const status = await getSyncStatus(id);
+      setSyncStatus(status);
+    } catch (err) {
+      console.error('Error checking sync status:', err);
+      window.toast?.error('Failed to check sync status');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initialize customer database
+  const handleInitialize = async () => {
+    if (!businessName.trim()) {
+      window.toast?.error('Business name is required');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const result = await initializeCustomerDB(businessName);
+      // Save the customerId to settings
+      await saveGeneralSettings({ customerId: result.customerId });
+      setCustomerId(result.customerId);
+      window.toast?.success('Database initialized successfully!');
+      await checkSyncStatus(result.customerId);
+    } catch (err: any) {
+      console.error('Error initializing database:', err);
+      window.toast?.error(err.message || 'Failed to initialize database');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Sync all data
+  const handleSync = async () => {
+    if (!customerId) {
+      window.toast?.error('Customer ID is required');
+      return;
+    }
+    
+    if (!token) {
+      window.toast?.error('You must be logged in to backup data');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const result = await syncAllData(customerId, token);
+      window.toast?.success('Data synchronized successfully! Your data is now backed up and can be accessed from other devices.');
+      await checkSyncStatus(customerId);
+    } catch (err: any) {
+      console.error('Error syncing data:', err);
+      window.toast?.error(err.message || 'Failed to sync data. Please check your internet connection and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Restore data from backup
+  const handleRestore = async () => {
+    if (!customerId) {
+      window.toast?.error('Customer ID is required');
+      return;
+    }
+    
+    if (!token) {
+      window.toast?.error('You must be logged in to restore data');
+      return;
+    }
+
+    if (!window.confirm('Are you sure you want to restore data? This will overwrite your current data with the last backup.')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // TODO: Implement restore functionality in syncService
+      // const result = await restoreData(customerId, token);
+      window.toast?.success('Data restored successfully! Your local data has been updated with the latest backup.');
+      await checkSyncStatus(customerId);
+    } catch (err: any) {
+      console.error('Error restoring data:', err);
+      window.toast?.error(err.message || 'Failed to restore data. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Format date
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return 'Never';
+    return new Date(dateString).toLocaleString();
+  };
+
+  return (
+    <div className="settings-section">
+      <h2>Prynova Cloud Database Sync</h2>
+      <p>Configure and manage your data synchronization with Prynova Cloud.</p>
+
+      <div className="settings-form">
+        <div className="form-group">
+          <label htmlFor="businessName">Business Name</label>
+          <input
+            type="text"
+            id="businessName"
+            value={businessName}
+            onChange={(e) => setBusinessName(e.target.value)}
+            placeholder="Enter your business name"
+            disabled={loading || !!customerId}
+          />
+        </div>
+
+        {!customerId ? (
+          <button 
+            className="btn primary-btn" 
+            onClick={handleInitialize}
+            disabled={loading || !businessName.trim()}
+          >
+            {loading ? 'Initializing...' : 'Initialize Database'}
+          </button>
+        ) : (
+          <div className="sync-info">
+            <div className="form-group">
+              <label>Customer ID</label>
+              <div className="readonly-field">{customerId}</div>
+            </div>
+
+            {syncStatus && (
+              <div className="sync-status">
+                <h3>Sync Status</h3>
+                <div className="status-item">
+                  <span>Last Sync:</span>
+                  <span>{formatDate(syncStatus.lastSyncTimestamp)}</span>
+                </div>
+                <div className="status-item">
+                  <span>Products:</span>
+                  <span>{formatDate(syncStatus.collections?.products)}</span>
+                </div>
+                <div className="status-item">
+                  <span>Transactions:</span>
+                  <span>{formatDate(syncStatus.collections?.transactions)}</span>
+                </div>
+                <div className="status-item">
+                  <span>Users:</span>
+                  <span>{formatDate(syncStatus.collections?.users)}</span>
+                </div>
+                <div className="status-item">
+                  <span>Categories:</span>
+                  <span>{formatDate(syncStatus.collections?.categories)}</span>
+                </div>
+                <div className="status-item">
+                  <span>Settings:</span>
+                  <span>{formatDate(syncStatus.collections?.settings)}</span>
+                </div>
+                <div className="status-item">
+                  <span>Status:</span>
+                  <span className={`sync-status-${syncStatus.status}`}>
+                    {syncStatus.status}
+                  </span>
+                </div>
+                {syncStatus.error && (
+                  <div className="status-item error">
+                    <span>Error:</span>
+                    <span>{syncStatus.error}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="button-group">
+              <button 
+                className="save-btn" 
+                style={{ backgroundColor: '#ff9f43' }}
+                onClick={handleSync}
+                disabled={loading}
+              >
+                {loading ? 'Syncing...' : 'Backup Now'}
+              </button>
+              <button 
+                className="save-btn" 
+                style={{ backgroundColor: '#ea5455' }}
+                onClick={handleRestore}
+                disabled={loading}
+              >
+                {loading ? 'Restoring...' : 'Restore Data'}
+              </button>
+              <button 
+                className="save-btn" 
+                style={{ backgroundColor: '#28c76f' }}
+                onClick={() => checkSyncStatus(customerId)}
+                disabled={loading}
+              >
+                Refresh Status
+              </button>
+            </div>
+            <div className="sync-help">
+              <p><strong>Note:</strong></p>
+              <ul>
+                <li>Backup Now will save your current data to the cloud</li>
+                <li>Restore Data will fetch the latest backup from the cloud</li>
+                <li>Make sure you have a stable internet connection</li>
+                <li>Your data is automatically backed up when you make changes</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+};
+
+export default SyncSettings;

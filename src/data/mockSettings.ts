@@ -10,6 +10,8 @@ export interface GeneralSettings {
   dateFormat: string;
   timeZone: string;
   receiptCounter: number;
+  customerId?: string;
+  businessName?: string;
 }
 
 export interface NotificationSettings {

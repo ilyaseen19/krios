@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { defaultGeneralSettings, defaultNotificationSettings, GeneralSettings, NotificationSettings, dateFormats, timeZones } from '../data/mockSettings';
 import { useSettings } from '../contexts/SettingsContext';
+import SyncSettings from './SyncSettings';
 import './Settings.css';
 
 const Settings: React.FC = () => {
@@ -283,15 +284,7 @@ const Settings: React.FC = () => {
         
         {activeTab === 'backup' && (
           <div className="backup-settings">
-            <div className="settings-group">
-              <h3 className="settings-group-title">Backup & Restore</h3>
-              <div className="settings-placeholder">
-                <svg className="placeholder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p>Backup and restore functionality will be available in a future update.</p>
-              </div>
-            </div>
+            <SyncSettings />
           </div>
         )}
       </div>
