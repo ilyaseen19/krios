@@ -69,10 +69,6 @@ export const syncAllData = async (customerId: string, token: string): Promise<an
   }
 
   try {
-    // Get business name from settings
-    const settings = await getGeneralSettings();
-    const businessName = settings?.businessName || '';
-
     // Get all data from local stores
     const results: Record<string, any> = {};
     const storeToEndpoint: Record<string, string> = {
@@ -98,7 +94,6 @@ export const syncAllData = async (customerId: string, token: string): Promise<an
         },
         body: JSON.stringify({
           customerId,
-          businessName,
           [endpoint]: items
         }),
       });
