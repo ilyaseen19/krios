@@ -16,7 +16,6 @@
     "noImplicitReturns": false,
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "types": ["node"],
   },
   "include": ["src/**/*.ts", "*.ts"],
   "exclude": ["node_modules", "dist"],
