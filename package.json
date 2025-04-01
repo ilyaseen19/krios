@@ -1,7 +1,7 @@
 {
   "name": "krios-backend",
   "version": "1.0.0",
-  "description": "Backend for Krios POS system with MongoDB Atlas synchronization",
+  "description": "Backend for Krios POS system",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
