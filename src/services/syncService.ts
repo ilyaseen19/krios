@@ -1,5 +1,5 @@
 // Sync Service for MongoDB Atlas backup
-import { STORES, getAllItems } from './dbService';
+import { STORES, getAllItems, clearStore, updateItem, addItem } from './dbService';
 import { getGeneralSettings } from './settingsService';
 
 // API base URL
@@ -49,16 +49,40 @@ export const getSyncStatus = async (customerId: string): Promise<any> => {
   try {
     // Get business name from settings
     const settings = await getGeneralSettings();
-    const businessName = settings?.businessName || '';
+    const businessName = settings?.storeName;
     
-    const response = await fetch(`${API_BASE_URL}/sync/status?customerId=${customerId}&businessName=${encodeURIComponent(businessName)}`);
-    if (!response.ok) {
-      throw new Error('Failed to get sync status');
+    try {
+      const response = await fetch(`${API_BASE_URL}/sync/status?customerId=${customerId}&businessName=${businessName}`);
+      if (!response.ok) {
+        console.warn(`API returned status ${response.status} for sync status`);
+        // Return a default response instead of throwing an error
+        return {
+          status: 'unavailable',
+          lastSyncTimestamp: null,
+          collections: {},
+          error: `Server returned ${response.status}: ${response.statusText}`
+        };
+      }
+      return await response.json();
+    } catch (fetchError) {
+      console.warn('Network error when fetching sync status:', fetchError);
+      // Return a default response for network errors
+      return {
+        status: 'unavailable',
+        lastSyncTimestamp: null,
+        collections: {},
+        error: 'Cannot connect to sync server. Please check your network connection.'
+      };
     }
-    return await response.json();
   } catch (error) {
     console.error('Error getting sync status:', error);
-    throw error;
+    // Return a default response instead of throwing
+    return {
+      status: 'error',
+      lastSyncTimestamp: null,
+      collections: {},
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
+    };
   }
 };
 
@@ -70,7 +94,6 @@ export const syncAllData = async (customerId: string, token: string): Promise<an
 
   try {
     // Get all data from local stores
-    const results: Record<string, any> = {};
     const storeToEndpoint: Record<string, string> = {
       [STORES.PRODUCTS]: 'products',
       [STORES.CATEGORIES]: 'categories',
@@ -79,35 +102,105 @@ export const syncAllData = async (customerId: string, token: string): Promise<an
       [STORES.SETTINGS]: 'settings'
     };
 
-    // Sync each store type to its corresponding endpoint
+    // Get business name from settings
+    const settings = await getGeneralSettings();
+    const businessName = settings?.storeName;
+
+    // Prepare data payload for the all-in-one sync endpoint
+    const payload: Record<string, any> = { customerId, businessName }; 
+    
+    // Collect data from all stores
     for (const [store, endpoint] of Object.entries(storeToEndpoint)) {
       if (store === STORES.PENDING_OPERATIONS) continue; // Skip pending operations
       
       const items = await getAllItems(store);
-      if (items.length === 0) continue; // Skip empty stores
-      
-      const response = await fetch(`${API_BASE_URL}/sync/${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          customerId,
-          [endpoint]: items
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to sync ${endpoint}`);
+      if (items.length > 0) {
+        payload[endpoint] = items;
       }
-      
-      results[endpoint] = await response.json();
+    }
+
+    // Use the /sync/all endpoint to sync all data at once
+    const response = await fetch(`${API_BASE_URL}/sync/all`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to sync all data');
+    }
+    
+    return await response.json();
+  
+  } catch (error) {
+    console.error('Error syncing data:', error);
+    throw error;
+  }
+};
+
+// Restore data from backup
+export const restoreData = async (customerId: string, token: string): Promise<any> => {
+  if (!isOnline()) {
+    throw new Error('Cannot restore data while offline');
+  }
+
+  try {
+    const results: Record<string, any> = {};
+    const endpointToStore: Record<string, string> = {
+      'products': STORES.PRODUCTS,
+      'categories': STORES.CATEGORIES,
+      'transactions': STORES.SALES,
+      'users': STORES.USERS,
+      'settings': STORES.SETTINGS
+    };
+
+    // Get business name from settings
+    const settings = await getGeneralSettings();
+    const businessName = settings?.storeName;
+
+    // Use the consolidated /sync/restore endpoint to restore all data at once
+    const response = await fetch(`${API_BASE_URL}/sync/restore?customerId=${customerId}&businessName=${encodeURIComponent(businessName || '')}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to restore data: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    // Process each data type from the consolidated response
+    for (const [endpoint, store] of Object.entries(endpointToStore)) {
+      if (data && Array.isArray(data[endpoint]) && data[endpoint].length > 0) {
+        // Clear existing data in the store
+        await clearStore(store);
+        
+        // Add all items from the backup
+        for (const item of data[endpoint]) {
+          await addItem(store, item);
+        }
+        
+        results[endpoint] = {
+          status: 'success',
+          count: data[endpoint].length
+        };
+      } else {
+        results[endpoint] = {
+          status: 'empty',
+          count: 0
+        };
+      }
     }
 
     return results;
   } catch (error) {
-    console.error('Error syncing data:', error);
+    console.error('Error restoring data:', error);
     throw error;
   }
 };

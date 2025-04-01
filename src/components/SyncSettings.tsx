@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { getGeneralSettings, saveGeneralSettings } from '../services/settingsService';
-import { initializeCustomerDB, getSyncStatus, syncAllData } from '../services/syncService';
+import { initializeCustomerDB, getSyncStatus, syncAllData, restoreData } from '../services/syncService';
+import Modal from './Modal';
 import './Settings.css';
 
 const SyncSettings: React.FC = () => {
@@ -11,6 +12,7 @@ const SyncSettings: React.FC = () => {
   const [customerId, setCustomerId] = useState('');
   const [syncStatus, setSyncStatus] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
 
   // Load token from localStorage
   useEffect(() => {
@@ -23,8 +25,8 @@ const SyncSettings: React.FC = () => {
     const loadSettings = async () => {
       try {
         const settings = await getGeneralSettings();
-        if (settings?.businessName) {
-          setBusinessName(settings.businessName);
+        if (settings?.storeName) {
+          setBusinessName(settings.storeName);
         }
         if (settings?.customerId) {
           setCustomerId(settings.customerId);
@@ -46,6 +48,7 @@ const SyncSettings: React.FC = () => {
       setLoading(true);
       const status = await getSyncStatus(id);
       setSyncStatus(status);
+      window.toast?.success('Check sync status successfull!');
     } catch (err) {
       console.error('Error checking sync status:', err);
       window.toast?.error('Failed to check sync status');
@@ -105,7 +108,7 @@ const SyncSettings: React.FC = () => {
   };
 
   // Restore data from backup
-  const handleRestore = async () => {
+  const handleRestore = () => {
     if (!customerId) {
       window.toast?.error('Customer ID is required');
       return;
@@ -116,15 +119,17 @@ const SyncSettings: React.FC = () => {
       return;
     }
 
-    if (!window.confirm('Are you sure you want to restore data? This will overwrite your current data with the last backup.')) {
-      return;
-    }
+    // Show the custom confirm dialog instead of using window.confirm
+    setShowRestoreConfirm(true);
+  };
 
+  // Execute the actual restore operation after confirmation
+  const executeRestore = async () => {
     try {
       setLoading(true);
+      setShowRestoreConfirm(false); // Close the dialog
 
-      // TODO: Implement restore functionality in syncService
-      // const result = await restoreData(customerId, token);
+      const result = await restoreData(customerId, token);
       window.toast?.success('Data restored successfully! Your local data has been updated with the latest backup.');
       await checkSyncStatus(customerId);
     } catch (err: any) {
@@ -135,16 +140,48 @@ const SyncSettings: React.FC = () => {
     }
   };
 
-  // Format date
+  // Format date with error handling
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleString();
+    try {
+      return new Date(dateString).toLocaleString();
+    } catch (error) {
+      console.warn('Invalid date format:', dateString, error);
+      return 'Invalid date';
+    }
   };
 
   return (
     <div className="settings-section">
       <h2>Prynova Cloud Database Sync</h2>
       <p>Configure and manage your data synchronization with Prynova Cloud.</p>
+      
+      {/* Restore Confirmation Modal */}
+      <Modal
+        isOpen={showRestoreConfirm}
+        onClose={() => setShowRestoreConfirm(false)}
+        title="Confirm Restore"
+        size="small"
+        actions={
+          <>
+            <button 
+              className="btn secondary-btn" 
+              onClick={() => setShowRestoreConfirm(false)}
+            >
+              Cancel
+            </button>
+            <button 
+              className="btn primary-btn" 
+              onClick={executeRestore}
+              style={{ backgroundColor: '#ea5455' }}
+            >
+              Restore
+            </button>
+          </>
+        }
+      >
+        <p>Are you sure you want to restore data? This will overwrite your current data with the last backup.</p>
+      </Modal>
 
       <div className="settings-form">
         <div className="form-group">
@@ -153,9 +190,9 @@ const SyncSettings: React.FC = () => {
             type="text"
             id="businessName"
             value={businessName}
-            onChange={(e) => setBusinessName(e.target.value)}
+            // onChange={(e) => setBusinessName(e.target.value)}
             placeholder="Enter your business name"
-            disabled={loading || !!customerId}
+            disabled={true}
           />
         </div>
 
@@ -181,6 +218,8 @@ const SyncSettings: React.FC = () => {
                   <span>Last Sync:</span>
                   <span>{formatDate(syncStatus.lastSyncTimestamp)}</span>
                 </div>
+                
+                {/* Collection status items - only render if collections exists */}
                 <div className="status-item">
                   <span>Products:</span>
                   <span>{formatDate(syncStatus.collections?.products)}</span>
@@ -201,6 +240,7 @@ const SyncSettings: React.FC = () => {
                   <span>Settings:</span>
                   <span>{formatDate(syncStatus.collections?.settings)}</span>
                 </div>
+                
                 <div className="status-item">
                   <span>Status:</span>
                   <span className={`sync-status-${syncStatus.status}`}>
