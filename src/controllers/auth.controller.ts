@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { connectToCustomerDB } from '../config/database';
 import User, { IUser } from '../models/User';
@@ -33,7 +33,7 @@ export const register = async (req: Request, res: Response) => {
 
     // Get all users to determine the next ID
     const users = await UserModel.find();
-    const id = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+    const id = users.length > 0 ? Math.max(...users.map(u => u.id || 0)) + 1 : 1;
 
     // Create new user
     const newUser = new UserModel({
@@ -52,7 +52,7 @@ export const register = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { id: newUser.id, email: newUser.email, role: newUser.role, customerId },
       JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
+      { expiresIn: JWT_EXPIRES_IN } as SignOptions
     );
 
     // Return user data and token
@@ -111,7 +111,7 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role, customerId },
       JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
+      { expiresIn: JWT_EXPIRES_IN } as SignOptions
     );
 
     // Return user data and token

@@ -24,7 +24,7 @@ export const connectToMongoDB = async (): Promise<typeof mongoose> => {
 };
 
 // Connect to a customer-specific database
-export const connectToCustomerDB = async (customerId: string, companyName?: string): Promise<typeof mongoose> => {
+export const connectToCustomerDB = async (customerId: string, companyName?: string): Promise<mongoose.Connection> => {
   if (!MONGODB_URI) {
     throw new Error('MONGODB_URI is not defined in environment variables');
   }
@@ -79,6 +79,9 @@ export const connectToCustomerDB = async (customerId: string, companyName?: stri
 // Get all customer database connections and return customerId fields
 export const getCustomerDatabases = async (companyName: string): Promise<string[]> => {
   try {
+    if (!mongoose.connection.db) {
+      throw new Error('Database connection not established');
+    }
     const adminDb = mongoose.connection.db.admin();
     const dbs = await adminDb.listDatabases();
     
