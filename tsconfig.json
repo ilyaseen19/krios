@@ -16,6 +16,7 @@
     "noImplicitReturns": false,
     "noImplicitAny": false,
     "noImplicitThis": false,
+    "moduleResolution": "node",
     "types": ["node"],
     "typeRoots": [
       "node_modules/@types",
