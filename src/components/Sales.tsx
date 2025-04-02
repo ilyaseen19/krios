@@ -40,30 +40,65 @@ const Sales: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [saleToDelete, setSaleToDelete] = useState<Sale | null>(null);
   const [printableSale, setPrintableSale] = useState<Sale | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Load sales data when component mounts
   useEffect(() => {
     const loadSales = async () => {
       try {
+        setIsLoading(true);
+        console.log('Fetching transactions...');
         const transactions = await getTransactions();
-        const formattedSales: Sale[] = transactions.map(transaction => ({
-          id: transaction.id,
-          date: transaction.createdAt.toISOString(),
-          customer: transaction.cashierId, // Using cashierId as customer for now
-          total: transaction.total,
-          tax: transaction.tax,
-          items: transaction.items,
-          receiptNumber: transaction.receiptNumber,
-          // Use transaction.status if it exists, otherwise determine from paymentType
-          status: transaction.status || (transaction.paymentType === 'cash' ? 'Completed' : 'Pending')
-        }));
+        
+        if (!transactions || transactions.length === 0) {
+          console.log('No transactions found');
+          setSales([]);
+          setIsLoading(false);
+          return;
+        }
+        
+        console.log(`Successfully loaded ${transactions.length} transactions`);
+        
+        // Format transactions into sales objects
+        const formattedSales: Sale[] = transactions.map(transaction => {
+          // Ensure date is properly formatted
+          let dateStr;
+          try {
+            dateStr = transaction.createdAt instanceof Date 
+              ? transaction.createdAt.toISOString() 
+              : new Date(transaction.createdAt).toISOString();
+          } catch (e) {
+            console.warn('Invalid date for transaction:', transaction.id);
+            dateStr = new Date().toISOString(); // Fallback to current date
+          }
+          
+          return {
+            id: transaction.id,
+            date: dateStr,
+            customer: transaction.cashierId || 'Unknown',
+            total: transaction.total || 0,
+            tax: transaction.tax,
+            items: transaction.items,
+            receiptNumber: transaction.receiptNumber,
+            // Use transaction.status if it exists, otherwise determine from paymentType
+            status: transaction.status || (transaction.paymentType === 'cash' ? 'Completed' : 'Pending')
+          };
+        });
+        
+        console.log(`Formatted ${formattedSales.length} sales for display`);
         setSales(formattedSales);
       } catch (error) {
         console.error('Error loading sales:', error);
+        window.toast?.error('Failed to load sales data');
+        setSales([]); // Set empty array on error to avoid undefined state
+      } finally {
+        setIsLoading(false);
       }
     };
     
+    // Call loadSales immediately when component mounts
     loadSales();
-  }, []);
+  }, []); // Empty dependency array means this runs once on mount
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
@@ -323,8 +358,16 @@ const Sales: React.FC = () => {
         </div>
       </div>
 
-      {/* Order Summary Cards */}
-      <div className="order-summary-row">
+      {/* Loading Indicator */}
+      {isLoading ? (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading sales data...</p>
+        </div>
+      ) : (
+        <>
+        {/* Order Summary Cards */}
+        <div className="order-summary-row">
         <div className="order-summary-card">
           <div className="order-icon purple">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -693,6 +736,8 @@ const Sales: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );
