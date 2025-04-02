@@ -17,6 +17,7 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "moduleResolution": "node",
+    "types": ["node", "express", "cors", "morgan"],
     "typeRoots": [
       "./node_modules/@types"
     ]
