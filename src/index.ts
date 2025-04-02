@@ -17,8 +17,27 @@ const PORT = process.env.PORT || 7001;
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'https://krios-pos.netlify.app',
-  credentials: true
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if(!origin) return callback(null, true);
+    
+    // Define allowed origins
+    const allowedOrigins = [
+      process.env.CLIENT_URL,
+      'https://krios-pos.netlify.app',
+      // Add any additional origins as needed
+    ].filter(Boolean); // Remove any undefined/null values
+    
+    if(allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked request from:', origin);
+      callback(null, true); // Temporarily allow all origins while debugging
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
