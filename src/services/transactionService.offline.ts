@@ -44,9 +44,16 @@ const generateReceiptNumber = async (): Promise<string> => {
 // Create a transaction and store it in IndexedDB
 export const createTransaction = async (items: CartItem[], cashierId: string, paymentType: string = 'cash', discount: {type: 'percentage' | 'fixed', value: number} | null = null): Promise<Transaction> => {
   try {
-    // Calculate total and tax
+    // Calculate subtotal
     const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const tax = calculateTax(subtotal);
+    
+    // Calculate product-specific taxes
+    const productTax = items.reduce((sum, item) => {
+      if (item.tax !== undefined) {
+        return sum + ((item.price * item.quantity) * (item.tax / 100));
+      }
+      return sum;
+    }, 0);
     
     // Calculate discount amount if applicable
     let discountAmount = 0;
@@ -56,7 +63,11 @@ export const createTransaction = async (items: CartItem[], cashierId: string, pa
         : discount.value;
     }
     
-    const total = subtotal + tax - discountAmount;
+    // Calculate general tax (on discounted subtotal)
+    const discountedSubtotal = subtotal - discountAmount;
+    const tax = calculateTax(discountedSubtotal);
+    
+    const total = subtotal + tax + productTax - discountAmount;
 
     // Generate a unique ID for the transaction
     const id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -70,6 +81,7 @@ export const createTransaction = async (items: CartItem[], cashierId: string, pa
       items,
       total,
       tax,
+      productTax,
       cashierId,
       paymentType,
       discount,

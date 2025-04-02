@@ -187,6 +187,17 @@ const POS: React.FC = () => {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
   
+  // Calculate product-specific taxes
+  const calculateProductTaxes = () => {
+    return cart.reduce((total, item) => {
+      // If the product has a specific tax rate, calculate it
+      if (item.tax !== undefined) {
+        return total + ((item.price * item.quantity) * (item.tax / 100));
+      }
+      return total;
+    }, 0);
+  };
+  
   // Calculate discount amount
   const calculateDiscountAmount = () => {
     if (!discount) return 0;
@@ -268,7 +279,7 @@ const POS: React.FC = () => {
   const handleConfirmPayment = async () => {
     try {
       // Use the actual cashier ID from auth context
-      const newTransaction = await transactionService.createTransaction(currentTransaction, userRole || 'cashier-1', paymentType);
+      const newTransaction = await transactionService.createTransaction(currentTransaction, userRole || 'cashier-1', paymentType, discount);
       // Store the transaction in state
       setTransaction(newTransaction);
       // console.log('Transaction completed:', newTransaction);
@@ -371,8 +382,18 @@ const POS: React.FC = () => {
       receipt += `Discount: -${currencySymbol}${calculateDiscountAmount().toFixed(2)}\n`;
     }
     
-    receipt += `Tax (${taxRate}%): ${currencySymbol}${(calculateFinalSubtotal() * (taxRate/100)).toFixed(2)}\n`;
-    receipt += `Total: ${currencySymbol}${(calculateFinalSubtotal() * (1 + taxRate/100)).toFixed(2)}\n`;
+    // Add product-specific taxes if any
+    const productTaxAmount = calculateProductTaxes();
+    if (productTaxAmount > 0) {
+      receipt += `Product Tax: ${currencySymbol}${productTaxAmount.toFixed(2)}\n`;
+    }
+    
+    // General tax on remaining amount
+    const generalTaxAmount = (calculateFinalSubtotal() * (taxRate/100));
+    receipt += `Tax (${taxRate}%): ${currencySymbol}${generalTaxAmount.toFixed(2)}\n`;
+    
+    // Total with both taxes
+    receipt += `Total: ${currencySymbol}${(calculateFinalSubtotal() + generalTaxAmount + productTaxAmount).toFixed(2)}\n`;
     receipt += `Payment Method: ${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}\n`;
     receipt += '----------------------------\n';
     receipt += '      Thank You!      \n\n\n';
@@ -598,13 +619,20 @@ const POS: React.FC = () => {
                   <span>-{formatPrice(calculateDiscountAmount())}</span>
                 </div>
               )}
+              {/* Display product-specific taxes if any */}
+              {calculateProductTaxes() > 0 && (
+                <div className="summary-row">
+                  <span>Product Tax</span>
+                  <span>{formatPrice(calculateProductTaxes())}</span>
+                </div>
+              )}
               <div className="summary-row">
                 <span>Tax ({generalSettings.taxRate}%)</span>
                 <span>{formatPrice(calculateFinalSubtotal() * (parseFloat(generalSettings.taxRate)/100))}</span>
               </div>
               <div className="summary-row total">
                 <span>Total</span>
-                <span>{formatPrice(calculateFinalSubtotal() * (1 + parseFloat(generalSettings.taxRate)/100))}</span>
+                <span>{formatPrice(calculateFinalSubtotal() * (1 + parseFloat(generalSettings.taxRate)/100) + calculateProductTaxes())}</span>
               </div>
               
               <div className="checkout-actions">
@@ -685,8 +713,9 @@ const POS: React.FC = () => {
         subtotal={calculateSubtotal()}
         discount={discount}
         discountAmount={calculateDiscountAmount()}
+        productTax={calculateProductTaxes()}
         tax={(calculateFinalSubtotal() * (parseFloat(generalSettings.taxRate)/100))}
-        total={(calculateFinalSubtotal() * (1 + parseFloat(generalSettings.taxRate)/100))}
+        total={(calculateFinalSubtotal() * (1 + parseFloat(generalSettings.taxRate)/100) + calculateProductTaxes())}
         paymentType={paymentType}
         receiptNumber={transaction?.receiptNumber}
       />

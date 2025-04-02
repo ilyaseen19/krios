@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import Modal from './Modal';
 import './ReceiptModal.css';
 import './PrintableReceipt.css';
@@ -13,6 +13,7 @@ interface ReceiptModalProps {
   subtotal: number;
   discount: { type: 'percentage' | 'fixed', value: number } | null;
   discountAmount: number;
+  productTax: number;
   tax: number;
   total: number;
   paymentType: string;
@@ -27,6 +28,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
   subtotal,
   discount,
   discountAmount,
+  productTax,
   tax,
   total,
   paymentType,
@@ -90,6 +92,13 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
                 Discount {discount.type === 'percentage' ? `(${discount.value}%)` : '(Fixed)'}
               </span>
               <span>-{formatPrice(discountAmount)}</span>
+            </div>
+          )}
+          
+          {productTax > 0 && (
+            <div className="printable-receipt-summary-row">
+              <span>Product Tax</span>
+              <span>{formatPrice(productTax)}</span>
             </div>
           )}
           
@@ -170,6 +179,13 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
                     Discount {discount.type === 'percentage' ? `(${discount.value}%)` : '(Fixed)'}
                   </span>
                   <span>-{formatPrice(discountAmount)}</span>
+                </div>
+              )}
+              
+              {productTax > 0 && (
+                <div className="receipt-summary-row">
+                  <span>Product Tax</span>
+                  <span>{formatPrice(productTax)}</span>
                 </div>
               )}
               

@@ -6,6 +6,7 @@ export interface Product {
   description?: string;
   category?: string;
   color?: string;
+  tax?: number; // Product-specific tax rate (percentage)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,7 +20,8 @@ export interface Transaction {
   receiptNumber: string;
   items: CartItem[];
   total: number;
-  tax: number;
+  tax: number; // General tax amount
+  productTax: number; // Product-specific tax amount
   cashierId: string;
   createdAt: Date;
   paymentType?: string;
