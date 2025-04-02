@@ -69,7 +69,7 @@ const SyncSettings: React.FC = () => {
     try {
       setLoading(true);
 
-      const result = await initializeCustomerDB(businessName);
+      const result = await initializeCustomerDB();
       // Save the customerId to settings
       await saveGeneralSettings({ customerId: result.customerId });
       setCustomerId(result.customerId);

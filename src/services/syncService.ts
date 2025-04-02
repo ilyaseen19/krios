@@ -10,10 +10,13 @@ const isOnline = (): boolean => {
 };
 
 // Initialize customer database
-export const initializeCustomerDB = async (businessName: string): Promise<{ customerId: string }> => {
+export const initializeCustomerDB = async (): Promise<{ customerId: string }> => {
   if (!isOnline()) {
     throw new Error('Cannot initialize database while offline');
   }
+
+  const settings = await getGeneralSettings();
+  const businessName = settings?.storeName;
 
   try {
     const response = await fetch(`${API_BASE_URL}/sync/initialize`, {

@@ -5,6 +5,7 @@ export interface Product {
   stock: number;
   description?: string;
   category?: string;
+  color?: string;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -119,10 +119,21 @@ const POS: React.FC = () => {
 
   // Add product to cart
   const addToCart = (product: Product) => {
+    // Check if product is out of stock
+    if (product.stock <= 0) {
+      alert('Product is out of stock');
+      return;
+    }
+
     setCart(prevCart => {
       const existingItem = prevCart.find(item => item.id === product.id);
       
       if (existingItem) {
+        // Check if adding one more would exceed available stock
+        if (existingItem.quantity >= product.stock) {
+          alert('Cannot add more of this product - not enough stock');
+          return prevCart;
+        }
         return prevCart.map(item => 
           item.id === product.id 
             ? { ...item, quantity: item.quantity + 1 } 
@@ -135,14 +146,25 @@ const POS: React.FC = () => {
   };
 
   // Remove item from cart
-  const removeFromCart = (productId: number) => {
+  const removeFromCart = (productId: string) => {
     setCart(prevCart => prevCart.filter(item => item.id !== productId));
   };
 
   // Update item quantity in cart
-  const updateQuantity = (productId: number, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number) => {
+    // If quantity is 0 or negative, remove the item from cart
     if (quantity <= 0) {
       removeFromCart(productId);
+      return;
+    }
+    
+    // Find the product in the products array to check stock
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    // Check if requested quantity exceeds available stock
+    if (quantity > product.stock) {
+      alert(`Cannot add ${quantity} items - only ${product.stock} in stock`);
       return;
     }
     
@@ -193,6 +215,15 @@ const POS: React.FC = () => {
   // Process transaction
   const processTransaction = async () => {
     if (cart.length === 0) return;
+    
+    // Verify all items in cart have sufficient stock
+    for (const cartItem of cart) {
+      const currentProduct = products.find(p => p.id === cartItem.id);
+      if (!currentProduct || currentProduct.stock < cartItem.quantity) {
+        alert(`Not enough stock for ${cartItem.name}. Available: ${currentProduct?.stock || 0}`);
+        return;
+      }
+    }
     
     setIsProcessing(true);
     try {
@@ -246,6 +277,20 @@ const POS: React.FC = () => {
       if (shouldPrintReceipt) {
         await printReceipt(newTransaction);
       }
+      
+      // Update local product stock in the UI
+      setProducts(prevProducts => {
+        return prevProducts.map(product => {
+          const soldItem = currentTransaction.find(item => item.id === product.id);
+          if (soldItem) {
+            return {
+              ...product,
+              stock: Math.max(0, product.stock - soldItem.quantity)
+            };
+          }
+          return product;
+        });
+      });
       
       // Close the receipt modal
       setShowReceiptModal(false);
@@ -452,7 +497,7 @@ const POS: React.FC = () => {
                 >
                   <div 
                     className="product-img-placeholder"
-                    style={{ backgroundColor: generateBackgroundColor(product.name) }}
+                    style={{ backgroundColor: product.color || generateBackgroundColor(product.name) }}
                   >
                     {!product.image && (
                       <div className="product-initials">
