@@ -121,7 +121,7 @@ const POS: React.FC = () => {
   const addToCart = (product: Product) => {
     // Check if product is out of stock
     if (product.stock <= 0) {
-      alert('Product is out of stock');
+      window.toast?.error('Product is out of stock');
       return;
     }
 
@@ -131,7 +131,7 @@ const POS: React.FC = () => {
       if (existingItem) {
         // Check if adding one more would exceed available stock
         if (existingItem.quantity >= product.stock) {
-          alert('Cannot add more of this product - not enough stock');
+          window.toast?.error('Cannot add more of this product - not enough stock');
           return prevCart;
         }
         return prevCart.map(item => 
@@ -164,7 +164,7 @@ const POS: React.FC = () => {
     
     // Check if requested quantity exceeds available stock
     if (quantity > product.stock) {
-      alert(`Cannot add ${quantity} items - only ${product.stock} in stock`);
+      window.toast?.error(`Cannot add ${quantity} items - only ${product.stock} in stock`);
       return;
     }
     
@@ -220,7 +220,7 @@ const POS: React.FC = () => {
     for (const cartItem of cart) {
       const currentProduct = products.find(p => p.id === cartItem.id);
       if (!currentProduct || currentProduct.stock < cartItem.quantity) {
-        alert(`Not enough stock for ${cartItem.name}. Available: ${currentProduct?.stock || 0}`);
+        window.toast?.error(`Not enough stock for ${cartItem.name}. Available: ${currentProduct?.stock || 0}`);
         return;
       }
     }
@@ -233,7 +233,7 @@ const POS: React.FC = () => {
       setShowReceiptModal(true);
     } catch (error) {
       console.error('Transaction failed:', error);
-      alert('Transaction failed. Please try again.');
+      window.toast?.error('Transaction failed. Please try again.');
       setIsProcessing(false);
     }
   };
@@ -256,11 +256,11 @@ const POS: React.FC = () => {
       } else {
         // Use simulation for development or unsupported browsers
         await simulateOpenCashDrawer();
-        alert('Cash drawer opened (simulated)');
+        window.toast?.success('Cash drawer opened (simulated)');
       }
     } catch (error) {
       console.error('Failed to open cash drawer:', error);
-      alert(`Failed to open cash drawer: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      window.toast?.error(`Failed to open cash drawer: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
   
@@ -307,7 +307,7 @@ const POS: React.FC = () => {
       }
     } catch (error) {
       // console.error('Payment confirmation failed:', error);
-      alert('Payment confirmation failed. Please try again.');
+      window.toast?.error('Payment confirmation failed. Please try again.');
       setIsProcessing(false);
     }
   };
