@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { getGeneralSettings, saveGeneralSettings } from '../services/settingsService';
-import { initializeCustomerDB, getSyncStatus, syncAllData, restoreData } from '../services/syncService';
+import { initializeCustomerDB, getSyncStatus, syncAllData, restoreData, syncData } from '../services/syncService';
 import Modal from './Modal';
+import { SynchronizeModal } from './modals';
 import './Settings.css';
 
 const SyncSettings: React.FC = () => {
@@ -13,6 +14,7 @@ const SyncSettings: React.FC = () => {
   const [syncStatus, setSyncStatus] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
+  const [showSyncModal, setShowSyncModal] = useState(false);
 
   // Load token from localStorage
   useEffect(() => {
@@ -140,6 +142,34 @@ const SyncSettings: React.FC = () => {
     }
   };
 
+  // Execute restore with custom store name and customerId
+  const handleSyncWithCustomValues = async (businessName: string, customerId: string) => {
+    if (!token) {
+      window.toast?.error('You must be logged in to restore data');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setShowSyncModal(false); // Close the dialog
+      
+      // Use the provided values for restoration
+      const result = await syncData(customerId, businessName, token,);
+      window.toast?.success('Data synchronized successfully! Your local data has been updated with the backup.');
+      
+      // Update the local state with the new values
+      setBusinessName(businessName);
+      setCustomerId(customerId);
+      
+      await checkSyncStatus(customerId);
+    } catch (err: any) {
+      console.error('Error synchronizing data:', err);
+      window.toast?.error(err.message || 'Failed to synchronize data. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Format date with error handling
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return 'Never';
@@ -183,6 +213,14 @@ const SyncSettings: React.FC = () => {
         <p>Are you sure you want to restore data? This will overwrite your current data with the last backup.</p>
       </Modal>
 
+      {/* Synchronize Modal */}
+      <SynchronizeModal
+        isOpen={showSyncModal}
+        onClose={() => setShowSyncModal(false)}
+        onSynchronize={handleSyncWithCustomValues}
+        loading={loading}
+      />
+
       <div className="settings-form">
         <div className="form-group">
           <label htmlFor="businessName">Business Name</label>
@@ -197,13 +235,23 @@ const SyncSettings: React.FC = () => {
         </div>
 
         {!customerId ? (
-          <button 
-            className="btn primary-btn" 
-            onClick={handleInitialize}
-            disabled={loading || !businessName.trim()}
-          >
-            {loading ? 'Initializing...' : 'Initialize Database'}
-          </button>
+          <div className="button-group">
+            <button 
+              className="btn primary-btn" 
+              onClick={handleInitialize}
+              disabled={loading || !businessName.trim()}
+            >
+              {loading ? 'Initializing...' : 'Initialize Database'}
+            </button>
+            <button 
+              className="btn primary-btn" 
+              onClick={() => setShowSyncModal(true)}
+              disabled={loading}
+              style={{ backgroundColor: '#28c76f', marginLeft: '10px' }}
+            >
+              Synchronize
+            </button>
+          </div>
         ) : (
           <div className="sync-info">
             <div className="form-group">

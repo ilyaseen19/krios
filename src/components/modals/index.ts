@@ -9,3 +9,4 @@ export { default as ManageCategoriesModal } from './ManageCategoriesModal';
 export { default as AddUserModal } from './AddUserModal';
 export { default as EditUserModal } from './EditUserModal';
 export { default as DeleteConfirmationModal } from './DeleteConfirmationModal';
+export { default as SynchronizeModal } from './SynchronizeModal';
