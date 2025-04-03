@@ -13,7 +13,8 @@ export const STORES = {
   SALES: 'sales',
   USERS: 'users',
   SETTINGS: 'settings',
-  PENDING_OPERATIONS: 'pendingOperations'
+  PENDING_OPERATIONS: 'pendingOperations',
+  SUBSCRIPTION: 'subscription'
 };
 
 // Initialize the database
@@ -68,6 +69,10 @@ export const initDB = (): Promise<IDBDatabase> => {
         pendingStore.createIndex('type', 'type', { unique: false });
         pendingStore.createIndex('entityType', 'entityType', { unique: false });
         pendingStore.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+      
+      if (!db.objectStoreNames.contains(STORES.SUBSCRIPTION)) {
+        db.createObjectStore(STORES.SUBSCRIPTION, { keyPath: 'id' });
       }
     };
   });

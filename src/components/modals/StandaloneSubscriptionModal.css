@@ -1,0 +1,175 @@
+.standalone-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('../../assets/login-img.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.standalone-modal-content {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.standalone-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f3f4f6;
+}
+
+.standalone-modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.standalone-modal-body {
+  padding: 1.5rem;
+}
+
+.standalone-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+/* Subscription specific styles */
+.subscription-message {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #374151;
+  font-weight: 500;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.payment-instructions {
+  font-size: 0.9rem;
+  color: #4b5563;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+  background-color: #f3f4f6;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border-left: 3px solid #3b82f6;
+}
+
+.payment-instructions a {
+  color: #2563eb;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.payment-instructions a:hover {
+  text-decoration: underline;
+  color: #1f2937;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.form-group input::placeholder {
+  color: #9ca3af;
+}
+
+.save-btn {
+  background-color: #3b82f6;
+  color: white;
+  font-weight: 500;
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save-btn:hover {
+  background-color: #2563eb;
+}
+
+.save-btn:disabled {
+  background-color: #93c5fd;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .standalone-modal-content {
+    width: 90%;
+    max-width: none;
+  }
+  
+  .standalone-modal-header,
+  .standalone-modal-body,
+  .standalone-modal-actions {
+    padding: 1rem;
+  }
+}

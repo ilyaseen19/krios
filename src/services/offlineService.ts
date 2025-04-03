@@ -3,6 +3,7 @@
 import { initDB, STORES, getPendingOperations, deletePendingOperation } from './dbService';
 import { initializeDefaultAdmin } from './initDbData';
 import { NETWORK_EVENTS } from './networkService';
+import { initializeSubscription } from './subscriptionService';
 
 // Import offline implementations
 import * as ProductServiceOffline from './productService.offline';
@@ -37,6 +38,9 @@ export const initOfflineSystem = async (): Promise<void> => {
     // Initialize default admin user if no users exist
     // Always check if there are users in the database
     await initializeDefaultAdmin();
+    
+    // Initialize subscription data
+    await initializeSubscription();
     
     // Set the flag to indicate that the database has been initialized
     if (!localStorage.getItem('dbInitialized')) {

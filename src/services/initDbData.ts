@@ -2,6 +2,7 @@
 
 import { User } from '../types/user';
 import { addItem, STORES, getAllItems } from './dbService';
+import { initializeSubscription } from './subscriptionService';
 
 // Initialize default admin user if no users exist
 export const initializeDefaultAdmin = async (): Promise<void> => {
@@ -26,6 +27,9 @@ export const initializeDefaultAdmin = async (): Promise<void> => {
       await addItem<User>(STORES.USERS, defaultAdmin);
       console.log('Default admin user created');
     }
+    
+    // Initialize subscription data
+    await initializeSubscription();
   } catch (error) {
     console.error('Error initializing default admin:', error);
   }

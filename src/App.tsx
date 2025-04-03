@@ -11,6 +11,7 @@ import AdminLayout from './components/AdminLayout';
 import OfflineIndicator from './components/OfflineIndicator';
 import ToastContainer from './components/ToastContainer';
 import Unauthorized from './components/Unauthorized';
+import SubscriptionValidator from './components/SubscriptionValidator';
 import './App.css';
 
 // Import page components
@@ -28,12 +29,13 @@ const App: React.FC = () => {
       <AuthProvider>
         <OfflineProvider>
           <SettingsProvider>
-            <ToastContainer />
-            <div style={{ padding: '0.5rem 1rem' }}>
-              <OfflineIndicator />
-              <InstallPWA />
-            </div>
-            <Routes>
+            <SubscriptionValidator>
+              <ToastContainer />
+              <div style={{ padding: '0.5rem 1rem' }}>
+                <OfflineIndicator />
+                <InstallPWA />
+              </div>
+              <Routes>
           <Route path="/login" element={<LoginProtection><Login /></LoginProtection>} />
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route
@@ -64,6 +66,7 @@ const App: React.FC = () => {
           />
           <Route path="/" element={<LoginProtection><Login /></LoginProtection>} />
             </Routes>
+            </SubscriptionValidator>
           </SettingsProvider>
         </OfflineProvider>
       </AuthProvider>
