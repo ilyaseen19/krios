@@ -4,7 +4,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-image: url('../../assets/login-img.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -98,6 +104,23 @@
   border: 1px solid #d1d5db;
   border-radius: 4px;
   font-size: 1rem;
+}
+
+.payment-info-text {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.payment-info-text a {
+  color: #2563eb;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.payment-info-text a:hover {
+  text-decoration: underline;
   color: #1f2937;
   transition: border-color 0.2s;
 }
