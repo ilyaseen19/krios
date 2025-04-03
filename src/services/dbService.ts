@@ -4,7 +4,7 @@ import { Category } from "./categoryService.offline";
 
 // Database configuration
 const DB_NAME = 'kriosDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Increased version to trigger database upgrade
 
 // Store names
 export const STORES = {

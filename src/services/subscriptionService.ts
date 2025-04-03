@@ -40,10 +40,20 @@ export const updateSubscription = async (paymentId: string): Promise<Subscriptio
   try {
     const existingSubscription = await getItemById<Subscription>(STORES.SUBSCRIPTION, DEFAULT_SUBSCRIPTION_ID);
     
+    // If no subscription data exists, create a new one instead of throwing an error
     if (!existingSubscription) {
-      throw new Error('Subscription data not found');
+      const newSubscription: Subscription = {
+        id: DEFAULT_SUBSCRIPTION_ID,
+        paymentId,
+        paymentDate: new Date()
+      };
+      
+      await addItem<Subscription>(STORES.SUBSCRIPTION, newSubscription);
+      console.log('New subscription data created');
+      return newSubscription;
     }
     
+    // Update existing subscription
     const updatedSubscription: Subscription = {
       ...existingSubscription,
       paymentId,
