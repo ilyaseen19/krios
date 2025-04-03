@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { defaultGeneralSettings, defaultNotificationSettings, GeneralSettings, NotificationSettings, dateFormats, timeZones } from '../data/mockSettings';
 import { useSettings } from '../contexts/SettingsContext';
+import { CURRENCIES, getCurrencyDisplayText } from '../constants/currencyConstants';
 import SyncSettings from './SyncSettings';
 import './Settings.css';
 
@@ -135,16 +136,11 @@ const Settings: React.FC = () => {
                     onChange={handleGeneralChange}
                     className="settings-select"
                   >
-                    <option value="$">$ (USD)</option>
-                    <option value="€">€ (EUR)</option>
-                    <option value="£">£ (GBP)</option>
-                    <option value="¥">¥ (JPY/CNY)</option>
-                    <option value="₹">₹ (INR)</option>
-                    <option value="₽">₽ (RUB)</option>
-                    <option value="₩">₩ (KRW)</option>
-                    <option value="A$">A$ (AUD)</option>
-                    <option value="C$">C$ (CAD)</option>
-                    <option value="Fr">Fr (CHF)</option>
+                    {CURRENCIES.map(currency => (
+                      <option key={currency.code} value={currency.symbol}>
+                        {getCurrencyDisplayText(currency)}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 

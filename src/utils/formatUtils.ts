@@ -1,4 +1,5 @@
 // Utility functions for formatting currency and dates based on user settings
+import { DEFAULT_CURRENCY } from '../constants/currencyConstants';
 
 /**
  * Format a number as currency using the provided currency symbol
@@ -6,7 +7,7 @@
  * @param currencySymbol The currency symbol to use
  * @returns Formatted currency string
  */
-export const formatCurrency = (amount: number, currencySymbol: string = '$'): string => {
+export const formatCurrency = (amount: number, currencySymbol: string = DEFAULT_CURRENCY.symbol): string => {
   return `${currencySymbol}${amount.toFixed(2)}`;
 };
 
