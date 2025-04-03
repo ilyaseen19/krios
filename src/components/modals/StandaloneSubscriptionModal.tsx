@@ -129,9 +129,6 @@ const StandaloneSubscriptionModal: React.FC<StandaloneSubscriptionModalProps> = 
                 placeholder="Enter payment ID"
                 disabled={isSubmitting}
               />
-              <p className="payment-instructions">
-                Visit <a href="https://krios.com/payments" target="_blank" rel="noopener noreferrer">krios.com/payments</a> to make a payment and receive your payment ID. Enter the ID above to activate your subscription.
-              </p>
             </div>
           </div>
         </div>

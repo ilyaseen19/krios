@@ -40,11 +40,11 @@ export const updateSubscription = async (paymentId: string): Promise<Subscriptio
   try {
     const existingSubscription = await getItemById<Subscription>(STORES.SUBSCRIPTION, DEFAULT_SUBSCRIPTION_ID);
     
-    // if (!existingSubscription) {
-    //   throw new Error('Subscription data not found');
-    // }
+    if (!existingSubscription) {
+      throw new Error('Subscription data not found');
+    }
     
-    const updatedSubscription = {
+    const updatedSubscription: Subscription = {
       ...existingSubscription,
       paymentId,
       paymentDate: new Date()
