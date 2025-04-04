@@ -128,12 +128,10 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl requests)
     if(!origin) return callback(null, true);
     
-    // Define allowed origins
-    const allowedOrigins = [
-      process.env.CLIENT_URL,
-      'https://krios-pos.netlify.app',
-      // Add any additional origins as needed
-    ].filter(Boolean); // Remove any undefined/null values
+    // Parse allowed origins from environment variable
+    const allowedOrigins = process.env.CORS_CLIENT_URLS ? 
+      process.env.CORS_CLIENT_URLS.split(',').map(url => url.trim()) : 
+      ['https://krios-pos.netlify.app']
     
     if(allowedOrigins.indexOf(origin) !== -1 || !origin) {
       callback(null, true);

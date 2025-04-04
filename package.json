@@ -1,7 +1,7 @@
 {
-  "name": "krios-backend",
+  "name": "prynova-backend",
   "version": "1.0.0",
-  "description": "Backend for Krios POS system",
+  "description": "Backend for Prynova Technologies",
   "main": "index.js",
   "scripts": {
     "build": "tsc --project tsconfig.json",
@@ -14,9 +14,10 @@
     "pos",
     "mongodb",
     "sync",
-    "backup"
+    "backup",
+    "managemnt"
   ],
-  "author": "",
+  "author": {"name": "ilyaseen19", "email": "alfuty09@gmail.com", "fullname": "Alhassan Abdallah"},
   "license": "ISC",
   "dependencies": {
     "@paypal/checkout-server-sdk": "^1.0.3",
