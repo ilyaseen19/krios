@@ -7,6 +7,9 @@ import { connectToMongoDB } from './config/database';
 // Import routes
 import authRoutes from './routes/auth.routes';
 import syncRoutes from './routes/sync.routes';
+import customerRoutes from './routes/customer.routes';
+import paymentRoutes from './routes/payment.routes';
+import adminRoutes from './routes/admin.routes';
 
 // Load environment variables
 dotenv.config();
@@ -46,6 +49,9 @@ app.use(morgan('dev'));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/sync', syncRoutes);
+app.use('/api/customers', customerRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/admins', adminRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

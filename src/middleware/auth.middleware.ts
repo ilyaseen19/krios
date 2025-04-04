@@ -43,8 +43,9 @@ export const optionalAuthenticate = (req: Request, res: Response, next: NextFunc
 /**
  * Authentication middleware
  * Verifies JWT token and attaches user data to request
+ * Also checks if customer is blocked
  */
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   // Get token from header
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -56,6 +57,17 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   try {
     // Verify token
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    
+    // Check if customer exists and is not blocked
+    if (decoded.customerId) {
+      // Import Customer model dynamically to avoid circular dependencies
+      const Customer = require('../models/Customer').default;
+      const customer = await Customer.findOne({ customerId: decoded.customerId });
+      
+      if (customer && customer.status === 'blocked') {
+        return res.status(403).json({ message: 'Access denied: customer account is blocked' });
+      }
+    }
     
     // Attach user data to request
     req.body.user = decoded;
