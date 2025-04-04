@@ -279,13 +279,13 @@ const SyncSettings: React.FC = () => {
 
         {!customerId ? (
           <div className="button-group">
-            <button 
+            {/* <button 
               className="btn primary-btn" 
               onClick={handleInitialize}
               disabled={loading || !businessName.trim()}
             >
               {loading ? 'Initializing...' : 'Initialize Database'}
-            </button>
+            </button> */}
             <button 
               className="btn primary-btn" 
               onClick={() => setShowSyncModal(true)}

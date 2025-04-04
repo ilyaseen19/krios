@@ -12,10 +12,9 @@ const Settings: React.FC = () => {
     notificationSettings, 
     updateGeneralSettings, 
     updateNotificationSettings,
-    isLoading 
   } = useSettings();
 
-  const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     updateGeneralSettings({
       [name]: value

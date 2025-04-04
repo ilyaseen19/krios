@@ -36,7 +36,7 @@ export const initOfflineSystem = async (): Promise<void> => {
     await initDB();
     
     // Initialize default admin user if no users exist
-    // Always check if there are users in the database
+    // This also initializes default settings
     await initializeDefaultAdmin();
     
     // Initialize subscription data

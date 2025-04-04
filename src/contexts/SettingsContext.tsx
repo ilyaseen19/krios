@@ -39,6 +39,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         let storedGeneralSettings = await getGeneralSettings();
         if (!storedGeneralSettings) {
           // If no settings found, save the defaults
+          console.log('No general settings found, saving defaults');
           storedGeneralSettings = await saveGeneralSettings(defaultGeneralSettings);
         }
         setGeneralSettings(storedGeneralSettings);
@@ -47,6 +48,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         let storedNotificationSettings = await getNotificationSettings();
         if (!storedNotificationSettings) {
           // If no settings found, save the defaults
+          console.log('No notification settings found, saving defaults');
           storedNotificationSettings = await saveNotificationSettings(defaultNotificationSettings);
         }
         setNotificationSettings(storedNotificationSettings);
@@ -55,6 +57,14 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         // Set defaults if there's an error
         setGeneralSettings(defaultGeneralSettings);
         setNotificationSettings(defaultNotificationSettings);
+        
+        // Try to save the defaults to IndexedDB
+        try {
+          await saveGeneralSettings(defaultGeneralSettings);
+          await saveNotificationSettings(defaultNotificationSettings);
+        } catch (saveError) {
+          console.error('Error saving default settings:', saveError);
+        }
       } finally {
         setIsLoading(false);
       }

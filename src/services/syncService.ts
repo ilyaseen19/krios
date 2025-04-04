@@ -51,6 +51,8 @@ export const getSyncStatus = async (customerId: string): Promise<any> => {
   try {
     // Get business name from settings
     const settings = await getGeneralSettings();
+    console.log(settings)
+
     const businessName = settings?.storeName;
     
     try {
