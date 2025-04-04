@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { getGeneralSettings, saveGeneralSettings } from '../services/settingsService';
 import { initializeCustomerDB, getSyncStatus, syncAllData, restoreData, syncData } from '../services/syncService';
 import Modal from './Modal';
 import { SynchronizeModal } from './modals';
+import { BACKUP_INTERVALS, DEFAULT_BACKUP_INTERVAL } from '../constants/backupConstants';
 import './Settings.css';
 
 const SyncSettings: React.FC = () => {
@@ -15,12 +16,48 @@ const SyncSettings: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
   const [showSyncModal, setShowSyncModal] = useState(false);
+  const [backupInterval, setBackupInterval] = useState(DEFAULT_BACKUP_INTERVAL);
+  const [lastBackupTime, setLastBackupTime] = useState<number>(0);
 
   // Load token from localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     setToken(storedToken);
   }, [isAuthenticated]); // Re-check when auth state changes
+
+  // Function to perform backup
+  const performBackup = useCallback(async () => {
+    if (!customerId || !token || !isAuthenticated) return;
+    try {
+      await syncAllData(customerId, token);
+      const now = Date.now();
+      setLastBackupTime(now);
+      await saveGeneralSettings({ lastBackupTime: now });
+      window.toast?.success('Automatic backup completed successfully');
+    } catch (error) {
+      // console.error('Automatic backup failed:', error);
+      window.toast?.success('Automatic backup failed:', error);
+    }
+  }, [customerId, token, isAuthenticated]);
+
+  // Setup automatic backup interval
+  useEffect(() => {
+    if (!backupInterval || !isAuthenticated) return;
+
+    const now = Date.now();
+    const timeSinceLastBackup = now - lastBackupTime;
+    const intervalMs = backupInterval * 60 * 60 * 1000; // Convert hours to milliseconds
+
+    // If it's been longer than the interval since the last backup, perform one now
+    if (timeSinceLastBackup >= intervalMs) {
+      performBackup();
+    }
+
+    // Set up the interval for future backups
+    const intervalId = setInterval(performBackup, intervalMs);
+
+    return () => clearInterval(intervalId);
+  }, [backupInterval, lastBackupTime, performBackup, isAuthenticated]);
 
   // Load settings on component mount
   useEffect(() => {
@@ -34,6 +71,12 @@ const SyncSettings: React.FC = () => {
           setCustomerId(settings.customerId);
           // Get sync status if customerId exists
           await checkSyncStatus(settings.customerId);
+        }
+        if (settings?.backupInterval) {
+          setBackupInterval(settings.backupInterval);
+        }
+        if (settings?.lastBackupTime) {
+          setLastBackupTime(settings.lastBackupTime);
         }
       } catch (err) {
         console.error('Error loading settings:', err);
@@ -329,6 +372,33 @@ const SyncSettings: React.FC = () => {
               >
                 Refresh Status
               </button>
+              <div className="form-group">
+              <select
+                id="backupInterval"
+                value={backupInterval}
+                onChange={async (e) => {
+                  const newInterval = Number(e.target.value);
+                  setBackupInterval(newInterval);
+                  await saveGeneralSettings({ backupInterval: newInterval });
+                }}
+                className="form-control"
+              >
+                {BACKUP_INTERVALS.map((interval) => (
+                  <option key={interval.value} value={interval.value}>
+                    {interval.label}
+                  </option>
+                ))}
+              </select>
+              <br />
+              <small className="form-text text-muted">
+                Select how often you want your data to be automatically backed up.
+                {lastBackupTime > 0 && (
+                  <div>
+                    Last automatic backup: {new Date(lastBackupTime).toLocaleString()}
+                  </div>
+                )}
+              </small>
+            </div>
             </div>
             <div className="sync-help">
               <p><strong>Note:</strong></p>
@@ -336,7 +406,7 @@ const SyncSettings: React.FC = () => {
                 <li>Backup Now will save your current data to the cloud</li>
                 <li>Restore Data will fetch the latest backup from the cloud</li>
                 <li>Make sure you have a stable internet connection</li>
-                <li>Your data is automatically backed up when you make changes</li>
+                <li>Your data is automatically backed up at the selected interval</li>
               </ul>
             </div>
           </div>

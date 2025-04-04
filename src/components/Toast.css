@@ -9,6 +9,14 @@
   max-width: 350px;
 }
 
+.persistent-toast-container {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  pointer-events: none;
+}
+
 .toast {
   display: flex;
   align-items: center;

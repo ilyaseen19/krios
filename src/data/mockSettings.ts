@@ -12,6 +12,8 @@ export interface GeneralSettings {
   receiptCounter: number;
   customerId?: string;
   businessName?: string;
+  backupInterval?: number; // Backup interval in hours
+  lastBackupTime?: number; // Timestamp of last backup
 }
 
 export interface NotificationSettings {
@@ -31,6 +33,8 @@ export const defaultGeneralSettings: GeneralSettings = {
   dateFormat: 'MM/DD/YYYY',
   timeZone: 'UTC-5 (Eastern Time)',
   receiptCounter: 1,
+  backupInterval: 2, // Default 2-hour backup interval
+  lastBackupTime: 0, // Initialize with 0 timestamp
 };
 
 export const defaultNotificationSettings: NotificationSettings = {

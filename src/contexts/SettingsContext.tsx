@@ -36,24 +36,25 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         setIsLoading(true);
         
         // Get general settings from IndexedDB
-        const storedGeneralSettings = await getGeneralSettings();
-        if (storedGeneralSettings) {
-          setGeneralSettings(storedGeneralSettings);
-        } else {
+        let storedGeneralSettings = await getGeneralSettings();
+        if (!storedGeneralSettings) {
           // If no settings found, save the defaults
-          await saveGeneralSettings(defaultGeneralSettings);
+          storedGeneralSettings = await saveGeneralSettings(defaultGeneralSettings);
         }
+        setGeneralSettings(storedGeneralSettings);
         
         // Get notification settings from IndexedDB
-        const storedNotificationSettings = await getNotificationSettings();
-        if (storedNotificationSettings) {
-          setNotificationSettings(storedNotificationSettings);
-        } else {
+        let storedNotificationSettings = await getNotificationSettings();
+        if (!storedNotificationSettings) {
           // If no settings found, save the defaults
-          await saveNotificationSettings(defaultNotificationSettings);
+          storedNotificationSettings = await saveNotificationSettings(defaultNotificationSettings);
         }
+        setNotificationSettings(storedNotificationSettings);
       } catch (error) {
         console.error('Error loading settings:', error);
+        // Set defaults if there's an error
+        setGeneralSettings(defaultGeneralSettings);
+        setNotificationSettings(defaultNotificationSettings);
       } finally {
         setIsLoading(false);
       }

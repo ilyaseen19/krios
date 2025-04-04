@@ -167,6 +167,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
+  height: 40px;
 }
 
 .save-btn:hover {
