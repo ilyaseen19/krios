@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Customer from '../models/Customer';
+import Payment from '../models/Payment';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
@@ -51,10 +52,24 @@ export const createPayPalOrder = async (req: Request, res: Response) => {
     // Execute the request
     const order = await client.execute(request);
 
+    // Create initial payment record
+    const payment = await Payment.create({
+      customerId,
+      companyName: customer.companyName,
+      subscribedApp: customer.subscribedApp || 'default',
+      orderId: order.result.id,
+      amount: customer.subscriptionAmount,
+      currency: 'USD',
+      status: 'pending',
+      paymentDate: new Date(),
+      description: `Subscription payment for ${customer.companyName}`
+    });
+
     // Return the order ID to the client
     res.status(200).json({
       orderId: order.result.id,
-      subscriptionAmount: customer.subscriptionAmount
+      subscriptionAmount: customer.subscriptionAmount,
+      paymentId: payment._id
     });
   } catch (error) {
     console.error('Error creating PayPal order:', error);
@@ -89,6 +104,7 @@ export const capturePayPalPayment = async (req: Request, res: Response) => {
 
     // Get the capture ID (payment ID)
     const captureId = capture.result.purchase_units[0].payments.captures[0].id;
+    const amount = parseFloat(capture.result.purchase_units[0].payments.captures[0].amount.value);
 
     // Calculate new subscription dates
     const startDate = new Date();
@@ -106,11 +122,34 @@ export const capturePayPalPayment = async (req: Request, res: Response) => {
       { new: true }
     );
 
+    // Update existing payment record
+    const payment = await Payment.findOneAndUpdate(
+      { orderId },
+      {
+        paymentId: captureId,
+        amount,
+        status: 'completed',
+        subscriptionStartDate: startDate,
+        subscriptionEndDate: endDate
+      },
+      { new: true }
+    );
+
+    if (!payment) {
+      return res.status(404).json({ message: 'Payment record not found' });
+    }
+
     // Return success response with payment details
     res.status(200).json({
       success: true,
       message: 'Payment successful',
       paymentId: captureId,
+      payment: {
+        amount,
+        currency: payment.currency,
+        status: payment.status,
+        paymentDate: payment.paymentDate
+      },
       customer: {
         customerId: updatedCustomer?.customerId,
         companyName: updatedCustomer?.companyName,
