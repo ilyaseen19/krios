@@ -255,6 +255,16 @@
   white-space: nowrap;
 }
 
+.update-button {
+  background-color: #3182ce;
+  color: white !important;
+}
+
+.update-button:hover {
+  background-color: #2c5282;
+  color: white !important;
+}
+
 @media (max-width: 576px) {
   .actions-section {
     gap: 0.5rem;

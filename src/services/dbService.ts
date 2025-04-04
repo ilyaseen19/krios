@@ -1,7 +1,5 @@
 // IndexedDB Database Service
 
-import { Category } from "./categoryService.offline";
-
 // Database configuration
 const DB_NAME = 'kriosDB';
 const DB_VERSION = 2; // Increased version to trigger database upgrade

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useSettings } from '../contexts/SettingsContext';
 import { getProducts } from '../services/productService.offline';
+import { useAppUpdate } from '../hooks/useAppUpdate';
 import './Topbar.css';
 
 interface TopbarProps {
@@ -11,11 +12,12 @@ interface TopbarProps {
 
 const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<{message: string, time: string, isNew?: boolean}[]>([]);
+  const [notifications, setNotifications] = useState<{message: string, time: string, isNew?: boolean, productId?: string | number}[]>([]);
   const [username, setUsername] = useState<string>('');
   const { logout } = useAuth();
   const { generalSettings } = useSettings();
   const navigate = useNavigate();
+  const { updateAvailable, applyUpdate } = useAppUpdate();
   
   // Get username from localStorage when component mounts
   useEffect(() => {
@@ -23,41 +25,53 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
     setUsername(storedUsername);
   }, []);
 
-  // Check for low stock products when component mounts
+  // Function to check low stock products
+  const checkLowStockProducts = async () => {
+    try {
+      const products = await getProducts();
+      const lowStockProducts = products.filter(product => {
+        const minimumStock = (product as any).minimumStock || 10;
+        return product.stock < minimumStock && product.stock > 0;
+      });
+      
+      const outOfStockProducts = products.filter(product => product.stock === 0);
+      
+      // Create notifications for low stock products
+      const newNotifications = [
+        ...lowStockProducts.map(product => ({
+          message: `${product.name} is low on stock!`,
+          time: 'Just now',
+          isNew: true,
+          productId: product.id
+        })),
+        ...outOfStockProducts.map(product => ({
+          message: `${product.name} is out of stock!`,
+          time: 'Just now',
+          isNew: true,
+          productId: product.id
+        }))
+      ];
+      
+      // Update notifications, removing old ones for the same products
+      setNotifications(prev => {
+        const filteredPrev = prev.filter(notification => 
+          !newNotifications.some(newNotif => newNotif.productId === notification.productId)
+        );
+        return [...newNotifications, ...filteredPrev];
+      });
+    } catch (error) {
+      console.error('Failed to check low stock products:', error);
+    }
+  };
+
+  // Check for low stock products when component mounts and when products change
   useEffect(() => {
-    const checkLowStockProducts = async () => {
-      try {
-        const products = await getProducts();
-        const lowStockProducts = products.filter(product => {
-          const minimumStock = (product as any).minimumStock || 10;
-          return product.stock < minimumStock && product.stock > 0;
-        });
-        
-        const outOfStockProducts = products.filter(product => product.stock === 0);
-        
-        // Create notifications for low stock products
-        const newNotifications = [
-          ...lowStockProducts.map(product => ({
-            message: `${product.name} is low on stock!`,
-            time: 'Just now',
-            isNew: true
-          })),
-          ...outOfStockProducts.map(product => ({
-            message: `${product.name} is out of stock!`,
-            time: 'Just now',
-            isNew: true
-          }))
-        ];
-        
-        if (newNotifications.length > 0) {
-          setNotifications(prev => [...newNotifications, ...prev]);
-        }
-      } catch (error) {
-        console.error('Failed to check low stock products:', error);
-      }
-    };
-    
     checkLowStockProducts();
+    
+    // Set up an interval to periodically check for low stock
+    const intervalId = setInterval(checkLowStockProducts, 30000); // Check every 30 seconds
+    
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
@@ -75,6 +89,18 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
       </div>
 
       <div className="topbar-right">
+        {updateAvailable && (
+          <button
+            className="notification-btn update-button"
+            onClick={applyUpdate}
+            aria-label="Update App"
+            title="Update Available"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+        )}
         <button
           className="notification-btn pos-button"
           onClick={() => navigate('/pos')}
