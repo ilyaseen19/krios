@@ -29,10 +29,10 @@ router.post('/categories', optionalAuthenticate, syncCategories);
 router.post('/settings', optionalAuthenticate, syncSettings);
 
 // Sync all data at once
-router.post('/all', optionalAuthenticate, syncAll);
+router.post('/all', syncAll);
 
 // Restore data routes
-router.get('/restore/:collection', optionalAuthenticate, restoreCollection);
-router.get('/restore', optionalAuthenticate, restoreAll);
+router.get('/restore/:collection', restoreCollection);
+router.get('/restore', restoreAll);
 
 export default router;

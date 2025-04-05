@@ -576,13 +576,19 @@ export const syncAll = async (req: Request, res: Response) => {
       for (let i = 0; i < batches; i++) {
         const batch = products.slice(i * batchSize, (i + 1) * batchSize);
         
-        const bulkOps = batch.map((product: any) => ({
-          updateOne: {
-            filter: { id: product.id },
-            update: { $set: product },
-            upsert: true
-          }
-        }));
+        const bulkOps = batch.map((product: any) => {
+          // Create a copy of the product without the _id field to avoid MongoDB immutable field error
+          const productCopy = { ...product };
+          if (productCopy._id) delete productCopy._id;
+          
+          return {
+            updateOne: {
+              filter: { id: product.id },
+              update: { $set: productCopy },
+              upsert: true
+            }
+          };
+        });
         
         await ProductModel.bulkWrite(bulkOps);
       }
@@ -607,13 +613,19 @@ export const syncAll = async (req: Request, res: Response) => {
       for (let i = 0; i < batches; i++) {
         const batch = transactions.slice(i * batchSize, (i + 1) * batchSize);
         
-        const bulkOps = batch.map((transaction: any) => ({
-          updateOne: {
-            filter: { id: transaction.id },
-            update: { $set: transaction },
-            upsert: true
-          }
-        }));
+        const bulkOps = batch.map((transaction: any) => {
+          // Create a copy of the transaction without the _id field to avoid MongoDB immutable field error
+          const transactionCopy = { ...transaction };
+          if (transactionCopy._id) delete transactionCopy._id;
+          
+          return {
+            updateOne: {
+              filter: { id: transaction.id },
+              update: { $set: transactionCopy },
+              upsert: true
+            }
+          };
+        });
         
         await TransactionModel.bulkWrite(bulkOps);
       }
@@ -638,13 +650,19 @@ export const syncAll = async (req: Request, res: Response) => {
       for (let i = 0; i < batches; i++) {
         const batch = users.slice(i * batchSize, (i + 1) * batchSize);
         
-        const bulkOps = batch.map((user: any) => ({
-          updateOne: {
-            filter: { id: user.id },
-            update: { $set: user },
-            upsert: true
-          }
-        }));
+        const bulkOps = batch.map((user: any) => {
+          // Create a copy of the user without the _id field to avoid MongoDB immutable field error
+          const userCopy = { ...user };
+          if (userCopy._id) delete userCopy._id;
+          
+          return {
+            updateOne: {
+              filter: { id: user.id },
+              update: { $set: userCopy },
+              upsert: true
+            }
+          };
+        });
         
         await UserModel.bulkWrite(bulkOps);
       }
@@ -669,13 +687,19 @@ export const syncAll = async (req: Request, res: Response) => {
       for (let i = 0; i < batches; i++) {
         const batch = categories.slice(i * batchSize, (i + 1) * batchSize);
         
-        const bulkOps = batch.map((category: any) => ({
-          updateOne: {
-            filter: { id: category.id },
-            update: { $set: category },
-            upsert: true
-          }
-        }));
+        const bulkOps = batch.map((category: any) => {
+          // Create a copy of the category without the _id field to avoid MongoDB immutable field error
+          const categoryCopy = { ...category };
+          if (categoryCopy._id) delete categoryCopy._id;
+          
+          return {
+            updateOne: {
+              filter: { id: category.id },
+              update: { $set: categoryCopy },
+              upsert: true
+            }
+          };
+        });
         
         await CategoryModel.bulkWrite(bulkOps);
       }
@@ -700,13 +724,19 @@ export const syncAll = async (req: Request, res: Response) => {
       for (let i = 0; i < batches; i++) {
         const batch = settings.slice(i * batchSize, (i + 1) * batchSize);
         
-        const bulkOps = batch.map((setting: any) => ({
-          updateOne: {
-            filter: { id: setting.id },
-            update: { $set: setting },
-            upsert: true
-          }
-        }));
+        const bulkOps = batch.map((setting: any) => {
+          // Create a copy of the setting without the _id field to avoid MongoDB immutable field error
+          const settingCopy = { ...setting };
+          if (settingCopy._id) delete settingCopy._id;
+          
+          return {
+            updateOne: {
+              filter: { id: setting.id },
+              update: { $set: settingCopy },
+              upsert: true
+            }
+          };
+        });
         
         await SettingsModel.bulkWrite(bulkOps);
       }
