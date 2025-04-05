@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Table from './Table';
-import { getFilteredTransactions, getFilteredInventory } from '../services/reportService';
+import { getFilteredInventory } from '../services/reportService';
 import { getTransactions } from '../services/transactionService.offline';
 import { usePriceFormatter } from '../utils/priceUtils';
 import { useSettings } from '../contexts/SettingsContext';
-import { ToastType } from './Toast';
 
 import './Reports.css';
 
@@ -17,9 +16,6 @@ const Reports: React.FC = () => {
   const [filteredTransactions, setFilteredTransactions] = useState<any[]>([]);
   const [isReportGenerated, setIsReportGenerated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
-  // Get settings for currency symbol
-  const { generalSettings } = useSettings();
   
   // Use the price formatter utility
   const { formatPrice } = usePriceFormatter();
@@ -144,7 +140,7 @@ const Reports: React.FC = () => {
             <option value="" disabled>Select Report</option>
             <option value="sales">Sales Report</option>
             <option value="inventory">Inventory Report</option>
-            <option value="profit">Profit & Loss</option>
+            {/* <option value="profit">Profit & Loss</option> */}
           </select>
         </div>
         
