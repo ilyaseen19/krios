@@ -1,5 +1,5 @@
 // Sync Service for MongoDB Atlas backup
-import { STORES, getAllItems, clearStore, addItem } from './dbService';
+import { STORES, getAllItems, clearStore, addItem, getItemById } from './dbService';
 import { getGeneralSettings } from './settingsService';
 import { API_BASE_URL } from './envService';
 
@@ -51,7 +51,6 @@ export const getSyncStatus = async (customerId: string): Promise<any> => {
   try {
     // Get business name from settings
     const settings = await getGeneralSettings();
-    console.log(settings)
 
     const businessName = settings?.storeName;
     
@@ -118,6 +117,23 @@ export const syncAllData = async (customerId: string, token: string): Promise<an
       if (store === STORES.PENDING_OPERATIONS) continue; // Skip pending operations
       
       const items = await getAllItems(store);
+      
+      // Special handling for settings store to preserve general settings
+      if (store === STORES.SETTINGS && items.length > 0) {
+        // Check if the data has general settings
+        const hasGeneralSettings = items.some((item: any) => item.id === 'general-settings');
+        
+        if (!hasGeneralSettings) {
+          // If no general settings in the data, get current general settings
+          const currentGeneralSettings = await getItemById(STORES.SETTINGS, 'general-settings');
+          
+          // If we have general settings, add them to the items array
+          if (currentGeneralSettings) {
+            items.push(currentGeneralSettings);
+          }
+        }
+      }
+      
       if (items.length > 0) {
         payload[endpoint] = items;
       }
@@ -178,7 +194,6 @@ export const restoreData = async (customerId: string, token: string): Promise<an
     }
     
     const responseData = await response.json();
-    console.log('Response data structure:', responseData);
     
     // Extract the data object from the response
     const data = responseData.data;
@@ -187,8 +202,30 @@ export const restoreData = async (customerId: string, token: string): Promise<an
     for (const [endpoint, store] of Object.entries(endpointToStore)) {
       if (data && Array.isArray(data[endpoint]) && data[endpoint].length > 0) {
         try {
-          // Clear existing data in the store
-          await clearStore(store);
+          // For settings store, check if we need to preserve general settings
+          if (store === STORES.SETTINGS) {
+            // Check if the incoming data has general settings
+            const hasGeneralSettings = data[endpoint].some((item: any) => item.id === 'general-settings');
+            
+            if (!hasGeneralSettings) {
+              // If no general settings in cloud data, get current general settings before clearing
+              const currentGeneralSettings = await getItemById(STORES.SETTINGS, 'general-settings');
+              
+              // Clear existing data in the store
+              await clearStore(store);
+              
+              // If we had general settings, add them back
+              if (currentGeneralSettings) {
+                await addItem(store, currentGeneralSettings);
+              }
+            } else {
+              // If cloud data has general settings, clear the store as usual
+              await clearStore(store);
+            }
+          } else {
+            // For non-settings stores, clear as usual
+            await clearStore(store);
+          }
           
           // Improved batch processing with better transaction management
           const BATCH_SIZE = 25; // Smaller batch size for better reliability
@@ -315,8 +352,30 @@ export const syncData = async (customerId: string, businessName: string, token: 
     for (const [endpoint, store] of Object.entries(endpointToStore)) {
       if (data && Array.isArray(data[endpoint]) && data[endpoint].length > 0) {
         try {
-          // Clear existing data in the store
-          await clearStore(store);
+          // For settings store, check if we need to preserve general settings
+          if (store === STORES.SETTINGS) {
+            // Check if the incoming data has general settings
+            const hasGeneralSettings = data[endpoint].some((item: any) => item.id === 'general-settings');
+            
+            if (!hasGeneralSettings) {
+              // If no general settings in cloud data, get current general settings before clearing
+              const currentGeneralSettings = await getItemById(STORES.SETTINGS, 'general-settings');
+              
+              // Clear existing data in the store
+              await clearStore(store);
+              
+              // If we had general settings, add them back
+              if (currentGeneralSettings) {
+                await addItem(store, currentGeneralSettings);
+              }
+            } else {
+              // If cloud data has general settings, clear the store as usual
+              await clearStore(store);
+            }
+          } else {
+            // For non-settings stores, clear as usual
+            await clearStore(store);
+          }
           
           // Improved batch processing with better transaction management
           const BATCH_SIZE = 25; // Smaller batch size for better reliability

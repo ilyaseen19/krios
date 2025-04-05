@@ -32,7 +32,11 @@ const SyncSettings: React.FC = () => {
       await syncAllData(customerId, token);
       const now = Date.now();
       setLastBackupTime(now);
-      await saveGeneralSettings({ lastBackupTime: now });
+      
+      // Get current settings first, then update only the lastBackupTime
+      const currentSettings = await getGeneralSettings() || {};
+      await saveGeneralSettings({ ...currentSettings, lastBackupTime: now });
+      
       window.toast?.success('Automatic backup completed successfully');
     } catch (error) {
       // console.error('Automatic backup failed:', error);
