@@ -20,14 +20,12 @@ export const createCustomer = async (req: Request, res: Response) => {
       subscriptionAmount,
       subscriptionStartDate,
       subscriptionEndDate,
-      paymentId,
       agent
     } = req.body;
 
     // Validate required fields
     if (!companyName || !email || !contactPhone || !contactPerson || 
-        !subscribedApp || !subscriptionAmount || !subscriptionStartDate || 
-        !subscriptionEndDate || !paymentId) {
+        !subscribedApp || !subscriptionAmount) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -84,9 +82,9 @@ export const createCustomer = async (req: Request, res: Response) => {
       contactPerson,
       subscribedApp,
       subscriptionAmount,
-      subscriptionStartDate: new Date(subscriptionStartDate),
-      subscriptionEndDate: new Date(subscriptionEndDate),
-      paymentId,
+      subscriptionStartDate: subscriptionStartDate ? new Date(subscriptionStartDate) : undefined,
+      subscriptionEndDate: subscriptionEndDate ? new Date(subscriptionEndDate) : undefined,
+      isSubscribed: false,
       status: 'active',
       agent: agent || null // Set agent if provided, otherwise null
     });
@@ -142,17 +140,34 @@ export const getCustomerById = async (req: Request, res: Response) => {
  */
 export const updateCustomer = async (req: Request, res: Response) => {
   try {
-    const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, {
+    const { id } = req.params;
+
+    // Validate if ID is provided
+    if (!id) {
+      return res.status(400).json({ message: 'Customer ID is required' });
+    }
+
+    // Validate if ID is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid customer ID format' });
+    }
+
+    const customer = await Customer.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true
     });
+
     if (!customer) {
       return res.status(404).json({ message: 'Customer not found' });
     }
+
     res.status(200).json(customer);
   } catch (error) {
     console.error('Error updating customer:', error);
-    res.status(500).json({ message: 'Server error updating customer' });
+    res.status(500).json({ 
+      message: 'Server error updating customer',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 };
 
@@ -162,11 +177,33 @@ export const updateCustomer = async (req: Request, res: Response) => {
  */
 export const deleteCustomer = async (req: Request, res: Response) => {
   try {
-    const customer = await Customer.findByIdAndDelete(req.params.id);
+    // First find the customer to get their customerId and companyName
+    const customer = await Customer.findById(req.params.id);
     if (!customer) {
       return res.status(404).json({ message: 'Customer not found' });
     }
-    res.status(200).json({ message: 'Customer deleted successfully' });
+
+    // Connect to the customer's database
+    const connection = await connectToCustomerDB(customer.customerId, customer.companyName);
+
+    try {
+      // Drop the customer's database
+      await connection.dropDatabase();
+      console.log(`Dropped database for customer: ${customer.companyName}`);
+    } catch (dbError) {
+      console.error('Error dropping customer database:', dbError);
+      // Continue with customer deletion even if database drop fails
+    } finally {
+      // Close the connection
+      await connection.close();
+    }
+
+    // Delete the customer record
+    await Customer.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ 
+      message: 'Customer and associated database deleted successfully'
+    });
   } catch (error) {
     console.error('Error deleting customer:', error);
     res.status(500).json({ message: 'Server error deleting customer' });

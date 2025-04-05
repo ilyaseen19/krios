@@ -951,3 +951,64 @@ export const restoreAll = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error restoring data' });
   }
 };
+
+/**
+ * Get customer database information
+ * @route GET /api/sync/db-info
+ */
+export const getCustomerDBInfo = async (req: Request, res: Response) => {
+  try {
+    const { customerId, businessName } = req.query;
+
+    if (!customerId) {
+      return res.status(400).json({ message: 'Customer ID is required' });
+    }
+
+    // Check if customer database exists
+    const exists = await customerDbExists(customerId as string, businessName as string);
+    if (!exists) {
+      return res.status(404).json({ message: 'Customer database not found' });
+    }
+
+    // Connect to customer database
+    const connection = await connectToCustomerDB(customerId as string, businessName as string);
+
+    if (!connection ) {
+      return res.status(500).json({ message: 'Failed to connect to customer database' });
+    }
+
+    // Get database stats and collection information
+    const dbStats = await connection.db.stats();
+    const collections = await connection.db.listCollections().toArray();
+
+    // Get sync metadata
+    const SyncMetadataModel = connection.model('SyncMetadata', SyncMetadata.schema);
+    const syncMetadata = await SyncMetadataModel.findOne({ customerId });
+
+    // Return database information
+    res.status(200).json({
+      customerId,
+      businessName,
+      databaseName: connection.name,
+      stats: {
+        collections: dbStats.collections,
+        dataSize: dbStats.dataSize,
+        storageSize: dbStats.storageSize,
+        indexes: dbStats.indexes,
+        totalSize: dbStats.totalSize
+      },
+      collectionsList: collections.map(col => ({
+        name: col.name,
+        type: col.type
+      })),
+      syncInfo: syncMetadata ? {
+        lastSync: syncMetadata.lastSyncTimestamp,
+        status: syncMetadata.status,
+        collections: syncMetadata.collections
+      } : null
+    });
+  } catch (error) {
+    console.error('Error getting database info:', error);
+    res.status(500).json({ message: 'Server error getting database information' });
+  }
+};

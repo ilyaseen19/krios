@@ -57,12 +57,10 @@ const PaymentSchema: Schema = new Schema({
     default: Date.now
   },
   subscriptionStartDate: {
-    type: Date,
-    required: true
+    type: Date
   },
   subscriptionEndDate: {
-    type: Date,
-    required: true
+    type: Date
   },
   description: {
     type: String

@@ -131,18 +131,20 @@ app.use(cors({
     // Parse allowed origins from environment variable
     const allowedOrigins = process.env.CORS_CLIENT_URLS ? 
       process.env.CORS_CLIENT_URLS.split(',').map(url => url.trim()) : 
-      ['https://krios-pos.netlify.app']
+      ['https://krios-pos.netlify.app', "http://localhost:5173", "http://localhost:5174"]
     
-    if(allowedOrigins.indexOf(origin) !== -1 || !origin) {
+    if(allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       console.log('CORS blocked request from:', origin);
-      callback(null, true); // Temporarily allow all origins while debugging
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Content-Length', 'X-Requested-With'],
+  maxAge: 86400 // 24 hours
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));

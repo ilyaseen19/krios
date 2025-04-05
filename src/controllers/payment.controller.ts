@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import Customer from '../models/Customer';
 import Payment from '../models/Payment';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -111,13 +110,14 @@ export const capturePayPalPayment = async (req: Request, res: Response) => {
     const endDate = new Date(startDate);
     endDate.setMonth(endDate.getMonth() + customer.subscriptionDuration);
 
-    // Update customer with new subscription dates and payment ID
+    // Update customer with new subscription dates, payment ID, and subscription status
     const updatedCustomer = await Customer.findOneAndUpdate(
       { customerId },
       {
         subscriptionStartDate: startDate,
         subscriptionEndDate: endDate,
-        paymentId: captureId
+        paymentId: captureId,
+        isSubscribed: true
       },
       { new: true }
     );

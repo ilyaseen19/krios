@@ -9,7 +9,8 @@ import {
   syncSettings,
   syncAll,
   restoreCollection,
-  restoreAll
+  restoreAll,
+  getCustomerDBInfo
 } from '../controllers/sync.controller';
 import { optionalAuthenticate } from '../middleware/auth.middleware';
 
@@ -20,6 +21,9 @@ router.post('/initialize', initializeCustomerDB);
 
 // Get synchronization status
 router.get('/status', getSyncStatus);
+
+// Get customer database information
+router.get('/db-info', optionalAuthenticate, getCustomerDBInfo);
 
 // Routes with optional authentication
 router.post('/products', optionalAuthenticate, syncProducts);
