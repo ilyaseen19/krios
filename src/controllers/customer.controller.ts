@@ -280,7 +280,7 @@ export const validateSubscription = async (req: Request, res: Response) => {
 
     // Check if subscription has expired
     const currentDate = new Date();
-    if (currentDate > customer.subscriptionEndDate) {
+    if (customer.subscriptionEndDate && currentDate > customer.subscriptionEndDate) {
       return res.status(403).json({ 
         success: false,
         message: 'Subscription has expired' 

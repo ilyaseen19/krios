@@ -978,6 +978,11 @@ export const getCustomerDBInfo = async (req: Request, res: Response) => {
     }
 
     // Get database stats and collection information
+    if (!connection.db) {
+      return res.status(500).json({ message: 'Database connection not initialized' });
+    }
+
+    // Get database stats and collection information
     const dbStats = await connection.db.stats();
     const collections = await connection.db.listCollections().toArray();
 
