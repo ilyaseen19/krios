@@ -132,7 +132,7 @@ app.use(cors({
     // Parse allowed origins from environment variable
     const allowedOrigins = process.env.CORS_CLIENT_URLS ? 
       process.env.CORS_CLIENT_URLS.split(',').map(url => url.trim()) : 
-      ['https://krios-pos.netlify.app', "http://localhost:5173", "http://localhost:5174"]
+      ['https://krios-pos.netlify.app', "http://localhost:5173", "http://localhost:5174",'https://prynova.netlify.app']
     
     if(allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
