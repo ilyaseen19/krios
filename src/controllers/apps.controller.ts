@@ -81,18 +81,12 @@ export const getAppById = async (req: Request, res: Response) => {
  */
 export const updateApp = async (req: Request, res: Response) => {
   try {
-    const updateData = req.body;
+    // Remove appName from updateData to prevent updates to app name
+    const { appName, ...updateData } = req.body;
 
-    // Check if new app name already exists (if app name is being updated)
-    if (updateData.appName) {
-      const existingApp = await App.findOne({
-        appName: updateData.appName,
-        appId: { $ne: req.params.appId }
-      });
-      if (existingApp) {
-        return res.status(400).json({ message: 'An app with this name already exists' });
-      }
-    }
+    // if (appName) {
+    //   return res.status(400).json({ message: 'App name cannot be updated' });
+    // }
 
     const app = await App.findOneAndUpdate(
       { appId: req.params.appId },
