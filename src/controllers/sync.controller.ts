@@ -973,7 +973,7 @@ export const getCustomerDBInfo = async (req: Request, res: Response) => {
     // Connect to customer database
     const connection = await connectToCustomerDB(customerId as string, businessName as string);
 
-    if (!connection ) {
+    if (!connection) {
       return res.status(500).json({ message: 'Failed to connect to customer database' });
     }
 
@@ -982,7 +982,7 @@ export const getCustomerDBInfo = async (req: Request, res: Response) => {
       return res.status(500).json({ message: 'Database connection not initialized' });
     }
 
-    // Get database stats and collection information
+    // Get all required data before sending response
     const dbStats = await connection.db.stats();
     const collections = await connection.db.listCollections().toArray();
 
@@ -990,8 +990,8 @@ export const getCustomerDBInfo = async (req: Request, res: Response) => {
     const SyncMetadataModel = connection.model('SyncMetadata', SyncMetadata.schema);
     const syncMetadata = await SyncMetadataModel.findOne({ customerId });
 
-    // Return database information
-    res.status(200).json({
+    // Only send response after all data is collected
+    return res.status(200).json({
       customerId,
       businessName,
       databaseName: connection.name,
@@ -1014,6 +1014,9 @@ export const getCustomerDBInfo = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error getting database info:', error);
-    res.status(500).json({ message: 'Server error getting database information' });
+    // Ensure we haven't already sent a response
+    if (!res.headersSent) {
+      return res.status(500).json({ message: 'Server error getting database information' });
+    }
   }
 };

@@ -17,6 +17,7 @@ import syncRoutes from './routes/sync.routes';
 import customerRoutes from './routes/customer.routes';
 import paymentRoutes from './routes/payment.routes';
 import adminRoutes from './routes/admin.routes';
+import appsRoutes from './routes/apps.routes';
 
 // Load environment variables
 dotenv.config();
@@ -156,6 +157,7 @@ app.use('/api/sync', syncRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admins', adminRoutes);
+app.use('/api/apps', appsRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

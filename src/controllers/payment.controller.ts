@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Customer from '../models/Customer';
 import Payment from '../models/Payment';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
 // Load environment variables
 dotenv.config();
@@ -194,5 +195,73 @@ export const getSubscriptionDetails = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error getting subscription details:', error);
     res.status(500).json({ message: 'Error retrieving subscription details' });
+  }
+};
+
+/**
+ * Get all payments with pagination and filtering
+ * @route GET /api/payments
+ */
+export const getAllPayments = async (req: Request, res: Response) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const status = req.query.status as string;
+    const customerId = req.query.customerId as string;
+
+    const query: any = {};
+
+    // Add filters if provided
+    if (status) query.status = status;
+    if (customerId) query.customerId = customerId;
+
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination
+    const total = await Payment.countDocuments(query);
+
+    // Get paginated payments
+    const payments = await Payment.find(query)
+      .sort({ paymentDate: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      payments,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: limit
+      }
+    });
+  } catch (error) {
+    console.error('Error getting payments:', error);
+    res.status(500).json({ message: 'Error retrieving payments' });
+  }
+};
+
+/**
+ * Get a single payment by ID
+ * @route GET /api/payments/:id
+ */
+export const getPaymentById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid payment ID' });
+    }
+
+    const payment = await Payment.findById(id);
+
+    if (!payment) {
+      return res.status(404).json({ message: 'Payment not found' });
+    }
+
+    res.status(200).json(payment);
+  } catch (error) {
+    console.error('Error getting payment:', error);
+    res.status(500).json({ message: 'Error retrieving payment' });
   }
 };

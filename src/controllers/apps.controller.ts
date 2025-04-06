@@ -15,9 +15,22 @@ export const createApp = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'An app with this name already exists' });
     }
 
+    // Generate appId from the first part of appName and 4 random digits
+    const firstPart = appName.split(' ')[0].toLowerCase();
+    const randomDigits = Math.floor(1000 + Math.random() * 9000); // Generate a number between 1000-9999
+    const appId = `${firstPart}${randomDigits}`;
+    
+    // Check if generated appId already exists
+    const existingAppId = await App.findOne({ appId });
+    if (existingAppId) {
+      // If appId already exists, regenerate it
+      return createApp(req, res);
+    }
+
     // Create new app
     const app = await App.create({
       appName,
+      appId,
       description,
       implementationState: implementationState || ImplementationState.PLANNING,
       deploymentStatus: deploymentStatus || DeploymentStatus.PENDING,

@@ -1,5 +1,6 @@
 import express from 'express';
-import { createPayPalOrder, capturePayPalPayment, getSubscriptionDetails } from '../controllers/payment.controller';
+import { createPayPalOrder, capturePayPalPayment, getSubscriptionDetails, getAllPayments, getPaymentById } from '../controllers/payment.controller';
+import { authenticate, authorize } from '../middleware/auth.middleware';
 
 const router = express.Router();
 
@@ -22,6 +23,20 @@ router.post('/capture-payment', capturePayPalPayment);
  * @desc    Get customer subscription details
  * @access  Public
  */
-router.get('/subscription/:customerId', getSubscriptionDetails);
+router.get('/subscription/:customerId', authenticate, authorize(['admin', 'super_admin']), getSubscriptionDetails);
+
+/**
+ * @route   GET /api/payments
+ * @desc    Get all payments with pagination and filtering
+ * @access  Private (Admin and Super Admin only)
+ */
+router.get('/', authenticate, authorize(['admin', 'super_admin']), getAllPayments);
+
+/**
+ * @route   GET /api/payments/:id
+ * @desc    Get a single payment by ID
+ * @access  Private (Admin and Super Admin only)
+ */
+router.get('/:id', authenticate, authorize(['admin', 'super_admin']), getPaymentById);
 
 export default router;

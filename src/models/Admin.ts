@@ -19,7 +19,7 @@ const AdminSchema: Schema = new Schema(
     username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, required: true, enum: ['super_admin', 'admin', 'editor'], default: 'admin' },
+    role: { type: String, required: true, enum: ['super_admin', 'admin', 'editor', 'viewer'], default: 'admin' },
     status: { type: String, required: true, enum: ['active', 'inactive'], default: 'active' }
   },
   { timestamps: true }
