@@ -69,9 +69,7 @@ const AppSchema: Schema = new Schema({
   timestamps: true
 });
 
-// Create indexes
-AppSchema.index({ appName: 1 }, { unique: true });
-AppSchema.index({ appId: 1 }, { unique: true });
+// Indexes are already defined in the schema properties with unique: true
 
 // Pre-save middleware to generate appId if not provided
 AppSchema.pre('save', function(next) {
