@@ -23,7 +23,7 @@ router.post('/capture-payment', capturePayPalPayment);
  * @desc    Get customer subscription details
  * @access  Public
  */
-router.get('/subscription/:customerId', authenticate, authorize(['admin', 'super_admin']), getSubscriptionDetails);
+router.get('/subscription/:customerId', getSubscriptionDetails);
 
 /**
  * @route   GET /api/payments
