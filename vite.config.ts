@@ -11,6 +11,17 @@ export default defineConfig({
     }
   },
   build: {
+    sourcemap: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      },
+      format: {
+        comments: false
+      }
+    },
     assetsInlineLimit: 0, // Ensure SVGs are processed as assets
     rollupOptions: {
       output: {
