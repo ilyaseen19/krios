@@ -24,19 +24,17 @@ const ToastContainer: React.FC = () => {
 
   // Expose methods to window for global access
   React.useEffect(() => {
-    // Create a global toast object if it doesn't exist
-    if (!window.toast) {
-      window.toast = {
-        success: (message: string, duration?: number) => addToast(message, 'success', duration),
-        error: (message: string, duration?: number) => addToast(message, 'error', duration),
-        warning: (message: string, duration?: number) => addToast(message, 'warning', duration),
-        info: (message: string, duration?: number) => addToast(message, 'info', duration),
-      };
-    }
+    // Always create a new toast object to ensure methods are available
+    window.toast = {
+      success: (message: string, duration?: number) => addToast(message, 'success', duration),
+      error: (message: string, duration?: number) => addToast(message, 'error', duration),
+      warning: (message: string, duration?: number) => addToast(message, 'warning', duration),
+      info: (message: string, duration?: number) => addToast(message, 'info', duration),
+    };
 
     return () => {
       // Clean up global object when component unmounts
-      delete window.toast;
+      window.toast = undefined;
     };
   }, [addToast]);
 

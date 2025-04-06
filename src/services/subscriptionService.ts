@@ -45,10 +45,12 @@ export const updateSubscription = async (paymentId: string): Promise<Subscriptio
     if (isOnline()) {
       const isValid = await validateOnlineSubscription(paymentId);
       if (isValid) {
+        window.toast?.success('Subscription updated successfully');
         // The subscription data has already been updated in validateOnlineSubscription
         return await getSubscription();
       }
       // If online validation fails, don't update local data
+      window.toast?.error('Failed to validate subscription with server');
       return null;
     }
     
@@ -64,7 +66,7 @@ export const updateSubscription = async (paymentId: string): Promise<Subscriptio
       };
       
       await addItem<Subscription>(STORES.SUBSCRIPTION, newSubscription);
-      console.log('New subscription data created');
+      window.toast?.success('New subscription created successfully');
       return newSubscription;
     }
     
@@ -76,9 +78,11 @@ export const updateSubscription = async (paymentId: string): Promise<Subscriptio
     };
     
     await updateItem<Subscription>(STORES.SUBSCRIPTION, updatedSubscription);
+    window.toast?.success('Subscription updated successfully');
     return updatedSubscription;
   } catch (error) {
     console.error('Error updating subscription data:', error);
+    window.toast?.error('Failed to update subscription');
     return null;
   }
 };
@@ -86,7 +90,7 @@ export const updateSubscription = async (paymentId: string): Promise<Subscriptio
 // Validate subscription with the backend server
 export const validateOnlineSubscription = async (paymentId: string): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/validate-subscription`, {
+    const response = await fetch(`${API_BASE_URL}/customers/validate-subscription`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -96,6 +100,7 @@ export const validateOnlineSubscription = async (paymentId: string): Promise<boo
 
     if (!response.ok) {
       console.error('Subscription validation failed:', response.statusText);
+      window.toast?.error(`Subscription validation failed: ${response.statusText}`);
       return false;
     }
 
@@ -129,9 +134,11 @@ export const validateOnlineSubscription = async (paymentId: string): Promise<boo
       return true;
     }
     
+    window.toast?.error('Invalid subscription data received from server');
     return false;
   } catch (error) {
     console.error('Error validating subscription online:', error);
+    window.toast?.error('Failed to connect to subscription server');
     return false;
   }
 };
@@ -143,6 +150,7 @@ export const validateOfflineSubscription = async (): Promise<boolean> => {
     
     // If no subscription data or paymentId is undefined, subscription is invalid
     if (!subscription || !subscription.paymentId || !subscription.paymentDate) {
+      window.toast?.warning('No valid subscription found');
       return false;
     }
     
@@ -151,9 +159,14 @@ export const validateOfflineSubscription = async (): Promise<boolean> => {
     const currentDate = new Date();
     const daysSincePayment = Math.floor((currentDate.getTime() - paymentDate.getTime()) / (1000 * 60 * 60 * 24));
     
-    return daysSincePayment < 35;
+    const isValid = daysSincePayment < 35;
+    if (!isValid) {
+      window.toast?.warning('Your subscription has expired');
+    }
+    return isValid;
   } catch (error) {
     console.error('Error checking subscription validity offline:', error);
+    window.toast?.error('Failed to validate subscription offline');
     return false;
   }
 };
@@ -165,6 +178,7 @@ export const isSubscriptionValid = async (): Promise<boolean> => {
     
     // If no subscription data or paymentId is undefined, subscription is invalid
     if (!subscription || !subscription.paymentId) {
+      window.toast?.warning('No active subscription found');
       return false;
     }
     
