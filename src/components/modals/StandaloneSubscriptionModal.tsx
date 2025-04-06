@@ -130,7 +130,7 @@ const StandaloneSubscriptionModal: React.FC<StandaloneSubscriptionModalProps> = 
                 disabled={isSubmitting}
               />
               <p className="payment-info-text">
-                Visit <a href="https://krios.com/payments" target="_blank" rel="noopener noreferrer">krios.com/payments</a> to make a payment and receive your payment ID.
+                Visit <a href="https://prynova.netlify.app/payments" target="_blank" rel="noopener noreferrer">krios.com/payments</a> to make a payment and receive your payment ID.
               </p>
             </div>
           </div>
