@@ -81,6 +81,7 @@ const Settings: React.FC = () => {
                     name="storeName"
                     value={generalSettings.storeName}
                     onChange={handleGeneralChange}
+                    disabled
                     className="settings-input"
                   />
                 </div>

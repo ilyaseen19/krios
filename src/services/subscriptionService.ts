@@ -54,32 +54,7 @@ export const updateSubscription = async (paymentId: string): Promise<Subscriptio
       return null;
     }
     
-    // Offline update logic
-    const existingSubscription = await getItemById<Subscription>(STORES.SUBSCRIPTION, DEFAULT_SUBSCRIPTION_ID);
-    
-    // If no subscription data exists, create a new one instead of throwing an error
-    if (!existingSubscription) {
-      const newSubscription: Subscription = {
-        id: DEFAULT_SUBSCRIPTION_ID,
-        paymentId,
-        paymentDate: new Date()
-      };
-      
-      await addItem<Subscription>(STORES.SUBSCRIPTION, newSubscription);
-      window.toast?.success('New subscription created successfully');
-      return newSubscription;
-    }
-    
-    // Update existing subscription
-    const updatedSubscription: Subscription = {
-      ...existingSubscription,
-      paymentId,
-      paymentDate: new Date()
-    };
-    
-    await updateItem<Subscription>(STORES.SUBSCRIPTION, updatedSubscription);
-    window.toast?.success('Subscription updated successfully');
-    return updatedSubscription;
+    return null;
   } catch (error) {
     console.error('Error updating subscription data:', error);
     window.toast?.error('Failed to update subscription');
@@ -112,7 +87,7 @@ export const validateOnlineSubscription = async (paymentId: string): Promise<boo
       const updatedSubscription: Subscription = {
         id: DEFAULT_SUBSCRIPTION_ID,
         paymentId: data.subscription.paymentId,
-        paymentDate: new Date()
+        paymentDate: data.subscription.paymentDate
       };
       
       if (subscription) {
@@ -127,7 +102,8 @@ export const validateOnlineSubscription = async (paymentId: string): Promise<boo
         await saveGeneralSettings({
           ...generalSettings,
           customerId: data.subscription.customerId,
-          businessName: data.subscription.companyName
+          businessName: data.subscription.companyName,
+          storeName: data.subscription.companyName,
         });
       }
       
@@ -159,7 +135,7 @@ export const validateOfflineSubscription = async (): Promise<boolean> => {
     const currentDate = new Date();
     const daysSincePayment = Math.floor((currentDate.getTime() - paymentDate.getTime()) / (1000 * 60 * 60 * 24));
     
-    const isValid = daysSincePayment < 35;
+    const isValid = daysSincePayment < 32;
     if (!isValid) {
       window.toast?.warning('Your subscription has expired');
     }

@@ -17,8 +17,8 @@ const SubscriptionValidator: React.FC<SubscriptionValidatorProps> = ({ children 
       setIsValid(valid);
     } catch (error) {
       console.error('Error checking subscription:', error);
-      // Default to valid in case of errors to prevent blocking the app unnecessarily
-      setIsValid(true);
+      window.toast?.warning('Error checking subscription:');
+      setIsValid(false);
     } finally {
       setIsValidating(false);
     }
