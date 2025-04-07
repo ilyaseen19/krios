@@ -689,7 +689,7 @@ const POS: React.FC = () => {
         onClose={() => setShowPasswordModal(false)}
         onSuccess={() => {
           setShowPasswordModal(false);
-          navigate('/admin');
+          navigate('/dashboard');
         }}
       />
       
