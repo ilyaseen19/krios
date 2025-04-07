@@ -32,7 +32,8 @@ const PaymentSchema: Schema = new Schema({
   paymentId: {
     type: String,
     required: false,
-    sparse: true
+    sparse: true,
+    unique: true
   },
   orderId: {
     type: String,
