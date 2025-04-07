@@ -3,6 +3,7 @@ import Customer from '../models/Customer';
 import Payment from '../models/Payment';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 // Load environment variables
 dotenv.config();
@@ -95,21 +96,122 @@ export const capturePayPalPayment = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Customer not found' });
     }
 
-    // Create capture request
-    const request = new paypal.orders.OrdersCaptureRequest(orderId);
-    request.requestBody({});
+    let captureId: string;
+    let amount: number;
+    let captureResult: any;
 
-    // Execute the capture request
-    const capture = await client.execute(request);
+    // First check if the order is already captured by getting order details
+    const getOrderRequest = new paypal.orders.OrdersGetRequest(orderId);
+    const orderDetails = await client.execute(getOrderRequest);
+    
+    // Extract the payment status from PayPal response
+    const paymentStatus = orderDetails.result.status;
+    console.log(`PayPal order status: ${paymentStatus}`);
+    
+    // Check if the payment was successful or failed
+    if (paymentStatus === 'COMPLETED') {
+      console.log('Order completed successfully, extracting payment details');
+      captureId = orderDetails.result.purchase_units[0].payments.captures[0].id;
+      amount = parseFloat(orderDetails.result.purchase_units[0].payments.captures[0].amount.value);
+      captureResult = orderDetails;
+    } else if (paymentStatus === 'VOIDED' || paymentStatus === 'DECLINED' || paymentStatus === 'FAILED') {
+      // Handle failed payment
+      console.log(`Payment failed with status: ${paymentStatus}`);
+      
+      // Update payment record with failed status
+      const payment = await Payment.findOneAndUpdate(
+        { orderId },
+        {
+          status: 'failed',
+          description: `Payment failed with status: ${paymentStatus}`
+        },
+        { new: true }
+      );
 
-    // Get the capture ID (payment ID)
-    const captureId = capture.result.purchase_units[0].payments.captures[0].id;
-    const amount = parseFloat(capture.result.purchase_units[0].payments.captures[0].amount.value);
+      if (!payment) {
+        return res.status(404).json({ message: 'Payment record not found' });
+      }
+
+      // Return failed payment response
+      return res.status(400).json({
+        success: false,
+        message: 'Payment failed',
+        payment: {
+          orderId,
+          status: 'failed',
+          paymentDate: payment.paymentDate
+        }
+      });
+    } else {
+      // Order is not yet captured, attempt to capture it
+      try {
+        // Create capture request
+        const captureRequest = new paypal.orders.OrdersCaptureRequest(orderId);
+        captureRequest.requestBody({});
+
+        // Execute the capture request
+        captureResult = await client.execute(captureRequest);
+        
+        // Check if capture was successful
+        if (captureResult.result.status === 'COMPLETED') {
+          // Get the capture ID (payment ID) and amount
+          captureId = captureResult.result.purchase_units[0].payments.captures[0].id;
+          amount = parseFloat(captureResult.result.purchase_units[0].payments.captures[0].amount.value);
+        } else {
+          // Handle failed capture
+          console.log(`Payment capture failed with status: ${captureResult.result.status}`);
+          
+          // Update payment record with failed status
+          const payment = await Payment.findOneAndUpdate(
+            { orderId },
+            {
+              status: 'failed',
+              description: `Payment capture failed with status: ${captureResult.result.status}`
+            },
+            { new: true }
+          );
+
+          if (!payment) {
+            return res.status(404).json({ message: 'Payment record not found' });
+          }
+
+          // Return failed payment response
+          return res.status(400).json({
+            success: false,
+            message: 'Payment capture failed',
+            payment: {
+              orderId,
+              status: 'failed',
+              paymentDate: payment.paymentDate
+            }
+          });
+        }
+      } catch (paypalError: any) {
+        // If there's an error during capture, update payment record with failed status
+        console.error('Error during payment capture:', paypalError);
+        
+        // Update payment record with failed status
+        const payment = await Payment.findOneAndUpdate(
+          { orderId },
+          {
+            status: 'failed',
+            description: paypalError.message || 'Error during payment capture'
+          },
+          { new: true }
+        );
+
+        // Rethrow the error to be caught by the outer catch block
+        throw paypalError;
+      }
+    }
 
     // Calculate new subscription dates
     const startDate = new Date();
     const endDate = new Date(startDate);
     endDate.setMonth(endDate.getMonth() + customer.subscriptionDuration);
+    
+    // Generate a new UUID for the payment ID
+    const paymentUuid = uuidv4();
 
     // Update customer with new subscription dates, payment ID, and subscription status
     const updatedCustomer = await Customer.findOneAndUpdate(
@@ -117,7 +219,7 @@ export const capturePayPalPayment = async (req: Request, res: Response) => {
       {
         subscriptionStartDate: startDate,
         subscriptionEndDate: endDate,
-        paymentId: captureId,
+        paymentId: paymentUuid,
         isSubscribed: true
       },
       { new: true }
@@ -127,7 +229,7 @@ export const capturePayPalPayment = async (req: Request, res: Response) => {
     const payment = await Payment.findOneAndUpdate(
       { orderId },
       {
-        paymentId: captureId,
+        paymentId: paymentUuid,
         amount,
         status: 'completed',
         subscriptionStartDate: startDate,
@@ -144,7 +246,8 @@ export const capturePayPalPayment = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: 'Payment successful',
-      paymentId: captureId,
+      orderId: captureId,
+      paymentId: paymentUuid,
       payment: {
         amount,
         currency: payment.currency,
@@ -158,9 +261,40 @@ export const capturePayPalPayment = async (req: Request, res: Response) => {
         subscriptionEndDate: updatedCustomer?.subscriptionEndDate
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error capturing PayPal payment:', error);
-    res.status(500).json({ message: 'Error capturing payment' });
+    
+    // Check if we can extract a more specific error message
+    let errorMessage = 'Error capturing payment';
+    if (error.details && Array.isArray(error.details)) {
+      const details = error.details.map((detail: any) => detail.description || detail.issue).join(', ');
+      if (details) errorMessage = details;
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    
+    // Try to update the payment record with failed status if we have orderId
+    try {
+      if (req.body.orderId) {
+        await Payment.findOneAndUpdate(
+          { orderId: req.body.orderId },
+          {
+            status: 'failed',
+            description: errorMessage
+          },
+          { new: true }
+        );
+      }
+    } catch (dbError) {
+      console.error('Error updating payment record:', dbError);
+      // Continue with error response even if payment update fails
+    }
+    
+    res.status(500).json({
+      success: false,
+      message: errorMessage,
+      payment: req.body.orderId ? { orderId: req.body.orderId, status: 'failed' } : undefined
+    });
   }
 };
 
