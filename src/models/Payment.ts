@@ -32,7 +32,6 @@ const PaymentSchema: Schema = new Schema({
   paymentId: {
     type: String,
     required: false,
-    unique: true,
     sparse: true
   },
   orderId: {
@@ -69,5 +68,10 @@ const PaymentSchema: Schema = new Schema({
 }, {
   timestamps: true
 });
+
+// Create a sparse index to ensure uniqueness only for non-null paymentId values
+// The sparse option ensures that documents without paymentId field are not indexed
+PaymentSchema.index({ paymentId: 1 }, { unique: true, sparse: true });
+
 
 export default mongoose.model<IPayment>('Payment', PaymentSchema);
