@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPayPalOrder, capturePayPalPayment, getSubscriptionDetails, getAllPayments, getPaymentById } from '../controllers/payment.controller';
+import { createPayPalOrder, capturePayPalPayment, getSubscriptionDetails, getAllPayments, getPaymentById, updatePaymentStatus } from '../controllers/payment.controller';
 import { authenticate, authorize } from '../middleware/auth.middleware';
 
 const router = express.Router();
@@ -38,5 +38,12 @@ router.get('/', authenticate, authorize(['admin', 'super_admin']), getAllPayment
  * @access  Private (Admin and Super Admin only)
  */
 router.get('/:id', authenticate, authorize(['admin', 'super_admin']), getPaymentById);
+
+/**
+ * @route   POST /api/payments/update-status
+ * @desc    Update payment status
+ * @access  Public
+ */
+router.post('/update-status', updatePaymentStatus);
 
 export default router;

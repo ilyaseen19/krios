@@ -399,3 +399,96 @@ export const getPaymentById = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error retrieving payment' });
   }
 };
+
+/**
+ * Update payment status
+ * @route POST /api/payments/update-status
+ */
+export const updatePaymentStatus = async (req: Request, res: Response) => {
+  try {
+    const { orderId, customerId, status, errorDetails } = req.body;
+
+    // Validate required fields
+    if (!orderId || !customerId || !status) {
+      return res.status(400).json({ message: 'Order ID, Customer ID, and status are required' });
+    }
+
+    // Validate status value
+    if (!['pending', 'completed', 'failed'].includes(status)) {
+      return res.status(400).json({ message: 'Status must be one of: pending, completed, failed' });
+    }
+
+    // Find customer
+    const customer = await Customer.findOne({ customerId });
+    if (!customer) {
+      return res.status(404).json({ message: 'Customer not found' });
+    }
+
+    // Find payment by orderId
+    const payment = await Payment.findOne({ orderId });
+    if (!payment) {
+      return res.status(404).json({ message: 'Payment record not found' });
+    }
+
+    // Update payment based on status
+     if (status === 'failed') {
+      // Update payment record with failed status
+      const description = errorDetails || `Payment failed manually updated`;
+      
+      const updatedPayment = await Payment.findOneAndUpdate(
+        { orderId },
+        {
+          status: 'failed',
+          description
+        },
+        { new: true }
+      );
+
+      // Return failed payment response
+      return res.status(200).json({
+        success: false,
+        message: 'Payment failed',
+        payment: {
+          orderId,
+          status: 'failed',
+          paymentDate: updatedPayment?.paymentDate,
+          description
+        }
+      });
+    } else if (status === 'pending') {
+      // Update payment record with pending status
+      const updatedPayment = await Payment.findOneAndUpdate(
+        { orderId },
+        {
+          status: 'pending',
+          description: errorDetails || 'Payment pending'
+        },
+        { new: true }
+      );
+
+      // Return pending payment response
+      return res.status(200).json({
+        success: true,
+        message: 'Payment status updated to pending',
+        payment: {
+          orderId,
+          status: 'pending',
+          paymentDate: updatedPayment?.paymentDate
+        }
+      });
+    }
+  } catch (error: any) {
+    console.error('Error updating payment status:', error);
+    
+    // Extract error message
+    let errorMessage = 'Error updating payment status';
+    if (error.message) {
+      errorMessage = error.message;
+    }
+    
+    res.status(500).json({
+      success: false,
+      message: errorMessage
+    });
+  }
+};
