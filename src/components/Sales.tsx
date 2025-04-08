@@ -23,7 +23,14 @@ interface Sale {
   status: SaleStatus;
   items?: CartItem[];
   tax?: number;
+  productTax?: number;
   receiptNumber?: string;
+  paymentType?: string;
+  discount?: {
+    type: 'percentage' | 'fixed';
+    value: number;
+  } | null;
+  discountAmount?: number;
 }
 
 interface OrderSummary {
@@ -78,8 +85,12 @@ const Sales: React.FC = () => {
             customer: transaction.cashierId || 'Unknown',
             total: transaction.total || 0,
             tax: transaction.tax,
+            productTax: transaction.productTax,
             items: transaction.items,
             receiptNumber: transaction.receiptNumber,
+            paymentType: transaction.paymentType || 'cash',
+            discount: transaction.discount,
+            discountAmount: transaction.discountAmount,
             // Use transaction.status if it exists, otherwise determine from paymentType
             status: transaction.status || (transaction.paymentType === 'cash' ? 'Completed' : 'Pending')
           };
@@ -164,7 +175,11 @@ const Sales: React.FC = () => {
           ...order,
           items: transaction.items,
           tax: transaction.tax,
-          receiptNumber: transaction.receiptNumber
+          productTax: transaction.productTax,
+          receiptNumber: transaction.receiptNumber,
+          paymentType: transaction.paymentType,
+          discount: transaction.discount,
+          discountAmount: transaction.discountAmount
         });
         setShowOrderDetails(true);
       }
@@ -422,7 +437,7 @@ const Sales: React.FC = () => {
           {currentOrders.map(order => (
             <div key={order.id} className="order-card">
               <div className="order-card-header">
-                <span className="order-number">Receipt #{order.receiptNumber || order.id}</span>
+                <span className="order-number">Receipt #{order.receiptNumber || `ID-${order.id.substring(0, 6)}`}</span>
                 <span className="order-date">{formatDate(order.date)}</span>
               </div>
               <div className="order-card-body">
@@ -434,7 +449,7 @@ const Sales: React.FC = () => {
                   </div>
                   <div className="order-detail-item">
                     <span className="detail-label">Payment</span>
-                    <span className="detail-value">Credit Card</span>
+                    <span className="detail-value">{order.paymentType ? order.paymentType.charAt(0).toUpperCase() + order.paymentType.slice(1) : 'Cash'}</span>
                   </div>
                 </div>
                 
@@ -473,8 +488,8 @@ const Sales: React.FC = () => {
         <Table
           columns={[
             {
-              header: 'Order ID',
-              accessor: (order) => `#${order.id}`
+              header: 'Receipt #',
+              accessor: (order) => `#${order.receiptNumber || `ID-${order.id.substring(0, 6)}`}`
             },
             {
               header: 'Customer',
@@ -602,7 +617,7 @@ const Sales: React.FC = () => {
           <div className="receipt-container">
             <div className="receipt-header">
               <div className="company-name">{generalSettings.storeName}</div>
-              <div className="order-number">{`Order #${selectedOrder.id}`}</div>
+              <div className="order-number">{`Receipt #${selectedOrder.receiptNumber || `ID-${selectedOrder.id.substring(0, 6)}`}`}</div>
               <div className="order-date">{formatDate(new Date(selectedOrder.date), generalSettings.dateFormat)}</div>
               <div className="cashier-info">
                 <div>Cashier: {selectedOrder.customer}</div>
@@ -619,7 +634,7 @@ const Sales: React.FC = () => {
               </div>
               <div className="order-detail-item">
                 <span className="detail-label">Payment Method</span>
-                <span className="detail-value">{selectedOrder.status === 'Completed' ? 'Cash' : 'Credit Card'}</span>
+                <span className="detail-value">{selectedOrder.paymentType ? selectedOrder.paymentType.charAt(0).toUpperCase() + selectedOrder.paymentType.slice(1) : 'Cash'}</span>
               </div>
             </div>
 
@@ -642,13 +657,33 @@ const Sales: React.FC = () => {
             <div className="summary-row">
               <span className="detail-label">Subtotal</span>
               <span className="detail-value">
-                {formatPrice(selectedOrder.total - (selectedOrder.tax || 0))}
+                {formatPrice(selectedOrder.total - (selectedOrder.tax || 0) - (selectedOrder.productTax || 0) + (selectedOrder.discountAmount || 0))}
               </span>
             </div>
             
-            {selectedOrder.tax && (
+            {selectedOrder.discountAmount > 0 && selectedOrder.discount && (
               <div className="summary-row">
-                <span className="detail-label">Tax ({generalSettings.taxRate}%)</span>
+                <span className="detail-label">
+                  Discount {selectedOrder.discount.type === 'percentage' ? `(${selectedOrder.discount.value}%)` : ''}
+                </span>
+                <span className="detail-value" style={{ color: '#28c76f' }}>
+                  -{formatPrice(selectedOrder.discountAmount)}
+                </span>
+              </div>
+            )}
+            
+            {selectedOrder.productTax > 0 && (
+              <div className="summary-row">
+                <span className="detail-label">Product-specific Tax</span>
+                <span className="detail-value">
+                  {formatPrice(selectedOrder.productTax)}
+                </span>
+              </div>
+            )}
+            
+            {selectedOrder.tax > 0 && (
+              <div className="summary-row">
+                <span className="detail-label">General Tax ({generalSettings.taxRate}%)</span>
                 <span className="detail-value">
                   {formatPrice(selectedOrder.tax)}
                 </span>
@@ -709,13 +744,33 @@ const Sales: React.FC = () => {
             <div className="summary-row">
               <span className="detail-label">Subtotal</span>
               <span className="detail-value">
-                {formatPrice(printableSale.total - (printableSale.tax || 0))}
+                {formatPrice(printableSale.total - (printableSale.tax || 0) - (printableSale.productTax || 0) + (printableSale.discountAmount || 0))}
               </span>
             </div>
             
-            {printableSale.tax && (
+            {printableSale.discountAmount > 0 && printableSale.discount && (
               <div className="summary-row">
-                <span className="detail-label">Tax ({generalSettings.taxRate}%)</span>
+                <span className="detail-label">
+                  Discount {printableSale.discount.type === 'percentage' ? `(${printableSale.discount.value}%)` : ''}
+                </span>
+                <span className="detail-value" style={{ color: '#28c76f' }}>
+                  -{formatPrice(printableSale.discountAmount)}
+                </span>
+              </div>
+            )}
+            
+            {printableSale.productTax > 0 && (
+              <div className="summary-row">
+                <span className="detail-label">Product-specific Tax</span>
+                <span className="detail-value">
+                  {formatPrice(printableSale.productTax)}
+                </span>
+              </div>
+            )}
+            
+            {printableSale.tax > 0 && (
+              <div className="summary-row">
+                <span className="detail-label">General Tax ({generalSettings.taxRate}%)</span>
                 <span className="detail-value">
                   {formatPrice(printableSale.tax)}
                 </span>
