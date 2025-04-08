@@ -372,7 +372,15 @@ const POS: React.FC = () => {
     // Add items
     currentTransaction.forEach(item => {
       receipt += `${item.name}\n`;
-      receipt += `  ${item.quantity} x ${currencySymbol}${item.price.toFixed(2)} = ${currencySymbol}${(item.quantity * item.price).toFixed(2)}\n`;
+      receipt += `  ${item.quantity} x ${currencySymbol}${item.price.toFixed(2)} = ${currencySymbol}${(item.quantity * item.price).toFixed(2)}`;
+      
+      // Add item-specific tax if applicable
+      if (item.tax !== undefined && item.tax > 0) {
+        const itemTaxAmount = (item.price * item.quantity) * (item.tax / 100);
+        receipt += ` (+${currencySymbol}${itemTaxAmount.toFixed(2)} tax @ ${item.tax}%)\n`;
+      } else {
+        receipt += `\n`;
+      }
     });
     
     receipt += '\n----------------------------\n';
@@ -566,7 +574,11 @@ const POS: React.FC = () => {
                   <div key={item.id} className="cart-item">
                     <div className="cart-item-info">
                       <h3 className="cart-item-name">{item.name}</h3>
-                      <p className="cart-item-price">{formatPrice(item.price)}</p>
+                      <p className="cart-item-price">{formatPrice(item.price)}
+                        {item.tax !== undefined && item.tax > 0 && (
+                          <span className="cart-item-tax"> (+{item.tax}% tax)</span>
+                        )}
+                      </p>
                     </div>
                     <div className="cart-item-quantity">
                       <button 
@@ -590,6 +602,11 @@ const POS: React.FC = () => {
                     </div>
                     <div className="cart-item-total">
                       {formatPrice(item.price * item.quantity)}
+                      {item.tax !== undefined && item.tax > 0 && (
+                        <div className="cart-item-total-tax">
+                          +{formatPrice((item.price * item.quantity) * (item.tax / 100))} tax
+                        </div>
+                      )}
                     </div>
                     <button 
                       className="remove-item-btn" 

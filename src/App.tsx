@@ -8,7 +8,7 @@ import Login from './components/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginProtection from './components/LoginProtection';
 import AdminLayout from './components/AdminLayout';
-import OfflineIndicator from './components/OfflineIndicator';
+// import OfflineIndicator from './components/OfflineIndicator';
 import ToastContainer from './components/ToastContainer';
 import PersistentOfflineToast from './components/PersistentOfflineToast';
 import Unauthorized from './components/Unauthorized';

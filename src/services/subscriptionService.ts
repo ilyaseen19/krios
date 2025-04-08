@@ -65,6 +65,7 @@ export const updateSubscription = async (paymentId: string): Promise<Subscriptio
 // Validate subscription with the backend server
 export const validateOnlineSubscription = async (paymentId: string): Promise<boolean> => {
   try {
+
     const response = await fetch(`${API_BASE_URL}/customers/validate-subscription`, {
       method: 'POST',
       headers: {
@@ -80,6 +81,8 @@ export const validateOnlineSubscription = async (paymentId: string): Promise<boo
     }
 
     const data = await response.json();
+
+    console.log(data)
     
     if (data.success) {
       // Update local subscription data
@@ -127,6 +130,7 @@ export const validateOfflineSubscription = async (): Promise<boolean> => {
     // If no subscription data or paymentId is undefined, subscription is invalid
     if (!subscription || !subscription.paymentId || !subscription.paymentDate) {
       window.toast?.warning('No valid subscription found');
+      console.log('No valid subscription found');
       return false;
     }
     

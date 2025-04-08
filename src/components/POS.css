@@ -538,6 +538,12 @@
   margin: 0;
 }
 
+.cart-item-tax {
+  font-size: 0.7rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
 .cart-item-quantity {
   display: flex;
   align-items: center;

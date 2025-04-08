@@ -97,7 +97,21 @@ const Products: React.FC = () => {
   
   // Handle edit product
   const handleEditProduct = (product: Product) => {
-    setEditingProduct({...product});
+    // Create a complete ExtendedProduct object with all required fields
+    const extendedProduct: ExtendedProduct = {
+      ...product,
+      // Ensure all ExtendedProduct fields are properly set with defaults if not present
+      category: (product as any).category || 'Uncategorized',
+      minimumStock: (product as any).minimumStock || 0,
+      // Explicitly convert tax and cost to numbers to ensure they're not undefined
+      tax: typeof (product as any).tax === 'number' ? (product as any).tax : 0,
+      cost: typeof (product as any).cost === 'number' ? (product as any).cost : 0,
+      barcode: (product as any).barcode || '',
+      color: (product as any).color || '#7367f0',
+      description: product.description || ''
+    };
+    console.log('Editing product with cost:', extendedProduct.cost, 'and tax:', extendedProduct.tax);
+    setEditingProduct(extendedProduct);
     setShowEditModal(true);
   };
   
