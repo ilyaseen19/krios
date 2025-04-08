@@ -2,11 +2,11 @@ import express from 'express';
 import { 
   initializeCustomerDB, 
   getSyncStatus, 
-  syncProducts, 
-  syncTransactions, 
-  syncUsers,
-  syncCategories,
-  syncSettings,
+  // syncProducts, 
+  // syncTransactions, 
+  // syncUsers,
+  // syncCategories,
+  // syncSettings,
   syncAll,
   restoreCollection,
   restoreAll,
@@ -26,11 +26,11 @@ router.get('/status', getSyncStatus);
 router.get('/db-info', optionalAuthenticate, getCustomerDBInfo);
 
 // Routes with optional authentication
-router.post('/products', optionalAuthenticate, syncProducts);
-router.post('/transactions', optionalAuthenticate, syncTransactions);
-router.post('/users', optionalAuthenticate, syncUsers);
-router.post('/categories', optionalAuthenticate, syncCategories);
-router.post('/settings', optionalAuthenticate, syncSettings);
+// router.post('/products', optionalAuthenticate, syncProducts);
+// router.post('/transactions', optionalAuthenticate, syncTransactions);
+// router.post('/users', optionalAuthenticate, syncUsers);
+// router.post('/categories', optionalAuthenticate, syncCategories);
+// router.post('/settings', optionalAuthenticate, syncSettings);
 
 // Sync all data at once
 router.post('/all', syncAll);
