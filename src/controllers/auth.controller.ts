@@ -14,29 +14,25 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
  */
 export const register = async (req: Request, res: Response) => {
   try {
-    const { customerId, name, email, password, role } = req.body;
+    const { name, email, password, role } = req.body;
 
     // Validate required fields
-    if (!customerId || !name || !email || !password || !role) {
+    if (!name || !email || !password || !role) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Connect to customer database
-    const connection = await connectToCustomerDB(customerId);
-    const UserModel = connection.model<IUser>('User', User.schema);
-
     // Check if user already exists
-    const existingUser = await UserModel.findOne({ email });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
     // Get all users to determine the next ID
-    const users = await UserModel.find();
+    const users = await User.find();
     const id = users.length > 0 ? Math.max(...users.map(u => u.id || 0)) + 1 : 1;
 
     // Create new user
-    const newUser = new UserModel({
+    const newUser = new User({
       id,
       name,
       email,
@@ -48,16 +44,18 @@ export const register = async (req: Request, res: Response) => {
     // Save user to database
     await newUser.save();
 
+    let userID = newUser.id;
+
     // Create JWT token
     const token = jwt.sign(
-      { id: newUser.id, email: newUser.email, role: newUser.role, customerId },
+      { id: newUser.id, email: newUser.email, role: newUser.role, userID },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN } as SignOptions
     );
 
     // Return user data and token
     res.status(201).json({
-      message: 'User registered successfully',
+      message: 'User created successfully',
       user: {
         id: newUser.id,
         name: newUser.name,
