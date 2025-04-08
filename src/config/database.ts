@@ -24,7 +24,7 @@ export const connectToMongoDB = async (): Promise<typeof mongoose> => {
 };
 
 // Connect to a customer-specific database
-export const connectToCustomerDB = async (customerId: string, companyName?: string): Promise<mongoose.Connection> => {
+export const connectToCustomerDB = async (customerId: string, companyName: string): Promise<mongoose.Connection> => {
   if (!MONGODB_URI) {
     throw new Error('MONGODB_URI is not defined in environment variables');
   }
@@ -32,10 +32,8 @@ export const connectToCustomerDB = async (customerId: string, companyName?: stri
   // Create a shortened customer ID (first 8 characters) to keep database name within MongoDB's 38-byte limit
   const shortCustomerId = customerId.split('-')[0];
   
-  // Use company name as prefix if provided, otherwise use default prefix
-  const dbPrefix = companyName ? 
-    `${companyName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_` : 
-    MONGODB_PREFIX;
+  // Use company name as prefix if provided
+  const dbPrefix = `${companyName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_`
 
   // If company name is provided, check if a database for this company already exists
   if (companyName) {
@@ -86,9 +84,7 @@ export const getCustomerDatabases = async (companyName: string): Promise<string[
     const dbs = await adminDb.listDatabases();
     
     // Use company name as prefix if provided, otherwise use default prefix
-    const dbPrefix = companyName ? 
-      `${companyName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_` : 
-      MONGODB_PREFIX;
+    const dbPrefix = `${companyName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_`
     
     // Filter databases that start with our prefix
     const customerDbNames = dbs.databases
@@ -134,7 +130,6 @@ export const getCustomerDatabases = async (companyName: string): Promise<string[
 
 // Check if a customer database exists
 export const customerDbExists = async (customerId: string, companyName: string): Promise<boolean> => {
-  console.log(customerId, companyName);
   
   try {
     const customerIds = await getCustomerDatabases(companyName);
@@ -147,7 +142,5 @@ export const customerDbExists = async (customerId: string, companyName: string):
 
 // Get company-specific database name
 export const getCompanyDbPrefix = (companyName: string): string => {
-  return companyName ? 
-    `${companyName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_` : 
-    MONGODB_PREFIX;
+  return `${companyName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_`
 };
