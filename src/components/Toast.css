@@ -12,9 +12,14 @@
 .persistent-toast-container {
   position: fixed;
   bottom: 1rem;
-  right: 1rem;
+  left: 1rem;
   z-index: 9999;
   pointer-events: none;
+}
+
+.persistent-toast-container.bottom-right {
+  left: auto;
+  right: 1rem;
 }
 
 .toast {

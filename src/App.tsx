@@ -10,6 +10,7 @@ import LoginProtection from './components/LoginProtection';
 import AdminLayout from './components/AdminLayout';
 import OfflineIndicator from './components/OfflineIndicator';
 import ToastContainer from './components/ToastContainer';
+import PersistentOfflineToast from './components/PersistentOfflineToast';
 import Unauthorized from './components/Unauthorized';
 import SubscriptionValidator from './components/SubscriptionValidator';
 import './App.css';
@@ -31,8 +32,9 @@ const App: React.FC = () => {
           <SettingsProvider>
             <SubscriptionValidator>
               <ToastContainer />
+              <PersistentOfflineToast />
               <div style={{ padding: '0.5rem 1rem' }}>
-                <OfflineIndicator />
+                {/* <OfflineIndicator /> */}
                 <InstallPWA />
               </div>
               <Routes>

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import './Toast.css';
+import { useOffline } from '../contexts/OfflineContext';
 
-interface PersistentOfflineToastProps {
-  isOffline: boolean;
-}
 
-const PersistentOfflineToast: React.FC<PersistentOfflineToastProps> = ({ isOffline }) => {
+const PersistentOfflineToast: React.FC = () => {
   const [show, setShow] = useState(false);
+  const { 
+    isOffline
+  } = useOffline();
 
   useEffect(() => {
     if (isOffline) {
