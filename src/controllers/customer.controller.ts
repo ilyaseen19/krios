@@ -295,7 +295,7 @@ export const validateSubscription = async (req: Request, res: Response) => {
         customerId: customer.customerId,
         companyName: customer.companyName,
         paymentId: customer.paymentId,
-        subscriptionEndDate: customer.subscriptionEndDate
+        paymentDate: customer.subscriptionStartDate
       }
     });
   } catch (error) {
