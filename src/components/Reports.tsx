@@ -3,7 +3,6 @@ import Table from './Table';
 import { getFilteredInventory } from '../services/reportService';
 import { getTransactions } from '../services/transactionService.offline';
 import { usePriceFormatter } from '../utils/priceUtils';
-import { useSettings } from '../contexts/SettingsContext';
 
 import './Reports.css';
 
@@ -44,27 +43,41 @@ const Reports: React.FC = () => {
       totalProfit: 0,
       totalRefunds: 0,
       totalTaxes: 0,
+      totalProductTaxes: 0,
+      totalDiscounts: 0,
       netRevenue: 0
     };
 
     return filteredTransactions.reduce((acc, transaction) => {
-      const sales = transaction.total || 0;
-      const taxes = transaction.tax || 0;
+      // Skip canceled transactions for sales calculations but count them for refunds
+      const isCancelled = transaction.status === 'Cancelled';
+      
+      // Calculate values based on transaction status
+      const sales = isCancelled ? 0 : (transaction.total || 0);
+      const taxes = isCancelled ? 0 : (transaction.tax || 0);
+      const productTaxes = isCancelled ? 0 : (transaction.productTax || 0);
+      const discounts = isCancelled ? 0 : (transaction.discountAmount || 0);
       const profit = sales * 0.2; // Assuming 20% profit margin
-      const refunds = 0; // Refunds not implemented yet
+      
+      // Count canceled transactions as refunds
+      const refunds = isCancelled ? (transaction.total || 0) : 0;
 
       return {
         totalSales: acc.totalSales + sales,
         totalProfit: acc.totalProfit + profit,
         totalRefunds: acc.totalRefunds + refunds,
         totalTaxes: acc.totalTaxes + taxes,
-        netRevenue: acc.netRevenue + (sales - taxes - refunds)
+        totalProductTaxes: acc.totalProductTaxes + productTaxes,
+        totalDiscounts: acc.totalDiscounts + discounts,
+        netRevenue: acc.netRevenue + (sales - taxes - productTaxes - discounts)
       };
     }, {
       totalSales: 0,
       totalProfit: 0,
       totalRefunds: 0,
       totalTaxes: 0,
+      totalProductTaxes: 0,
+      totalDiscounts: 0,
       netRevenue: 0
     });
   };
@@ -233,6 +246,13 @@ const Reports: React.FC = () => {
                   </div>
                   
                   <div className="summary-item">
+                    <h3>Total Discounts</h3>
+                    <p className="summary-value">
+                      {formatPrice(calculateSummaryData().totalDiscounts)}
+                    </p>
+                  </div>
+                  
+                  <div className="summary-item">
                     <h3>Total Refunds</h3>
                     <p className="summary-value">
                       {formatPrice(calculateSummaryData().totalRefunds)}
@@ -240,9 +260,16 @@ const Reports: React.FC = () => {
                   </div>
                   
                   <div className="summary-item">
-                    <h3>Total Taxes</h3>
+                    <h3>General Taxes</h3>
                     <p className="summary-value">
                       {formatPrice(calculateSummaryData().totalTaxes)}
+                    </p>
+                  </div>
+                  
+                  <div className="summary-item">
+                    <h3>Product Taxes</h3>
+                    <p className="summary-value">
+                      {formatPrice(calculateSummaryData().totalProductTaxes)}
                     </p>
                   </div>
                   
@@ -373,7 +400,11 @@ const Reports: React.FC = () => {
             ) : (
               <Table
                 columns={[
-                  { header: 'ID', accessor: 'id' },
+                  { 
+                    header: 'Receipt #', 
+                    accessor: (row) => row.receiptNumber || `ID-${row.id.substring(0, 6)}`,
+                    cell: (row) => row.receiptNumber || `ID-${row.id.substring(0, 6)}`
+                  },
                   { 
                     header: 'Date', 
                     accessor: 'createdAt',
@@ -386,25 +417,50 @@ const Reports: React.FC = () => {
                   },
                   {
                     header: 'Status',
-                    accessor: (row) => row.refunded ? 'Refunded' : 'Complete',
+                    accessor: (row) => row.status || (row.refunded ? 'Refunded' : 'Completed'),
+                    cell: (row) => {
+                      const status = row.status || (row.refunded ? 'Refunded' : 'Completed');
+                      return (
+                        <span className={`status-${status.toLowerCase()}`}>
+                          {status}
+                        </span>
+                      );
+                    },
                     className: 'status-column'
                   },
                   { 
                     header: 'Quantity', 
                     accessor: (row) => row.items ? row.items.reduce((sum, item) => sum + item.quantity, 0) : 0,
-                    footer: totalQty.toLocaleString() 
+                    footer: totalQty.toLocaleString(),
+                    className: 'numeric-column'
                   },
                   { 
-                    header: 'Tax', 
+                    header: 'Discount', 
+                    accessor: 'discountAmount',
+                    cell: (row) => formatPrice(row.discountAmount || 0),
+                    footer: formatPrice(filteredTransactions.reduce((sum, t) => sum + (t.discountAmount || 0), 0)),
+                    className: 'numeric-column'
+                  },
+                  { 
+                    header: 'General Tax', 
                     accessor: 'tax',
                     cell: (row) => formatPrice(row.tax || 0),
-                    footer: formatPrice(filteredTransactions.reduce((sum, t) => sum + (t.tax || 0), 0))
+                    footer: formatPrice(filteredTransactions.reduce((sum, t) => sum + (t.tax || 0), 0)),
+                    className: 'numeric-column'
+                  },
+                  { 
+                    header: 'Product Tax', 
+                    accessor: 'productTax',
+                    cell: (row) => formatPrice(row.productTax || 0),
+                    footer: formatPrice(filteredTransactions.reduce((sum, t) => sum + (t.productTax || 0), 0)),
+                    className: 'numeric-column'
                   },
                   { 
                     header: 'Total', 
                     accessor: 'total',
                     cell: (row) => formatPrice(row.total || 0),
-                    footer: formatPrice(totalTotal)
+                    footer: formatPrice(totalTotal),
+                    className: 'numeric-column'
                   }
                 ]}
                 data={filteredTransactions}

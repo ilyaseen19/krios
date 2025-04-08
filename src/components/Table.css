@@ -47,6 +47,19 @@
   font-style: italic;
 }
 
+/* Footer styling for totals row */
+.data-table tfoot td {
+  font-weight: bold;
+  background-color: #f0f0ff;
+  border-top: 2px solid #7367f0;
+  color: #7367f0;
+}
+
+/* Right-align numeric columns */
+.numeric-column {
+  text-align: right;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .table-container {
