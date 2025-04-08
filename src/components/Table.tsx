@@ -6,6 +6,7 @@ export interface TableColumn<T> {
   accessor: keyof T | ((data: T) => React.ReactNode);
   cell?: (data: T) => React.ReactNode;
   className?: string;
+  footer?: React.ReactNode;
 }
 
 export interface TableProps<T> {
@@ -70,13 +71,17 @@ const Table = <T extends object>({
             </tr>
           )}
         </tbody>
-<tfoot className="table-footer">
-<tr>
-{columns.map((col, index) => (
-<td key={index} className="footer-cell">{col.footer || ''}</td>
-))}
-</tr>
-</tfoot>
+        {data.length > 0 && (
+          <tfoot>
+            <tr>
+              {columns.map((column, index) => (
+                <td key={index} className={`${column.className || ''} ${typeof column.footer !== 'undefined' ? 'numeric-column' : ''}`}>
+                  {column.footer || ''}
+                </td>
+              ))}
+            </tr>
+          </tfoot>
+        )}
       </table>
     </div>
   );

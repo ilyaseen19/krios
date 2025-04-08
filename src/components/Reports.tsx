@@ -362,7 +362,6 @@ const Reports: React.FC = () => {
             {reportType === 'inventory' ? (
               <Table
                 columns={[
-                  { header: 'SKU', accessor: 'sku' },
                   { header: 'Product', accessor: 'name' },
                   { header: 'Category', accessor: 'category' },
                   { 
@@ -375,22 +374,37 @@ const Reports: React.FC = () => {
                     ),
                     className: 'status-column'
                   },
-                  { header: 'Current Stock', accessor: 'currentStock' },
-                  { header: 'Min Stock', accessor: 'minimumStock' },
+                  { 
+                    header: 'Current Stock', 
+                    accessor: 'currentStock',
+                    className: 'numeric-column',
+                    footer: filteredTransactions.reduce((sum, item) => sum + item.currentStock, 0).toLocaleString()
+                  },
+                  { 
+                    header: 'Min Stock', 
+                    accessor: 'minimumStock',
+                    className: 'numeric-column'
+                  },
                   { 
                     header: 'Stock Value', 
                     accessor: 'stockValue',
-                    cell: (row) => formatPrice(row.stockValue) 
+                    cell: (row) => formatPrice(row.stockValue),
+                    className: 'numeric-column',
+                    footer: formatPrice(filteredTransactions.reduce((sum, item) => sum + (item.stockValue || 0), 0))
                   },
                   { 
                     header: 'Cost Value', 
                     accessor: 'costValue',
-                    cell: (row) => formatPrice(row.costValue) 
+                    cell: (row) => formatPrice(row.costValue),
+                    className: 'numeric-column',
+                    footer: formatPrice(filteredTransactions.reduce((sum, item) => sum + (item.costValue || 0), 0))
                   },
                   { 
                     header: 'Potential Profit', 
                     accessor: 'potentialProfit',
-                    cell: (row) => formatPrice(row.potentialProfit) 
+                    cell: (row) => formatPrice(row.potentialProfit),
+                    className: 'numeric-column',
+                    footer: formatPrice(filteredTransactions.reduce((sum, item) => sum + (item.potentialProfit || 0), 0))
                   }
                 ]}
                 data={filteredTransactions}
