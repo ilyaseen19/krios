@@ -48,7 +48,7 @@ export const register = async (req: Request, res: Response) => {
 
     // Create JWT token
     const token = jwt.sign(
-      { id: newUser.id, email: newUser.email, role: newUser.role, userID },
+      { id: newUser.id, email: newUser.email, role: newUser.role },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN } as SignOptions
     );
@@ -77,16 +77,13 @@ export const register = async (req: Request, res: Response) => {
  */
 export const login = async (req: Request, res: Response) => {
   try {
-    const { customerId, email, password } = req.body;
+    const { email, password } = req.body;
 
     // Validate required fields
-    if (!customerId || !email || !password) {
+    if ( !email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
-
-    // Connect to customer database
-    const connection = await connectToCustomerDB(customerId);
-    const UserModel = connection.model<IUser>('User', User.schema);
+    const UserModel = User;
 
     // Find user by email
     const user = await UserModel.findOne({ email });
@@ -96,7 +93,7 @@ export const login = async (req: Request, res: Response) => {
 
     // Check if user is active
     if (user.status !== 'active') {
-      return res.status(401).json({ message: 'User account is inactive' });
+      return res.status(401).json({ message: 'Yor account is blocked, contact admin for help' });
     }
 
     // Check password
@@ -107,7 +104,7 @@ export const login = async (req: Request, res: Response) => {
 
     // Create JWT token
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role, customerId },
+      { id: user.id, email: user.email, role: user.role,  },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN } as SignOptions
     );
@@ -144,11 +141,8 @@ export const getCurrentUser = async (req: Request, res: Response) => {
       });
     }
     
-    const { customerId, id } = req.body.user;
-
-    // Connect to customer database
-    const connection = await connectToCustomerDB(customerId);
-    const UserModel = connection.model<IUser>('User', User.schema);
+    const { id } = req.body.user;
+    const UserModel = User
 
     // Find user by ID
     const user = await UserModel.findOne({ id });

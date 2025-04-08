@@ -28,7 +28,7 @@ export const loginAdmin = async (req: Request, res: Response) => {
 
     // Check if admin is active
     if (admin.status !== 'active') {
-      return res.status(403).json({ message: 'Your account is inactive. Please contact support.' });
+      return res.status(403).json({ message: 'Your account is blocked. Please contact support.' });
     }
 
     // Check password
@@ -86,7 +86,7 @@ export const createAdmin = async (req: Request, res: Response) => {
       username,
       email,
       password,
-      role: role || 'admin', // Default to 'admin' if not specified
+      role: role || 'viewer', // Default to 'viewer' if not specified
       status: 'active'
     });
 
