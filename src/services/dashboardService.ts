@@ -252,3 +252,20 @@ export const getSalesByPaymentType = async (): Promise<any[]> => {
     return [];
   }
 };
+
+// Get total taxes from transactions (both product-specific and general taxes)
+export const getTotalTaxes = async (): Promise<number> => {
+  try {
+    const transactions = await getAllItems<Transaction>(STORES.SALES);
+    // Filter out cancelled/refunded transactions before calculating total taxes
+    return transactions
+      .filter(transaction => transaction.status !== 'Cancelled')
+      .reduce((sum, transaction) => {
+        // Add both general tax and product-specific tax
+        return sum + transaction.tax + (transaction.productTax || 0);
+      }, 0);
+  } catch (error) {
+    console.error('Error getting total taxes:', error);
+    return 0;
+  }
+};

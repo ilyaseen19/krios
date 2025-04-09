@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import './Dashboard.css';
 import { getTotalRevenue, getTotalOrders, getTotalCategories, getTotalProducts, 
          getSalesData, getTopSellingProducts, getProductCategoryDistribution, 
-         getRecentSalesData, getSalesByPaymentType } from '../services/dashboardService';
+         getRecentSalesData, getSalesByPaymentType, getTotalTaxes } from '../services/dashboardService';
 import { usePriceFormatter } from '../utils/priceUtils';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -30,6 +30,7 @@ const Dashboard: React.FC = () => {
   
   // State for dashboard data
   const [stats, setStats] = useState<DashboardStat[]>([]);
+  const [totalTaxes, setTotalTaxes] = useState<number>(0);
   const [salesData, setSalesData] = useState<any[]>([]);
   const [topProducts, setTopProducts] = useState<any[]>([]);
   const [categoryData, setCategoryData] = useState<any[]>([]);
@@ -50,14 +51,23 @@ const Dashboard: React.FC = () => {
         const orders = await getTotalOrders();
         const categories = await getTotalCategories();
         const products = await getTotalProducts();
+        const taxes = await getTotalTaxes();
+        
+        setTotalTaxes(taxes);
         
         // Create stats array
         const dashboardStats: DashboardStat[] = [
           {
             title: 'Total Revenue',
             value: memoizedFormatPrice(revenue),
-            change: '+8% from last month',
+            change: 'Excluding taxes',
             icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+          },
+          {
+            title: 'Total Taxes',
+            value: memoizedFormatPrice(taxes),
+            change: 'Product & transaction taxes',
+            icon: 'M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z'
           },
           {
             title: 'Total Orders',
@@ -170,7 +180,7 @@ const Dashboard: React.FC = () => {
             return (
               <div className="stat-card" key={index}>
                 <div className="stat-icon" style={{ backgroundColor: bgColor }}>
-                  <svg className="w-8 h-8" fill="none" stroke={textColor} viewBox="0 0 24 24">
+                  <svg className="w-6 h-6" fill="none" stroke={textColor} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={stat.icon} />
                   </svg>
                 </div>
