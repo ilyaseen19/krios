@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useSettings } from '../contexts/SettingsContext';
 import { getProducts } from '../services/productService.offline';
 import { useAppUpdate } from '../hooks/useAppUpdate';
+import SubscriptionWarning from './SubscriptionWarning';
 import './Topbar.css';
 
 interface TopbarProps {
@@ -75,7 +76,9 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
   }, []);
 
   return (
-    <div className="topbar">
+    <>
+      <SubscriptionWarning variant="topbar" />
+      <div className="topbar">
       <div className="topbar-left">
         <button className="mobile-menu-btn" onClick={onMobileMenuToggle}>
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,6 +184,7 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

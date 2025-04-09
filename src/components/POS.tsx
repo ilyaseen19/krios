@@ -9,6 +9,7 @@ import { useCashDrawer, simulateOpenCashDrawer } from '../services/cashDrawerSer
 import { PasswordModal, DiscountModal, ReceiptModal } from './modals';
 import { usePriceFormatter } from '../utils/priceUtils';
 import { useSettings } from '../contexts/SettingsContext';
+import SubscriptionWarning from './SubscriptionWarning';
 import './POS.css';
 
 const getInitials = (name: string) => {
@@ -411,6 +412,7 @@ const POS: React.FC = () => {
 
   return (
     <div className="pos-page">
+      <SubscriptionWarning variant="pos" />
       {/* POS Header */}
       <div className="pos-header">
         <div className="pos-header-left">
