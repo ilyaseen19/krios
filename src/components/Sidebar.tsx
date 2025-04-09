@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Sidebar.css';
+import prynovaLogo from '../assets/prynova-logo.svg';
 
 interface SidebarProps {
   onToggleCollapse?: (collapsed: boolean) => void;
@@ -124,6 +125,37 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleCollapse, isMobileOpen = fals
           </li>
         </ul>
       </nav>
+      
+      {/* Parent Company Information */}
+      <div className="sidebar-company-info">
+        {!isCollapsed ? (
+          <>
+            <div className="company-logo-container">
+              <img src={prynovaLogo} alt="Prynova Technologies" className="company-logo" />
+            </div>
+            <div className="company-details">
+              <p className="company-name">Krios POS is a property of Prynova Technologies</p>
+              <p className="company-contact">
+                <a href="https://prynova.netlify.app/" target="_blank" rel="noopener noreferrer">
+                  company website
+                </a>
+              </p>
+              <p className="company-contact">
+                <a href="mailto:prynovatechnologies@gmail.com">
+                  prynovatechnologies@gmail.com
+                </a>
+              </p>
+              <p className="company-contact">
+                <a href="tel:+260765453163">+260 765 453 163</a>
+              </p>
+            </div>
+          </>
+        ) : (
+          <div className="company-logo-container collapsed">
+            <img src={prynovaLogo} alt="Prynova Technologies" className="company-logo" />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

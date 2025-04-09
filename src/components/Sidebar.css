@@ -164,6 +164,62 @@
   z-index: 35;
 }
 
+/* Company information section */
+.sidebar-company-info {
+  padding: 1rem;
+  border-top: 1px solid #e5e7eb;
+  margin-top: auto;
+  background-color: #f9fafb;
+}
+
+.company-logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.company-logo-container.collapsed {
+  margin-bottom: 0;
+}
+
+.company-logo {
+  max-width: 100%;
+  height: auto;
+  max-height: 40px;
+}
+
+.company-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.company-name {
+  font-size: 13px !important;
+  font-weight: 600;
+  color: #4b5563;
+  margin: 0;
+  text-align: center;
+}
+
+.company-contact {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+  text-align: center;
+}
+
+.company-contact a {
+  color: #0077cc;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.company-contact a:hover {
+  color: #005fa3;
+  text-decoration: underline;
+}
+
 /* Media queries for responsive design */
 @media (max-width: 1024px) {
   .sidebar {
