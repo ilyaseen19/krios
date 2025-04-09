@@ -559,7 +559,7 @@ const Products: React.FC = () => {
       {viewMode === 'grid' ? (
         <div className="products-grid">
           {currentProducts.map(product => {
-            const stockStatus = getStockStatus(product.stock);
+            const stockStatus = getStockStatus(product.stock, product.minimumStock || 0);
             return (
               <div key={product.id} className="product-card">
                 <div className="product-img">
@@ -627,7 +627,7 @@ const Products: React.FC = () => {
             {
               header: 'Stock',
               accessor: (product) => {
-                const stockStatus = getStockStatus(product.stock);
+                const stockStatus = getStockStatus(product.stock, product.minimumStock || 0);
                 return (
                   <span className={`product-stock ${stockStatus.class}`}>{stockStatus.text}</span>
                 );
@@ -753,8 +753,8 @@ const Products: React.FC = () => {
               <p className="product-detail-stock">Stock: {selectedProduct.stock}</p>
               <p className="product-detail-color">Color: <span style={{ display: 'inline-block', width: '20px', height: '20px', backgroundColor: selectedProduct.color, borderRadius: '4px', verticalAlign: 'middle', marginLeft: '5px', border: '1px solid #ddd' }}></span></p>
               <div className="product-detail-status">
-                <span className={`product-stock ${getStockStatus(selectedProduct.stock).class}`}>
-                  {getStockStatus(selectedProduct.stock).text}
+                <span className={`product-stock ${getStockStatus(selectedProduct.stock, selectedProduct.minimumStock || 0).class}`}>
+                  {getStockStatus(selectedProduct.stock, selectedProduct.minimumStock || 0).text}
                 </span>
               </div>
             </div>

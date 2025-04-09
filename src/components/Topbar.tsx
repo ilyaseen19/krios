@@ -30,7 +30,7 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
     try {
       const products = await getProducts();
       const lowStockProducts = products.filter(product => {
-        const minimumStock = (product as any).minimumStock || 10;
+        const minimumStock = (product as any).minimumStock || 0;
         return product.stock < minimumStock && product.stock > 0;
       });
       

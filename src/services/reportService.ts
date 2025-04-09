@@ -35,14 +35,15 @@ export const getFilteredInventory = async (startDate: Date, endDate: Date): Prom
       const costValue = costPrice * product.stock;
       const potentialProfit = stockValue - costValue;
       
-      // Determine stock status (assuming low stock threshold is 10)
-      const status = product.stock < 10 ? 'Low Stock' : 'In Stock';
+      // Determine stock status based on product's actual minimumStock
+      const minimumStock = product.minimumStock || 0;
+      const status = product.stock < minimumStock ? 'Low Stock' : 'In Stock';
       
       return {
         ...product,
         sku: product.id.substring(0, 8), // Use part of ID as SKU
         currentStock: product.stock,
-        minimumStock: 10, // Default minimum stock level
+        minimumStock: product.minimumStock || 0, // Use actual minimumStock from product
         stockValue,
         costValue,
         potentialProfit,
