@@ -411,8 +411,8 @@ const POS: React.FC = () => {
   };
 
   return (
+
     <div className="pos-page">
-      <SubscriptionWarning variant="pos" />
       {/* POS Header */}
       <div className="pos-header">
         <div className="pos-header-left">
@@ -427,8 +427,9 @@ const POS: React.FC = () => {
             Dashboard
           </button>
         </div>
-        
+      
         <div className="pos-header-center">
+          <SubscriptionWarning variant="pos" />
           <div className="topbar-actions">
             
             <button 

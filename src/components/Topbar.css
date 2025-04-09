@@ -108,7 +108,7 @@
   
   /* Show mobile menu button only on small screens */
   .mobile-menu-btn {
-    display: block;
+    display: block; /* Only visible on mobile screens */
   }
   
   .topbar-left {

@@ -77,7 +77,6 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
 
   return (
     <>
-      <SubscriptionWarning variant="topbar" />
       <div className="topbar">
       <div className="topbar-left">
         <button className="mobile-menu-btn" onClick={onMobileMenuToggle}>
@@ -90,6 +89,8 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
           <span className="logo-text">{generalSettings.storeName}</span>
         </div>
       </div>
+
+      <div><SubscriptionWarning variant="topbar" /></div>
 
       <div className="topbar-right">
         {updateAvailable && (
@@ -104,6 +105,7 @@ const Topbar: React.FC<TopbarProps> = ({ onMobileMenuToggle }) => {
             </svg>
           </button>
         )}
+        
         <button
           className="notification-btn pos-button"
           onClick={() => navigate('/pos')}

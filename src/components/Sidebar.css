@@ -46,9 +46,10 @@
 }
 
 .sidebar.collapsed .sidebar-small-logo {
-  display: block;
+  display: block !important; /* Force display in collapsed mode */
   width: 30px;
   height: 30px;
+  visibility: visible !important; /* Ensure visibility */
 }
 
 .logo-text {
