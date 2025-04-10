@@ -748,10 +748,14 @@ const Products: React.FC = () => {
             
             <div className="product-detail-info">
               <h4 className="product-detail-name">{selectedProduct.name}</h4>
-              <p className="product-detail-category">Category: {selectedProduct.category}</p>
-              <p className="product-detail-price">Price: {formatPrice(selectedProduct.price)}</p>
-              <p className="product-detail-stock">Stock: {selectedProduct.stock}</p>
-              <p className="product-detail-color">Color: <span style={{ display: 'inline-block', width: '20px', height: '20px', backgroundColor: selectedProduct.color, borderRadius: '4px', verticalAlign: 'middle', marginLeft: '5px', border: '1px solid #ddd' }}></span></p>
+              <p className="product-detail-category"><span className="detail-label">Category:</span> {selectedProduct.category}</p>
+              <p className="product-detail-price"><span className="detail-label">Price:</span> {formatPrice(selectedProduct.price)}</p>
+              <p className="product-detail-cost"><span className="detail-label">Cost:</span> {formatPrice(selectedProduct.cost)}</p>
+              <p className="product-detail-tax"><span className="detail-label">Tax:</span> {selectedProduct.tax}%</p>
+              <p className="product-detail-stock"><span className="detail-label">Stock:</span> {selectedProduct.stock}</p>
+              <p className="product-detail-min-stock"><span className="detail-label">Minimum Stock:</span> {selectedProduct.minimumStock || 0}</p>
+              <p className="product-detail-barcode"><span className="detail-label">Barcode:</span> {selectedProduct.barcode || 'N/A'}</p>
+              <p className="product-detail-color"><span className="detail-label">Color:</span> <span style={{ display: 'inline-block', width: '20px', height: '20px', backgroundColor: selectedProduct.color, borderRadius: '4px', verticalAlign: 'middle', marginLeft: '5px', border: '1px solid #ddd' }}></span></p>
               <div className="product-detail-status">
                 <span className={`product-stock ${getStockStatus(selectedProduct.stock, selectedProduct.minimumStock || 0).class}`}>
                   {getStockStatus(selectedProduct.stock, selectedProduct.minimumStock || 0).text}

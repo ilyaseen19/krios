@@ -745,6 +745,10 @@
 
 .product-detail-info {
   flex: 1;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .product-detail-name {
@@ -756,14 +760,73 @@
 
 .product-detail-category,
 .product-detail-price,
-.product-detail-stock {
+.product-detail-stock,
+.product-detail-cost,
+.product-detail-tax,
+.product-detail-min-stock,
+.product-detail-barcode,
+.product-detail-color {
   font-size: 16px;
   color: #555;
-  margin: 8px 0;
+  margin: 10px 0;
+  padding: 8px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 .product-detail-status {
   margin-top: 16px;
+}
+
+/* Specific colors for product details */
+.product-detail-name {
+  color: #333;
+}
+
+.product-detail-category {
+  color: #7367f0;
+  font-weight: 500;
+}
+
+.product-detail-price {
+  color: #28c76f;
+  font-weight: 600;
+}
+
+.product-detail-cost {
+  color: #ea5455;
+  font-weight: 500;
+}
+
+.product-detail-tax {
+  color: #ff9f43;
+  font-weight: 500;
+}
+
+.product-detail-stock {
+  color: #00cfe8;
+  font-weight: 500;
+}
+
+.product-detail-min-stock {
+  color: #5e50ee;
+  font-weight: 500;
+}
+
+.product-detail-barcode {
+  color: #666;
+  font-weight: 500;
+}
+
+.product-detail-color {
+  color: #666;
+  font-weight: 500;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #333;
+  display: inline-block;
+  min-width: 120px;
 }
 
 /* Category Management Styles */
