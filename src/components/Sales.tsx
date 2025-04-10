@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Transaction, CartItem } from '../types/product';
 import { getTransactions } from '../services/transactionService.offline';
 import './Sales.css';
 import { Modal } from './modals';
 import Table from './Table';
 import { usePriceFormatter } from '../utils/priceUtils';
 import { useSettings } from '../contexts/SettingsContext';
-import { formatDate } from '../utils/formatUtils';
 import DeleteConfirmationModal from './modals/DeleteConfirmationModal';
 import { updateProduct, getProduct } from '../services/productService.offline';
 import { STORES, deleteItem, updateItem } from '../services/dbService';
-import Toast from './Toast';
 
 type SaleStatus = 'Completed' | 'Pending' | 'Cancelled';
 const saleStatuses: SaleStatus[] = ['Completed', 'Pending', 'Cancelled'];
@@ -124,7 +121,8 @@ const Sales: React.FC = () => {
   // Filter sales based on search term, status, and date range
   const filteredSales = sales.filter(sale => {
     const matchesSearch = sale.customer.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         `#${sale.id}`.includes(searchTerm);
+                         `#${sale.id}`.includes(searchTerm) ||
+                         (sale.receiptNumber && sale.receiptNumber.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus = selectedStatus ? sale.status === selectedStatus : true;
     
     // Date filtering
@@ -322,7 +320,7 @@ const Sales: React.FC = () => {
           <input
             className="search-input"
             type="text"
-            placeholder="Search orders..."
+            placeholder="Search by customer, receipt number or ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
