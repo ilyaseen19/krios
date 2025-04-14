@@ -29,7 +29,7 @@
     font-family: 'Courier New', monospace !important; /* Better compatibility with POS printers */
     font-size: 10pt !important; /* Standardized font size */
     line-height: 1.2 !important;
-    page-break-after: always !important;
+    /* Removed page-break-after to prevent duplicate printing */
     print-color-adjust: exact !important;
     -webkit-print-color-adjust: exact !important;
   }
